@@ -1,0 +1,25 @@
+package org.firstinspires.ftc.teamcode.utilities;
+
+public class PressAndReleaseButton {
+    private boolean lastPressed;
+    private boolean isTrue;
+
+    public PressAndReleaseButton() {
+        lastPressed = false;
+    }
+
+    public void periodic(boolean buttonInput) {
+        if (buttonInput && !lastPressed) {
+            isTrue = true;
+            lastPressed = true;
+        } else if (buttonInput) {
+            lastPressed = true;
+        } else {
+            lastPressed = false;
+        }
+    }
+
+    public boolean getIsTrue() {
+        return isTrue;
+    }
+}
