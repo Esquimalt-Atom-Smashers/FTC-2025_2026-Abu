@@ -16,11 +16,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 
 public class DriveSubsystem extends SubsystemBase{
-    private DcMotor frontLeftMotor;
-    private DcMotor frontRightMotor;
-    private DcMotor rearLeftMotor;
-    private DcMotor rearRightMotor;
-
     private OpMode opMode;
 
     private boolean isFieldCentric;
