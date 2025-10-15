@@ -81,6 +81,10 @@ public class FlywheelSubsystem extends SubsystemBase {
         targetVelocity = rpmToTps(rpm);
     }
 
+    public void updateFlywheelPID() {
+        flyWheelController.setPID(PARAMS.P, PARAMS.I, PARAMS.D);
+    }
+
     public void setFlywheelMotorPower(double power) {
         if (flywheelMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             flywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
