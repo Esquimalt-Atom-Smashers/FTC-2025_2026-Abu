@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
-
+@TeleOp
 public class LimelightTester extends LinearOpMode {
     private LimelightSybsystem limelightSybsystem;
     @Override

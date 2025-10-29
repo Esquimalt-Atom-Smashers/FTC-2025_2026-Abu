@@ -13,11 +13,11 @@ public class IntakeFeedSubsystem extends SubsystemBase {
 
     private CRServo feedServo;
     private final String FEED_SERVO_NAME = "feedServo";
-    private final DcMotorSimple.Direction FEED_SERVO_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    private final DcMotorSimple.Direction FEED_SERVO_DIRECTION = DcMotorSimple.Direction.FORWARD;
 
     private CRServo rearFeedServo;
     private final String REAR_FEED_SERVO_NAME = "rearFeedServo";
-    private final DcMotorSimple.Direction REAR_FEED_SERVO_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    private final DcMotorSimple.Direction REAR_FEED_SERVO_DIRECTION = DcMotorSimple.Direction.FORWARD;
 
     public enum ServoStates {
         SPINNING(1.0),

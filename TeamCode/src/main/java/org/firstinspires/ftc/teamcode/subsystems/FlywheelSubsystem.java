@@ -18,13 +18,13 @@ import com.qualcomm.robotcore.util.Range;
 public class FlywheelSubsystem extends SubsystemBase {
     public static class Params {
         public double TOLERANCE = 28;
-        public double kS = -1;
-        public double kV = -1;
-        public double kA = -1;
+        public double kS = 0.005;
+        public double kV = 0.0008;
+        public double kA = 0.00005;
 
-        public double P = -1;
-        public double I = -1;
-        public double D = -1;
+        public double P = 0;
+        public double I = 0;
+        public double D = 0;
     }
     public static Params PARAMS = new Params();
     private OpMode opMode;
