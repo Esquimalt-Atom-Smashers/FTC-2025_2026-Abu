@@ -9,6 +9,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class LimelightSybsystem extends SubsystemBase {
     private Limelight3A limelight3A;
@@ -26,7 +27,7 @@ public class LimelightSybsystem extends SubsystemBase {
     private OpMode opMode;
 
     private Pose3D botPose;
-    private double ty;
+    private double ty = 0.0;
 
     public LimelightSybsystem(OpMode opMode, boolean isRedAlliance) {
         limelight3A = opMode.hardwareMap.get(Limelight3A.class, LIMELIGHT_NAME);
@@ -42,10 +43,14 @@ public class LimelightSybsystem extends SubsystemBase {
     }
 
     public double getDistanceFromGoal() {
-        Pose2d targetGoalPose = isRedAlliance? RED_GOAL_POSE : BLUE_GOAL_POSE;
-        double xDistance = (botPose.getPosition().x * METER_TO_INCH) - (targetGoalPose.position.x);
-        double yDistance = (botPose.getPosition().y * METER_TO_INCH) - (targetGoalPose.position.y);
-        return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+        if (botPose != null) {
+            Pose2d targetGoalPose = isRedAlliance? RED_GOAL_POSE : BLUE_GOAL_POSE;
+            double xDistance = (botPose.getPosition().x * METER_TO_INCH) - (targetGoalPose.position.x);
+            double yDistance = (botPose.getPosition().y * METER_TO_INCH) - (targetGoalPose.position.y);
+            return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+        } else {
+            return 0.0;
+        }
     }
 
     public double getTy() {

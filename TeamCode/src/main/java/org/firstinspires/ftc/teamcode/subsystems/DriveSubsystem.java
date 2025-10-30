@@ -23,7 +23,7 @@ public class DriveSubsystem extends SubsystemBase{
 
     private MecanumDrive mecanumDrive;
     private Pose2d currentPose;
-
+    private double driveHeadingError = 0.0;
     private final double POSITIONAL_TOLERANCE = 1.0;
     private final double ANGULAR_TOLERANCE = Math.toRadians(1);
 
@@ -42,19 +42,25 @@ public class DriveSubsystem extends SubsystemBase{
 
             mecanumDrive.setDrivePowers(
                     new PoseVelocity2d(
-                            new Vector2d(rotX * speedMultiplier, rotY * speedMultiplier), turn * speedMultiplier
+                            new Vector2d(rotY * speedMultiplier, rotX * speedMultiplier), turn * speedMultiplier
                     ));
         } else {
             mecanumDrive.setDrivePowers(
                     new PoseVelocity2d(
-                            new Vector2d(strafe * speedMultiplier, drive * speedMultiplier), turn * speedMultiplier
+                            new Vector2d(drive * speedMultiplier, strafe * speedMultiplier), turn * speedMultiplier
                     ));
         }
     }
 
     private double getHeading() {
         //get radian
-        return mecanumDrive.localizer.getPose().heading.toDouble();
+        double headingRadian = mecanumDrive.localizer.getPose().heading.toDouble() + driveHeadingError;
+        if (Math.toDegrees(headingRadian) >= 180) {
+            headingRadian -= Math.toRadians(360);
+        } else if (Math.toDegrees(headingRadian) < -180) {
+            headingRadian += Math.toRadians(360);
+        }
+        return headingRadian;
     }
 
     public void switchFieldCentric() {
@@ -63,6 +69,10 @@ public class DriveSubsystem extends SubsystemBase{
 
     public void changeSpeedMultiplier(double speedMultiplier) {
         this.speedMultiplier = Range.clip(speedMultiplier, 0, 1);
+    }
+
+    public void setDriveHeadingError() {
+        driveHeadingError = mecanumDrive.localizer.getPose().heading.toDouble();
     }
 
     public Pose2d getCurrentPos() {
