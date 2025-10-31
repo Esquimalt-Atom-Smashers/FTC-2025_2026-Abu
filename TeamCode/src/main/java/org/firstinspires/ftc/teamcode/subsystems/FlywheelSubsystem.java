@@ -19,11 +19,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     public static class Params {
         public double TOLERANCE = 28;
         public double kS = 0;
-        public double kV = 0.000514;
+        public double kV = 0.000475;
         public double kA = 0;
 
-        public double P = 0.01;
-        public double I = 0;
+        public double P = 0.005;
+        public double I = 0.001;
         public double D = 0;
     }
     public static Params PARAMS = new Params();
