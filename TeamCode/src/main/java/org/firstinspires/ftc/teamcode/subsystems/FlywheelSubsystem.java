@@ -18,11 +18,11 @@ import com.qualcomm.robotcore.util.Range;
 public class FlywheelSubsystem extends SubsystemBase {
     public static class Params {
         public double TOLERANCE = 28;
-        public double kS = 0.005;
-        public double kV = 0.0008;
-        public double kA = 0.00005;
+        public double kS = 0;
+        public double kV = 0.000514;
+        public double kA = 0;
 
-        public double P = 0;
+        public double P = 0.01;
         public double I = 0;
         public double D = 0;
     }
@@ -101,7 +101,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public double flywheelFeedForward(double targetVelocity) {
-        double feedForward = PARAMS.kS * Math.signum(targetVelocity) + PARAMS.kV * targetVelocity + PARAMS.kA * (targetVelocity - getFlywheelRPM());
+        double feedForward = PARAMS.kS * Math.signum(targetVelocity) + PARAMS.kV * targetVelocity + PARAMS.kA * (getFlywheelRPM() - targetVelocity);
 
         return feedForward;
     }

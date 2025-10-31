@@ -15,9 +15,9 @@ public class FlywheelTuner extends OpMode {
     private FlywheelSubsystem flywheelSubsystem;
     private IntakeFeedSubsystem intakeFeedSubsystem;
     private enum MotionProfilingStates{
-        ACCLEARATING(3400),
-        CONSTANT(2000),
-        DECELLERATING(2000);
+        ACCLEARATING(4000),
+        CONSTANT(3000),
+        DECELLERATING(3000);
         private double targetRPM;
         private MotionProfilingStates(double targetRPM) {
             this.targetRPM = targetRPM;
@@ -46,21 +46,22 @@ public class FlywheelTuner extends OpMode {
         if (gamepad1.a) {
             intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.SPINNING);
         } else {
-            intakeFeedSubsystem.stopArtifact();
+            intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.STOPPED);
         }
 
-        double targetRPM = motionProfiling();
+        double targetRPM = -motionProfiling();
         flywheelSubsystem.setFlywheelTargetVelocity(targetRPM);
         flywheelSubsystem.updateFlywheelPID();
         flywheelSubsystem.runFlywheelControl();
         telemetry.addData("targetRPM", targetRPM);
         telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
+        telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * 10000));
         telemetry.update();
     }
 
     private double motionProfiling() {
         double targetRPM;
-        if (timer.seconds() >= 5 && state == MotionProfilingStates.ACCLEARATING) {
+        if (timer.seconds() >= 2 && state == MotionProfilingStates.ACCLEARATING) {
             pastState = state;
             state = MotionProfilingStates.CONSTANT;
             timer.reset();
