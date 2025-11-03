@@ -64,6 +64,8 @@ public class LimelightSybsystem extends SubsystemBase {
             botPose = result.getBotpose();
             opMode.telemetry.addLine("Limelight got data");
         } else {
+            ty = 0.0;
+            botPose = null;
             opMode.telemetry.addLine("Limelight no data");
         }
 

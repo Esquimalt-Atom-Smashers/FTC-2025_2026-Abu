@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
 import org.firstinspires.ftc.teamcode.utilities.PressAndReleaseButton;
 import org.firstinspires.ftc.teamcode.utilities.RobotUtility;
 
@@ -19,6 +20,7 @@ public class DriveTest extends LinearOpMode {
     IntakeFeedSubsystem intakeFeedSubsystem;
     PressAndReleaseButton buttonA;
     FlywheelSubsystem flywheelSubsystem;
+    LimelightSybsystem limelightSybsystem;
     double targetRpm = 4000;
 
     @Override
@@ -26,6 +28,8 @@ public class DriveTest extends LinearOpMode {
         driveSubsystem = new DriveSubsystem(this, new Pose2d(0,0,0));
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
+        limelightSybsystem = new LimelightSybsystem(this, true);
+
         buttonA = new PressAndReleaseButton();
 
         waitForStart();
@@ -44,7 +48,7 @@ public class DriveTest extends LinearOpMode {
             }
 
             if (gamepad1.left_trigger >= 0.3) {
-                driveSubsystem.changeSpeedMultiplier(1.0 - (double) gamepad1.left_trigger);
+                driveSubsystem.changeSpeedMultiplier(1.1 - (double) gamepad1.left_trigger);
             } else {
                 driveSubsystem.changeSpeedMultiplier(1.0);
             }
@@ -71,7 +75,7 @@ public class DriveTest extends LinearOpMode {
 
             while (gamepad1.x) {
                 driveSubsystem.getMecanumDrive().actionBuilder(driveSubsystem.getCurrentPos())
-                        .strafeToSplineHeading(new Vector2d(0, 0), 0)
+                        .turnTo(Math.toRadians(limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())))
                         .build();
             }
 
