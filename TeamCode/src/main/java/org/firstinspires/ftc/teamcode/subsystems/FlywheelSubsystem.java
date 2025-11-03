@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.Range;
 
+import java.util.TreeMap;
+
 @Config
 public class FlywheelSubsystem extends SubsystemBase {
     public static class Params {
@@ -33,10 +35,8 @@ public class FlywheelSubsystem extends SubsystemBase {
     private final String FLYWHEEL_MOTOR_NAME = "flywheelMotor";
     private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
 
-    private final double WHEEL_RADIUS = 4; //inch
     private final double TICKS_PER_ROTATION = 28;
     private double targetVelocity; //ticks per second
-    private double currentVelocity;
 
     private final PIDFCoefficients FLYWHEEL_PIDF_SETTING = new PIDFCoefficients(200, 0, 0, 0);
 
@@ -44,6 +44,23 @@ public class FlywheelSubsystem extends SubsystemBase {
     private PIDController flyWheelController;
     private double maxFlywheelPower = 1.0;
 
+    //distance to rpm checking sheet
+    public class FlywheelSetting {
+        public double rpm;
+        public double hoodAngle;
+
+        public FlywheelSetting(double rpm, double hoodAngle) {
+            this.rpm = rpm;
+            this.hoodAngle = hoodAngle;
+        }
+    }
+
+    private final TreeMap<Double, FlywheelSetting> MATCHING_MAP= new TreeMap<>();
+    {
+        MATCHING_MAP.put(1.0 , new FlywheelSetting(3000, 20));
+        MATCHING_MAP.put(2.0, new FlywheelSetting(3500, 25));
+        MATCHING_MAP.put(3.0, new FlywheelSetting(4000, 30));
+    }
 
     public FlywheelSubsystem(OpMode opMode) {
         this.opMode = opMode;
@@ -104,6 +121,16 @@ public class FlywheelSubsystem extends SubsystemBase {
         double feedForward = PARAMS.kS * Math.signum(targetVelocity) + PARAMS.kV * targetVelocity + PARAMS.kA * (getFlywheelRPM() - targetVelocity);
 
         return feedForward;
+    }
+
+    //go through matching table
+    //get distance in inch
+    public FlywheelSetting distanceToFlywheelSetting(double distance) {
+        FlywheelSetting lower = MATCHING_MAP.floorEntry(distance).getValue();
+        FlywheelSetting higher = MATCHING_MAP.ceilingEntry(distance).getValue();
+
+        double percentageDistance = (distance - MATCHING_MAP.floorKey(distance)) / (MATCHING_MAP.ceilingKey(distance) - MATCHING_MAP.floorKey(distance));
+        return new FlywheelSetting(lower.rpm + ((higher.rpm - lower.rpm) * percentageDistance), lower.hoodAngle + ((higher.hoodAngle - lower.hoodAngle) * percentageDistance));
     }
 
     public void runFlywheelControl() {
