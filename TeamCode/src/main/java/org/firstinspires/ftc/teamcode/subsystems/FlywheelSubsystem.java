@@ -119,7 +119,6 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     public double flywheelFeedForward(double targetVelocity) {
         double feedForward = PARAMS.kS * Math.signum(targetVelocity) + PARAMS.kV * targetVelocity + PARAMS.kA * (getFlywheelRPM() - targetVelocity);
-
         return feedForward;
     }
 

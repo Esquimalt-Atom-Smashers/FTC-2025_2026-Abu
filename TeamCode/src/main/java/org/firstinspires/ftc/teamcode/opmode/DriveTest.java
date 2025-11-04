@@ -82,6 +82,9 @@ public class DriveTest extends LinearOpMode {
             driveSubsystem.drive(drive, strafe, turn);
             driveSubsystem.periodic();
             flywheelSubsystem.runFlywheelControl();
+            limelightSybsystem.periodic();
+            telemetry.addData("targetRPM", targetRpm);
+            telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             buttonA.periodic(gamepad1.a);
             telemetry.update();
         }

@@ -5,11 +5,14 @@ import android.sax.StartElementListener;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
+
+import java.util.List;
 
 public class LimelightSybsystem extends SubsystemBase {
     private Limelight3A limelight3A;
@@ -28,6 +31,7 @@ public class LimelightSybsystem extends SubsystemBase {
 
     private Pose3D botPose;
     private double ty = 0.0;
+    private int tagId = 0;
 
     public LimelightSybsystem(OpMode opMode, boolean isRedAlliance) {
         limelight3A = opMode.hardwareMap.get(Limelight3A.class, LIMELIGHT_NAME);
@@ -53,6 +57,10 @@ public class LimelightSybsystem extends SubsystemBase {
         }
     }
 
+    public int getTagId() {
+        return tagId;
+    }
+
     public double getTy() {
         return ty;
     }
@@ -62,10 +70,17 @@ public class LimelightSybsystem extends SubsystemBase {
         if (result.isValid()) {
             ty = result.getTy();
             botPose = result.getBotpose();
+            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                if (fr.getFiducialId() == 21 || fr.getFiducialId() == 22 || fr.getFiducialId() == 33){
+                    tagId = fr.getFiducialId();
+                }
+            }
             opMode.telemetry.addLine("Limelight got data");
         } else {
             ty = 0.0;
             botPose = null;
+            tagId = 0;
             opMode.telemetry.addLine("Limelight no data");
         }
 
