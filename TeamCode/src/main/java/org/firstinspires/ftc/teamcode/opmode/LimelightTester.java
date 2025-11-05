@@ -16,7 +16,7 @@ public class LimelightTester extends LinearOpMode {
             limelightSybsystem.periodic();
             telemetry.addData("distance from goal", limelightSybsystem.getDistanceFromGoal());
             telemetry.addData("ty", limelightSybsystem.getTy());
-
+            telemetry.addData("oblisk tag id" ,limelightSybsystem.getTagId());
             telemetry.update();
         }
     }
