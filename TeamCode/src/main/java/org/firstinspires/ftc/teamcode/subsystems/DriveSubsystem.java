@@ -23,7 +23,7 @@ public class DriveSubsystem extends SubsystemBase{
 
     private MecanumDrive mecanumDrive;
     private Pose2d currentPose;
-    private double driveHeadingError = 0.0;
+    public double driveHeadingError = 0.0;
     private final double POSITIONAL_TOLERANCE = 1.0;
     private final double ANGULAR_TOLERANCE = Math.toRadians(1);
 
@@ -52,7 +52,7 @@ public class DriveSubsystem extends SubsystemBase{
         }
     }
 
-    private double getHeading() {
+    public double getHeading() {
         //get radian
         double headingRadian = mecanumDrive.localizer.getPose().heading.toDouble() + driveHeadingError;
         if (Math.toDegrees(headingRadian) >= 180) {
