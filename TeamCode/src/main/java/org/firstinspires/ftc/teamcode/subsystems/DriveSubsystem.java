@@ -37,8 +37,8 @@ public class DriveSubsystem extends SubsystemBase{
     public void drive(double drive, double strafe, double turn) {
         if (isFieldCentric) {
             double botHeading = getHeading();
-            double rotX = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
-            double rotY = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
+            double rotX = strafe * Math.cos(botHeading) - drive * Math.sin(botHeading);
+            double rotY = strafe * Math.sin(botHeading) + drive * Math.cos(botHeading);
 
             mecanumDrive.setDrivePowers(
                     new PoseVelocity2d(
