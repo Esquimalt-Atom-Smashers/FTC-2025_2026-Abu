@@ -33,10 +33,12 @@ public class DriveTest extends LinearOpMode {
         buttonA = new PressAndReleaseButton();
 
         waitForStart();
-        flywheelSubsystem.setFlywheelTargetVelocity(4000);
+        flywheelSubsystem.setFlywheelTargetVelocity(-4000);
         while (opModeIsActive() && !isStopRequested()) {
+
+            //drive control
             double drive = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_y);
-            double strafe = RobotUtility.deadZoneJoyStick(gamepad1.left_stick_x);
+            double strafe = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
             double turn = RobotUtility.deadZoneJoyStick(-gamepad1.right_stick_x);
 
             if (buttonA.getIsTrue()) {
@@ -53,6 +55,7 @@ public class DriveTest extends LinearOpMode {
                 driveSubsystem.changeSpeedMultiplier(1.0);
             }
 
+            //intake control
             if (gamepad1.right_bumper) {
                 intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
             } else {
@@ -65,18 +68,19 @@ public class DriveTest extends LinearOpMode {
                 intakeFeedSubsystem.stopArtifact();
             }
 
+            //flywheel control
             if (gamepad1.dpad_up) {
                 targetRpm += 50;
             } else if (gamepad1.dpad_down) {
                 targetRpm -= 50;
             }
-            flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
+            flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
 
-
+            //aimbot
             while (gamepad1.x) {
-                driveSubsystem.getMecanumDrive().actionBuilder(driveSubsystem.getCurrentPos())
+                Actions.runBlocking(driveSubsystem.getMecanumDrive().actionBuilder(driveSubsystem.getCurrentPos())
                         .turnTo(Math.toRadians(limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())))
-                        .build();
+                        .build());
             }
 
             driveSubsystem.drive(drive, strafe, turn);
@@ -88,7 +92,7 @@ public class DriveTest extends LinearOpMode {
             telemetry.addData("ty", limelightSybsystem.getTy());
             telemetry.addData("turning heading", limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
             telemetry.addData("targetRPM", targetRpm);
-            telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
+            telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
             buttonA.periodic(gamepad1.a);
             telemetry.update();
         }

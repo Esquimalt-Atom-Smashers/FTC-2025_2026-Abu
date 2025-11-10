@@ -13,8 +13,10 @@ public class PressAndReleaseButton {
             isTrue = true;
             lastPressed = true;
         } else if (buttonInput) {
+            isTrue = false;
             lastPressed = true;
         } else {
+            isTrue = false;
             lastPressed = false;
         }
     }
