@@ -9,6 +9,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
@@ -46,6 +47,10 @@ public class LimelightSybsystem extends SubsystemBase {
         }
     }
 
+    public boolean getIsRedAlliance() {return isRedAlliance;}
+
+    public Pose2d getBotPose2D(Pose2d pose2d) {return botPose != null? new Pose2d(botPose.getPosition().x * METER_TO_INCH, botPose.getPosition().y * METER_TO_INCH, botPose.getOrientation().getYaw(AngleUnit.RADIANS)): pose2d;}
+
     public double getDistanceFromGoal() {
         if (botPose != null) {
             Pose2d targetGoalPose = isRedAlliance? RED_GOAL_POSE : BLUE_GOAL_POSE;
@@ -78,7 +83,7 @@ public class LimelightSybsystem extends SubsystemBase {
             }
             opMode.telemetry.addLine("Limelight got data");
         } else {
-            ty = 0.0;
+            ty = Double.NaN;
             botPose = null;
             tagId = 0;
             opMode.telemetry.addLine("Limelight no data");

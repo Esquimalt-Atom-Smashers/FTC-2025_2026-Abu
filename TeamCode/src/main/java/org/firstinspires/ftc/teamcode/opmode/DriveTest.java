@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
 import org.firstinspires.ftc.teamcode.utilities.PressAndReleaseButton;
 import org.firstinspires.ftc.teamcode.utilities.RobotUtility;
 
-@TeleOp(name = "Drive + Intake Test", group = "test")
+@TeleOp(name = "Experimental - start at (36,36,0)", group = "test")
 public class DriveTest extends LinearOpMode {
     DriveSubsystem driveSubsystem;
     IntakeFeedSubsystem intakeFeedSubsystem;
@@ -25,15 +25,15 @@ public class DriveTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        driveSubsystem = new DriveSubsystem(this, new Pose2d(0,0,0));
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, true);
+        driveSubsystem = new DriveSubsystem(this, new Pose2d(36,36,0), limelightSybsystem);
 
         buttonA = new PressAndReleaseButton();
 
         waitForStart();
-        flywheelSubsystem.setFlywheelTargetVelocity(-4000);
+        flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {
 
             //drive control
@@ -78,22 +78,21 @@ public class DriveTest extends LinearOpMode {
 
             //aimbot
             while (gamepad1.x) {
-                Actions.runBlocking(driveSubsystem.getMecanumDrive().actionBuilder(driveSubsystem.getCurrentPos())
-                        .turnTo(Math.toRadians(limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())))
-                        .build());
+                Actions.runBlocking(driveSubsystem.toLaunchHeading());
             }
 
             driveSubsystem.drive(drive, strafe, turn);
             driveSubsystem.periodic();
             flywheelSubsystem.runFlywheelControl();
             limelightSybsystem.periodic();
+            buttonA.periodic(gamepad1.a);
+
             telemetry.addData("current heading", driveSubsystem.getHeading());
             telemetry.addData("heading error", driveSubsystem.driveHeadingError);
             telemetry.addData("ty", limelightSybsystem.getTy());
             telemetry.addData("turning heading", limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
             telemetry.addData("targetRPM", targetRpm);
             telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
-            buttonA.periodic(gamepad1.a);
             telemetry.update();
         }
     }

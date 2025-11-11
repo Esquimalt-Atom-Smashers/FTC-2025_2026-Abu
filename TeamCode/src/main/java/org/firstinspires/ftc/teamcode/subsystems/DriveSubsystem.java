@@ -24,12 +24,16 @@ public class DriveSubsystem extends SubsystemBase{
     private MecanumDrive mecanumDrive;
     private Pose2d currentPose;
     public double driveHeadingError = 0.0;
-    private final double POSITIONAL_TOLERANCE = 1.0;
-    private final double ANGULAR_TOLERANCE = Math.toRadians(1);
+    private final double ANGULAR_TOLERANCE = 1.0;//degrees
 
-    public DriveSubsystem(OpMode opMode, Pose2d startingPose) {
+    private LimelightSybsystem limelightSybsystem;
+    private final Pose2d RED_GOAL_POSE = new Pose2d(-60,60,0);
+    private final Pose2d BLUE_GOAL_POSE = new Pose2d(-60,-60,0);
+
+    public DriveSubsystem(OpMode opMode, Pose2d startingPose, LimelightSybsystem limelightSybsystem) {
         this.opMode = opMode;
         mecanumDrive = new MecanumDrive(opMode.hardwareMap, startingPose);
+        this.limelightSybsystem = limelightSybsystem;
 
         isFieldCentric = true;
     }
@@ -91,22 +95,45 @@ public class DriveSubsystem extends SubsystemBase{
         currentPose = mecanumDrive.localizer.getPose();
     }
 
-    public class ToLaunchPos implements Action {
+    public class ToLaunchHeading implements Action {
         private boolean cancelled = false;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if((Math.abs(currentPose.position.x) <= POSITIONAL_TOLERANCE && Math.abs(currentPose.position.y) <= POSITIONAL_TOLERANCE && currentPose.heading.toDouble() <= ANGULAR_TOLERANCE) || cancelled) {
+            if( (Math.toDegrees(currentPose.heading.toDouble()) <= ANGULAR_TOLERANCE) || cancelled) {
                 return false;
             } else {
-                return mecanumDrive.actionBuilder(currentPose).
-                        strafeToSplineHeading(new Vector2d(0, 0), Math.toRadians(0))
-                        .build().run(telemetryPacket);
+                double goalHeadingError = limelightSybsystem.getTy();
+                if (goalHeadingError != Double.NaN) {
+                    mecanumDrive.localizer.setPose(limelightSybsystem.getBotPose2D(currentPose));
+
+                    return mecanumDrive.actionBuilder(currentPose)
+                            .turnTo(Math.toRadians(limelightSybsystem.getTy() + Math.toDegrees(mecanumDrive.localizer.getPose().heading.toDouble())))
+                            .build()
+                            .run(telemetryPacket);
+                } else {
+                    Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? RED_GOAL_POSE: BLUE_GOAL_POSE;
+                    double goalPosX = goalPos.position.x;
+                    double goalPosY = goalPos.position.y;
+                    double robotPosX = getCurrentPos().position.x;
+                    double robotPosY = getCurrentPos().position.y;
+
+                    double hyp = Math.sqrt(Math.pow(robotPosX - goalPosX,2) + Math.pow(robotPosY - goalPosY,2));
+                    double targetHeading = Math.asin(robotPosX - goalPosX / hyp);
+
+                    opMode.telemetry.addData("goal target heading", targetHeading);
+                    return false;
+//                    return mecanumDrive.actionBuilder(currentPose)
+//                            .turnTo(targetHeading)
+//                            .build()
+//                            .run(telemetryPacket);
+                }
+
             }
         }
 
         public void cancelAbruptly() {cancelled = true;}
     }
 
-    public ToLaunchPos toLaunchPos() {return new ToLaunchPos();}
+    public ToLaunchHeading toLaunchHeading() {return new ToLaunchHeading();}
 
 }
