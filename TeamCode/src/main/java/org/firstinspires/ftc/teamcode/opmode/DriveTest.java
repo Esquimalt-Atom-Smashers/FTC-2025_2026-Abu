@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
+import org.firstinspires.ftc.teamcode.utilities.CommandManager;
 import org.firstinspires.ftc.teamcode.utilities.PressAndReleaseButton;
 import org.firstinspires.ftc.teamcode.utilities.RobotUtility;
 
@@ -21,6 +22,7 @@ public class DriveTest extends LinearOpMode {
     PressAndReleaseButton buttonA;
     FlywheelSubsystem flywheelSubsystem;
     LimelightSybsystem limelightSybsystem;
+    CommandManager commandManager;
     double targetRpm = 4000;
 
     @Override
@@ -28,10 +30,10 @@ public class DriveTest extends LinearOpMode {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, true);
-        driveSubsystem = new DriveSubsystem(this, new Pose2d(36,36,0), limelightSybsystem);
+        driveSubsystem = new DriveSubsystem(this, new Pose2d(36,36,0));
 
         buttonA = new PressAndReleaseButton();
-
+        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {
@@ -74,11 +76,11 @@ public class DriveTest extends LinearOpMode {
             } else if (gamepad1.dpad_down) {
                 targetRpm -= 50;
             }
-            flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
+            flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
             //aimbot
             while (gamepad1.x) {
-                Actions.runBlocking(driveSubsystem.toLaunchHeading());
+                Actions.runBlocking(commandManager.toLaunchHeading());
             }
 
             driveSubsystem.drive(drive, strafe, turn);
@@ -92,7 +94,7 @@ public class DriveTest extends LinearOpMode {
             telemetry.addData("ty", limelightSybsystem.getTy());
             telemetry.addData("turning heading", limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
             telemetry.addData("targetRPM", targetRpm);
-            telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
+            telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             telemetry.update();
         }
     }

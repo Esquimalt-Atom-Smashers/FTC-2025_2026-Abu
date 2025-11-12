@@ -19,12 +19,12 @@ public class LimelightSybsystem extends SubsystemBase {
     private Limelight3A limelight3A;
     private String LIMELIGHT_NAME = "limelight";
 
-    private int RED_GOAL_APRILTAG_PIPELINE = 0;
-    private int BLUE_GOAL_APRILTAG_PIPELINE = 1;
-    private int PULL_RATE_HZ = 10;
+    private final int RED_GOAL_APRILTAG_PIPELINE = 0;
+    private final int BLUE_GOAL_APRILTAG_PIPELINE = 1;
+    private final int PULL_RATE_HZ = 10;
 
-    private Pose2d RED_GOAL_POSE = new Pose2d(-60, 60 ,0);
-    private Pose2d BLUE_GOAL_POSE = new Pose2d(-60, 60, 0);
+    public final Pose2d RED_GOAL_POSE = new Pose2d(-60, 60 ,0);
+    public final Pose2d BLUE_GOAL_POSE = new Pose2d(-60, 60, 0);
     private double METER_TO_INCH = 39.37008;
 
     private boolean isRedAlliance;

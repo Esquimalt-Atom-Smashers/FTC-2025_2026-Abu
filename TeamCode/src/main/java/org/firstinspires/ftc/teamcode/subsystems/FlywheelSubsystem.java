@@ -34,6 +34,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     private DcMotorEx flywheelMotor;
     private final String FLYWHEEL_MOTOR_NAME = "flywheelMotor";
     private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    public final double RPM_TOLERANCE = 25.0;
 
     private final double TICKS_PER_ROTATION = 28;
     private double targetVelocity; //ticks per second
@@ -86,7 +87,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public double getFlywheelRPM() {
-        return flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
+        return -flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
     }
 
     //custom PID
@@ -95,7 +96,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public void setFlywheelTargetVelocity(double rpm) {
-        targetVelocity = rpmToTps(rpm);
+        targetVelocity = rpmToTps(-rpm);
     }
 
     public void updateFlywheelPID() {
@@ -129,7 +130,11 @@ public class FlywheelSubsystem extends SubsystemBase {
         FlywheelSetting higher = MATCHING_MAP.ceilingEntry(distance).getValue();
 
         double percentageDistance = (distance - MATCHING_MAP.floorKey(distance)) / (MATCHING_MAP.ceilingKey(distance) - MATCHING_MAP.floorKey(distance));
-        return new FlywheelSetting(lower.rpm + ((higher.rpm - lower.rpm) * percentageDistance), lower.hoodAngle + ((higher.hoodAngle - lower.hoodAngle) * percentageDistance));
+        if (!Double.isNaN(percentageDistance)) {
+            return new FlywheelSetting(lower.rpm + ((higher.rpm - lower.rpm) * percentageDistance), lower.hoodAngle + ((higher.hoodAngle - lower.hoodAngle) * percentageDistance));
+        } else {
+            return lower;
+        }
     }
 
     public void runFlywheelControl() {
@@ -139,17 +144,9 @@ public class FlywheelSubsystem extends SubsystemBase {
         setFlywheelMotorPower(feedforward + pid);
     }
 
-    public class RunFlywheelAction implements Action {
-
-        public RunFlywheelAction(double targetRPM, double maxPower) {
-            targetVelocity = rpmToTps(targetRPM);
-            maxFlywheelPower = maxPower;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            runFlywheelControl();
-            return true;
-        }
+    public void runShooterControlByDistance(double distance) {
+        FlywheelSetting flywheelSetting = distanceToFlywheelSetting(distance);
+        setFlywheelTargetVelocity(flywheelSetting.rpm);
+        runFlywheelControl();
     }
 }
