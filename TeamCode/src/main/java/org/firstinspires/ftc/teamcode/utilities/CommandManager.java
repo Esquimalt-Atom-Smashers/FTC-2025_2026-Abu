@@ -25,40 +25,27 @@ public class CommandManager {
     }
 
     public class ToLaunchHeading implements Action {
-        private boolean cancelled = false;
-
         private final double ANGULAR_TOLERANCE = 1.0;//degrees
-
         public ToLaunchHeading() {}
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            double goalHeadingError = limelightSybsystem.getTy();
-            if (goalHeadingError != -999.0) {
-                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
+            driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
 
-                if ((goalHeadingError <= ANGULAR_TOLERANCE) || cancelled) {
-                    return false;
-                } else {
-                    return driveSubsystem.getMecanumDrive().actionBuilder(driveSubsystem.getCurrentPos())
-                            .turnTo(Math.toRadians(limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())))
-                            .build()
-                            .run(telemetryPacket);
-                }
-            } else {
-                Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? limelightSybsystem.RED_GOAL_POSE: limelightSybsystem.BLUE_GOAL_POSE;
-                double goalPosX = goalPos.position.x;
-                double goalPosY = goalPos.position.y;
-                double robotPosX = driveSubsystem.getCurrentPos().position.x;
-                double robotPosY = driveSubsystem.getCurrentPos().position.y;
+            Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? limelightSybsystem.RED_GOAL_POSE: limelightSybsystem.BLUE_GOAL_POSE;
+            double goalPosX = goalPos.position.x;
+            double goalPosY = goalPos.position.y;
+            double robotPosX = driveSubsystem.getCurrentPos().position.x;
+            double robotPosY = driveSubsystem.getCurrentPos().position.y;
 
-                double hyp = Math.sqrt(Math.pow(robotPosX - goalPosX,2) + Math.pow(robotPosY - goalPosY,2));
+            double hyp = Math.sqrt(Math.pow(robotPosX - goalPosX,2) + Math.pow(robotPosY - goalPosY,2));
 
-                double targetHeading = Math.asin((robotPosX - goalPosX) / hyp);
+            double targetHeading = Math.asin((robotPosX - goalPosX) / hyp);
 
-                driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
-                driveSubsystem.opMode.telemetry.update();
-                return false;
+            driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
+            driveSubsystem.opMode.telemetry.addData("is within tolerance", (Math.abs(Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()) - targetHeading) <= ANGULAR_TOLERANCE));
+            driveSubsystem.opMode.telemetry.update();
+            return false;
 
 //                if ((Math.abs(Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()) - targetHeading) <= ANGULAR_TOLERANCE) || cancelled) {
 //                    return false;
@@ -68,10 +55,8 @@ public class CommandManager {
 //                            .build()
 //                            .run(telemetryPacket);
 //                }
-            }
-        }
 
-        public void cancelAbruptly() {cancelled = true;}
+        }
     }
 
     public ToLaunchHeading toLaunchHeading() {return new ToLaunchHeading();}
@@ -126,7 +111,7 @@ public class CommandManager {
 //            driveSubsystem.opMode.telemetry.addData("targetRPM", flywheelSubsystem.getTargetVelocity());
 //            driveSubsystem.opMode.telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
 //            driveSubsystem.opMode.telemetry.update();
-            return true;
+            return false;
         }
     }
 
