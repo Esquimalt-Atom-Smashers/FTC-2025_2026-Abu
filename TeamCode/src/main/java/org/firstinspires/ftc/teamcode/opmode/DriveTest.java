@@ -99,11 +99,10 @@ public class DriveTest extends LinearOpMode {
             buttonA.periodic(gamepad1.a);
 
             telemetry.addData("current heading", driveSubsystem.getHeading());
+            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
             telemetry.addData("heading error", driveSubsystem.driveHeadingError);
-            telemetry.addData("ty", limelightSybsystem.getTy());
-            telemetry.addData("turning heading", limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
-            telemetry.addData("targetRPM", targetRpm);
-            telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
+//            telemetry.addData("targetRPM", targetRpm);
+//            telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             telemetry.update();
         }
         limelightSybsystem.stop();

@@ -40,10 +40,10 @@ public class CommandManager {
 
             double hyp = Math.sqrt(Math.pow(robotPosX - goalPosX,2) + Math.pow(robotPosY - goalPosY,2));
 
-            double targetHeading = Math.asin((robotPosX - goalPosX) / hyp);
+            double targetHeading = Math.toRadians(90) - Math.asin((robotPosX - goalPosX) / hyp);
 
             driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
-            driveSubsystem.opMode.telemetry.addData("is within tolerance", (Math.abs(Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()) - targetHeading) <= ANGULAR_TOLERANCE));
+            driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()) - Math.toDegrees(targetHeading)) <= ANGULAR_TOLERANCE);
             driveSubsystem.opMode.telemetry.update();
             return false;
 
