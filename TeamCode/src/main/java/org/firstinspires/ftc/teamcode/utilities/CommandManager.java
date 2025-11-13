@@ -33,35 +33,41 @@ public class CommandManager {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if( (Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()) <= ANGULAR_TOLERANCE) || cancelled) {
-                return false;
-            } else {
-                double goalHeadingError = limelightSybsystem.getTy();
-                if (goalHeadingError != Double.NaN) {
-                    driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
+            double goalHeadingError = limelightSybsystem.getTy();
+            if (goalHeadingError != -999.0) {
+                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
 
+                if ((goalHeadingError <= ANGULAR_TOLERANCE) || cancelled) {
+                    return false;
+                } else {
                     return driveSubsystem.getMecanumDrive().actionBuilder(driveSubsystem.getCurrentPos())
                             .turnTo(Math.toRadians(limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())))
                             .build()
                             .run(telemetryPacket);
-                } else {
-                    Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? limelightSybsystem.RED_GOAL_POSE: limelightSybsystem.BLUE_GOAL_POSE;
-                    double goalPosX = goalPos.position.x;
-                    double goalPosY = goalPos.position.y;
-                    double robotPosX = driveSubsystem.getCurrentPos().position.x;
-                    double robotPosY = driveSubsystem.getCurrentPos().position.y;
+                }
+            } else {
+                Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? limelightSybsystem.RED_GOAL_POSE: limelightSybsystem.BLUE_GOAL_POSE;
+                double goalPosX = goalPos.position.x;
+                double goalPosY = goalPos.position.y;
+                double robotPosX = driveSubsystem.getCurrentPos().position.x;
+                double robotPosY = driveSubsystem.getCurrentPos().position.y;
 
-                    double hyp = Math.sqrt(Math.pow(robotPosX - goalPosX,2) + Math.pow(robotPosY - goalPosY,2));
-                    double targetHeading = Math.asin(robotPosX - goalPosX / hyp);
+                double hyp = Math.sqrt(Math.pow(robotPosX - goalPosX,2) + Math.pow(robotPosY - goalPosY,2));
 
-                    driveSubsystem.opMode.telemetry.addData("goal target heading", targetHeading);
-                    return false;
-//                    return mecanumDrive.actionBuilder(currentPose)
+                double targetHeading = Math.asin((robotPosX - goalPosX) / hyp);
+
+                driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
+                driveSubsystem.opMode.telemetry.update();
+                return false;
+
+//                if ((Math.abs(Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()) - targetHeading) <= ANGULAR_TOLERANCE) || cancelled) {
+//                    return false;
+//                } else {
+//                    return driveSubsystem.getMecanumDrive().actionBuilder(driveSubsystem.getCurrentPos())
 //                            .turnTo(targetHeading)
 //                            .build()
 //                            .run(telemetryPacket);
-                }
-
+//                }
             }
         }
 
@@ -105,4 +111,24 @@ public class CommandManager {
     }
 
     public Action shootArtifactAction(double targetRPM, double maxPower) {return new ShootArtifactAction(targetRPM, maxPower);}
+
+    public class Periodic implements Action{
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            driveSubsystem.periodic();
+            flywheelSubsystem.runFlywheelControl();
+            limelightSybsystem.periodic();
+
+//            driveSubsystem.opMode.telemetry.addData("current heading", driveSubsystem.getHeading());
+//            driveSubsystem.opMode.telemetry.addData("heading error", driveSubsystem.driveHeadingError);
+//            driveSubsystem.opMode.telemetry.addData("ty", limelightSybsystem.getTy());
+//            driveSubsystem.opMode.telemetry.addData("turning heading", limelightSybsystem.getTy() + Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
+//            driveSubsystem.opMode.telemetry.addData("targetRPM", flywheelSubsystem.getTargetVelocity());
+//            driveSubsystem.opMode.telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
+//            driveSubsystem.opMode.telemetry.update();
+            return true;
+        }
+    }
+
+    public Action periodic() {return new Periodic();}
 }

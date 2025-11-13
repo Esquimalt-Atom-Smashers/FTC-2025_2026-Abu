@@ -83,11 +83,14 @@ public class LimelightSybsystem extends SubsystemBase {
             }
             opMode.telemetry.addLine("Limelight got data");
         } else {
-            ty = Double.NaN;
+            ty = -999.0;
             botPose = null;
             tagId = 0;
             opMode.telemetry.addLine("Limelight no data");
         }
+    }
 
+    public void stop() {
+        limelight3A.stop();
     }
 }

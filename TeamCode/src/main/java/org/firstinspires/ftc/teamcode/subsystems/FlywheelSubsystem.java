@@ -90,6 +90,8 @@ public class FlywheelSubsystem extends SubsystemBase {
         return -flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
     }
 
+    public double getTargetVelocity() {return targetVelocity;}
+
     //custom PID
     public void setFlywheelMaxPower(double maxPower) {
         this.maxFlywheelPower = maxPower;

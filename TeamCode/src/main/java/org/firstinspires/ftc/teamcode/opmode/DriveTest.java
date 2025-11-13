@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.InstantFunction;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -80,7 +83,13 @@ public class DriveTest extends LinearOpMode {
 
             //aimbot
             while (gamepad1.x) {
-                Actions.runBlocking(commandManager.toLaunchHeading());
+                Actions.runBlocking(
+                        new ParallelAction(
+                                commandManager.toLaunchHeading(),
+                                commandManager.periodic()
+
+                        )
+                );
             }
 
             driveSubsystem.drive(drive, strafe, turn);
@@ -97,5 +106,6 @@ public class DriveTest extends LinearOpMode {
             telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             telemetry.update();
         }
+        limelightSybsystem.stop();
     }
 }
