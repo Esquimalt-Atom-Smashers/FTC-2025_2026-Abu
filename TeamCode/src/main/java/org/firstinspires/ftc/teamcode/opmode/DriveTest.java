@@ -94,8 +94,8 @@ public class DriveTest extends LinearOpMode {
 
 //            telemetry.addData("current heading", driveSubsystem.getHeading());
 //            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
-//            telemetry.addData("targetRPM", targetRpm);
-//            telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
+            telemetry.addData("targetRPM", targetRpm);
+            telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             telemetry.update();
         }
         limelightSybsystem.stop();

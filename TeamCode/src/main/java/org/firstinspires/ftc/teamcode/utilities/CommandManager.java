@@ -52,6 +52,8 @@ public class CommandManager {
         double targetHeading;
         if (limelightSybsystem.getIsRedAlliance()) {
             targetHeading = Math.toRadians(180) - Math.atan(dY / dX) - Math.toRadians(90);
+            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
+            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         } else {
             targetHeading = Math.atan(dY / dX)  + Math.toRadians(90);
             if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
