@@ -87,6 +87,7 @@ public class DriveSubsystem extends SubsystemBase{
     public void periodic() {
         opMode.telemetry.addData("heading", Math.toDegrees(getHeading()));
         opMode.telemetry.addData("is fieldCentric", isFieldCentric);
+        opMode.telemetry.addData("current Pose", getCurrentPos());
         mecanumDrive.updatePoseEstimate();
         currentPose = mecanumDrive.localizer.getPose();
     }

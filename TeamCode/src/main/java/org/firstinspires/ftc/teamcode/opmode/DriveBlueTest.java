@@ -1,11 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -18,8 +14,8 @@ import org.firstinspires.ftc.teamcode.utilities.CommandManager;
 import org.firstinspires.ftc.teamcode.utilities.PressAndReleaseButton;
 import org.firstinspires.ftc.teamcode.utilities.RobotUtility;
 
-@TeleOp(name = "Experimental - start at (36,36,0)", group = "test")
-public class DriveTest extends LinearOpMode {
+@TeleOp(name = "Experimental - blue", group = "test")
+public class DriveBlueTest extends LinearOpMode {
     DriveSubsystem driveSubsystem;
     IntakeFeedSubsystem intakeFeedSubsystem;
     PressAndReleaseButton buttonA;
@@ -32,8 +28,8 @@ public class DriveTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
-        limelightSybsystem = new LimelightSybsystem(this, true);
-        driveSubsystem = new DriveSubsystem(this, new Pose2d(48,24,0));
+        limelightSybsystem = new LimelightSybsystem(this, false);
+        driveSubsystem = new DriveSubsystem(this, new Pose2d(48,-24,0));
 
         buttonA = new PressAndReleaseButton();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
