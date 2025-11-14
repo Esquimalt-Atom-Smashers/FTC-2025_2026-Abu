@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
+import org.firstinspires.ftc.teamcode.RobotContainer;
 
 public class ReadPosTeleOp extends LinearOpMode {
     @Override
