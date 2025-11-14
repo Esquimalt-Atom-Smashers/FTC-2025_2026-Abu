@@ -81,18 +81,12 @@ public class DriveTest extends LinearOpMode {
             }
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
-            //aimbot
-            while (gamepad1.x) {
-                Actions.runBlocking(
-                        new ParallelAction(
-                                commandManager.toLaunchHeading(),
-                                commandManager.periodic()
-
-                        )
-                );
+            if (gamepad1.x) {
+                commandManager.aimbotAssistedDrive(drive, strafe);
+            } else {
+                driveSubsystem.drive(drive, strafe, turn);
             }
 
-            driveSubsystem.drive(drive, strafe, turn);
             driveSubsystem.periodic();
             flywheelSubsystem.runFlywheelControl();
             limelightSybsystem.periodic();

@@ -2,20 +2,33 @@ package org.firstinspires.ftc.teamcode.utilities;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.arcrobotics.ftclib.controller.PIDFController;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
-
+@Config
 public class CommandManager {
     private DriveSubsystem driveSubsystem;
     private IntakeFeedSubsystem intakeFeedSubsystem;
     private FlywheelSubsystem flywheelSubsystem;
     private LimelightSybsystem limelightSybsystem;
+
+    //aimbot
+    public static class Params {
+        public double P = 10.0;
+        public double I = 0.0;
+        public double D = 0.1;
+        public double F = 0.0;
+    }
+    public static Params PARAMS = new Params();
+    private PIDFController turnController = new PIDFController(PARAMS.P, PARAMS.I, PARAMS.D, PARAMS.F);
+    private double ANGULAR_TOLERANCE = 1.0;
 
     public CommandManager(DriveSubsystem driveSubsystem, IntakeFeedSubsystem intakeFeedSubsystem, FlywheelSubsystem flywheelSubsystem, LimelightSybsystem limelightSybsystem) {
         this.driveSubsystem = driveSubsystem;
@@ -24,42 +37,36 @@ public class CommandManager {
         this.limelightSybsystem = limelightSybsystem;
     }
 
-    public class ToLaunchHeading implements Action {
-        private final double ANGULAR_TOLERANCE = 1.0;//degrees
-        public ToLaunchHeading() {}
+    public void aimbotAssistedDrive(double drive, double strafe) {
+//        driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
 
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
+        Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? limelightSybsystem.RED_GOAL_POSE: limelightSybsystem.BLUE_GOAL_POSE;
+        double goalPosX = goalPos.position.x;
+        double goalPosY = goalPos.position.y;
+        double robotPosX = driveSubsystem.getCurrentPos().position.x;
+        double robotPosY = driveSubsystem.getCurrentPos().position.y;
 
-            Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? limelightSybsystem.RED_GOAL_POSE: limelightSybsystem.BLUE_GOAL_POSE;
-            double goalPosX = goalPos.position.x;
-            double goalPosY = goalPos.position.y;
-            double robotPosX = driveSubsystem.getCurrentPos().position.x;
-            double robotPosY = driveSubsystem.getCurrentPos().position.y;
-
-            double hyp = Math.sqrt(Math.pow(robotPosX - goalPosX,2) + Math.pow(robotPosY - goalPosY,2));
-
-            double targetHeading = Math.toRadians(90) - Math.asin((robotPosX - goalPosX) / hyp);
-
-            driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
-            driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()) - Math.toDegrees(targetHeading)) <= ANGULAR_TOLERANCE);
-            driveSubsystem.opMode.telemetry.update();
-            return false;
-
-//                if ((Math.abs(Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()) - targetHeading) <= ANGULAR_TOLERANCE) || cancelled) {
-//                    return false;
-//                } else {
-//                    return driveSubsystem.getMecanumDrive().actionBuilder(driveSubsystem.getCurrentPos())
-//                            .turnTo(targetHeading)
-//                            .build()
-//                            .run(telemetryPacket);
-//                }
-
+        double dX = Math.abs(goalPosX - robotPosX);
+        double dY = Math.abs(goalPosY - robotPosY);
+        double targetHeading;
+        if (limelightSybsystem.getIsRedAlliance()) {
+            targetHeading = Math.toRadians(180) - Math.atan(dY / dX);
+        } else {
+            targetHeading = Math.atan(dY / dX) - Math.toRadians(180);
         }
-    }
 
-    public ToLaunchHeading toLaunchHeading() {return new ToLaunchHeading();}
+        driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
+        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
+        driveSubsystem.opMode.telemetry.update();
+
+        double turn;
+        if (Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE) {
+            turn = turnController.calculate(driveSubsystem.getCurrentPos().heading.toDouble(), targetHeading);
+        } else {
+            turn = 0.0;
+        }
+        driveSubsystem.drive(drive, strafe, turn);
+    }
 
     public class ShootArtifactAction implements Action {
 //        TODO: adjust numbers from testing
