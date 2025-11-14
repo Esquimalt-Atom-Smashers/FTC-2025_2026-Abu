@@ -21,10 +21,11 @@ public class CommandManager {
 
     //aimbot
     public static class Params {
-        public double P = 10.0;
+        public double P = 0.5;
         public double I = 0.0;
-        public double D = 0.1;
+        public double D = 0.0;
         public double F = 0.0;
+        public int direction = 1;
     }
     public static Params PARAMS = new Params();
     private PIDFController turnController = new PIDFController(PARAMS.P, PARAMS.I, PARAMS.D, PARAMS.F);
@@ -50,21 +51,25 @@ public class CommandManager {
         double dY = Math.abs(goalPosY - robotPosY);
         double targetHeading;
         if (limelightSybsystem.getIsRedAlliance()) {
-            targetHeading = Math.toRadians(180) - Math.atan(dY / dX);
+            targetHeading = Math.toRadians(180) - Math.atan(dY / dX) - Math.toRadians(90);
         } else {
-            targetHeading = Math.atan(dY / dX) - Math.toRadians(180);
+            targetHeading = Math.atan(dY / dX) - Math.toRadians(180) + Math.toRadians(90);
+            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
+            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         }
 
-        driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
+        driveSubsystem.opMode.telemetry.addData("goal target heading", targetHeading);
+        driveSubsystem.opMode.telemetry.addData("current heading", driveSubsystem.getCurrentPos().heading.toDouble());
+        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
         driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
-        driveSubsystem.opMode.telemetry.update();
 
         double turn;
-        if (Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE) {
+        if (Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) >= ANGULAR_TOLERANCE) {
             turn = turnController.calculate(driveSubsystem.getCurrentPos().heading.toDouble(), targetHeading);
         } else {
             turn = 0.0;
         }
+        driveSubsystem.opMode.telemetry.addData("turn power", turn);
         driveSubsystem.drive(drive, strafe, turn);
     }
 
