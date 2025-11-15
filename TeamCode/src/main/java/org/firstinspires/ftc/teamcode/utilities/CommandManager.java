@@ -60,10 +60,10 @@ public class CommandManager {
             if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         }
 
-        driveSubsystem.opMode.telemetry.addData("goal target heading", targetHeading);
-        driveSubsystem.opMode.telemetry.addData("current heading", driveSubsystem.getCurrentPos().heading.toDouble());
-        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
-        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
+//        driveSubsystem.opMode.telemetry.addData("goal target heading", targetHeading);
+//        driveSubsystem.opMode.telemetry.addData("current heading", driveSubsystem.getCurrentPos().heading.toDouble());
+//        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
+//        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
 
         double turn;
         if (Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) >= ANGULAR_TOLERANCE) {
@@ -71,7 +71,7 @@ public class CommandManager {
         } else {
             turn = 0.0;
         }
-        driveSubsystem.opMode.telemetry.addData("turn power", turn);
+//        driveSubsystem.opMode.telemetry.addData("turn power", turn);
         driveSubsystem.drive(drive, strafe, turn);
     }
 

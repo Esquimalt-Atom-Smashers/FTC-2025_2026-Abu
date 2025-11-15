@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.utilities;
+package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
