@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
@@ -33,7 +34,15 @@ public class DriveTest extends LinearOpMode {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, true);
-        driveSubsystem = new DriveSubsystem(this, new Pose2d(48,24,0));
+
+        Pose2d startingPose;
+        if (RobotContainer.hasData()) {
+            startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
+            RobotContainer.markReceived();
+        } else {
+            startingPose = limelightSybsystem.getIsRedAlliance()? RobotContainer.RED_RESET_POS: RobotContainer.BLUE_RESET_POS;
+        }
+        driveSubsystem = new DriveSubsystem(this, startingPose);
 
         buttonA = new PressAndReleaseButton();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
@@ -85,6 +94,10 @@ public class DriveTest extends LinearOpMode {
                 commandManager.aimbotAssistedDrive(drive, strafe);
             } else {
                 driveSubsystem.drive(drive, strafe, turn);
+            }
+
+            if (gamepad1.b) {
+                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getIsRedAlliance()? RobotContainer.RED_RESET_POS : RobotContainer.BLUE_RESET_POS);
             }
 
             driveSubsystem.periodic();

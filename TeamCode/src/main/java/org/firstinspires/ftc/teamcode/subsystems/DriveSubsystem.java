@@ -89,8 +89,5 @@ public class DriveSubsystem extends SubsystemBase{
         opMode.telemetry.addData("is fieldCentric", isFieldCentric);
         opMode.telemetry.addData("current PoseX", getCurrentPos().position.x);
         opMode.telemetry.addData("current PoseY", getCurrentPos().position.y);
-
-        mecanumDrive.updatePoseEstimate();
-        currentPose = mecanumDrive.localizer.getPose();
     }
 }
