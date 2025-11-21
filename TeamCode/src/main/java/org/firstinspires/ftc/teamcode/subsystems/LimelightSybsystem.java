@@ -24,7 +24,7 @@ public class LimelightSybsystem extends SubsystemBase {
     private final int PULL_RATE_HZ = 10;
 
     public final Pose2d RED_GOAL_POSE = new Pose2d(-60, 60 ,0);
-    public final Pose2d BLUE_GOAL_POSE = new Pose2d(-60, 60, 0);
+    public final Pose2d BLUE_GOAL_POSE = new Pose2d(-60, -60, 0);
     private double METER_TO_INCH = 39.37008;
 
     private boolean isRedAlliance;
