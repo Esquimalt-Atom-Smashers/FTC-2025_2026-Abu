@@ -1,12 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.InstantFunction;
-import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -18,29 +13,35 @@ import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
 import org.firstinspires.ftc.teamcode.utilities.CommandManager;
 import org.firstinspires.ftc.teamcode.utilities.PressAndReleaseButton;
 import org.firstinspires.ftc.teamcode.utilities.RobotUtility;
-
-@TeleOp(name = "Experimental - start at (48,24,0)", group = "test")
-public class DriveTest extends LinearOpMode {
+@Config
+@TeleOp(name = "Kenny - BlueTeleOp", group = "AAA")
+public class BlueTeleOp extends LinearOpMode {
     DriveSubsystem driveSubsystem;
     IntakeFeedSubsystem intakeFeedSubsystem;
     PressAndReleaseButton buttonA;
     FlywheelSubsystem flywheelSubsystem;
     LimelightSybsystem limelightSybsystem;
     CommandManager commandManager;
-    double targetRpm = 4000;
+    double targetRpm = PARAMS.farRPM;
+
+    public static class Params {
+        public static double farRPM = 3600;
+        public static double nearRPM = 3100;
+    }
+    public static Params PARAMS = new Params();
 
     @Override
     public void runOpMode() throws InterruptedException {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
-        limelightSybsystem = new LimelightSybsystem(this, true);
+        limelightSybsystem = new LimelightSybsystem(this, false);
 
         Pose2d startingPose;
         if (RobotContainer.hasData()) {
             startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
             RobotContainer.markReceived();
         } else {
-            startingPose = limelightSybsystem.getIsRedAlliance()? RobotContainer.RED_RESET_POS: RobotContainer.BLUE_RESET_POS;
+            startingPose = limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS: RobotUtility.BLUE_RESET_POS;
         }
         driveSubsystem = new DriveSubsystem(this, startingPose);
 
@@ -55,31 +56,31 @@ public class DriveTest extends LinearOpMode {
             double strafe = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
             double turn = RobotUtility.deadZoneJoyStick(-gamepad1.right_stick_x);
 
-            if (buttonA.getIsTrue()) {
-                driveSubsystem.switchFieldCentric();
-            }
+//            if (buttonA.getIsTrue()) {
+//                driveSubsystem.switchFieldCentric();
+//            }
 
-            if (gamepad1.back) {
+            //reset field centric
+            if (gamepad1.start || gamepad1.options) {
                 driveSubsystem.setDriveHeadingError();
             }
+            //reset aimbot
+            if (gamepad1.back || gamepad1.share) {
+                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
+            }
 
-            if (gamepad1.left_trigger >= 0.3) {
-                driveSubsystem.changeSpeedMultiplier(1.1 - (double) gamepad1.left_trigger);
+            //shooting
+            if (gamepad1.right_trigger >= 0.3) {
+                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.SPINNING);
+                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
             } else {
-                driveSubsystem.changeSpeedMultiplier(1.0);
+                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.REVERSED);
+                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
             }
 
             //intake control
             if (gamepad1.right_bumper) {
-                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
-            } else {
-                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.STOPPED);
-            }
-
-            if (gamepad1.left_bumper) {
-                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.SPINNING);
-            } else {
-                intakeFeedSubsystem.stopArtifact();
+                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.REVERSED);
             }
 
             //flywheel control
@@ -87,17 +88,21 @@ public class DriveTest extends LinearOpMode {
                 targetRpm += 50;
             } else if (gamepad1.dpad_down) {
                 targetRpm -= 50;
+            } else if (gamepad1.dpad_left) {
+                targetRpm = PARAMS.nearRPM;
+            } else if (gamepad1.dpad_right) {
+                targetRpm = PARAMS.farRPM;
             }
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
-            if (gamepad1.x) {
+            if (gamepad1.left_trigger >= 0.3) {
                 commandManager.aimbotAssistedDrive(drive, strafe);
             } else {
                 driveSubsystem.drive(drive, strafe, turn);
             }
 
             if (gamepad1.b) {
-                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getIsRedAlliance()? RobotContainer.RED_RESET_POS : RobotContainer.BLUE_RESET_POS);
+                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS : RobotUtility.BLUE_RESET_POS);
             }
 
             driveSubsystem.periodic();
