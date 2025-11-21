@@ -6,8 +6,8 @@ import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
 
 public class RobotContainer extends BlocksOpModeCompanion {
-    public static final Pose2d RED_RESET_POS = new Pose2d(60 - 11.5, 60 - 11, Math.toRadians(90));
-    public static final Pose2d BLUE_RESET_POS = new Pose2d(60 - 11.5, -(60 - 11), Math.toRadians(270));
+    public static final Pose2d RED_RESET_POS = new Pose2d(72 - 7.5, -(72 - 7.5), Math.toRadians(90));
+    public static final Pose2d BLUE_RESET_POS = new Pose2d(72 - 7.5, 72 - 7.5, Math.toRadians(270));
 
     public static double x = 0.0;
     public static double y = 0.0;
