@@ -112,5 +112,6 @@ public class DriveTest extends LinearOpMode {
             telemetry.update();
         }
         limelightSybsystem.stop();
+        RobotContainer.clear();
     }
 }
