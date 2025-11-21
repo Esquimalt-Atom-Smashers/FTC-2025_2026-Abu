@@ -89,5 +89,6 @@ public class DriveSubsystem extends SubsystemBase{
         opMode.telemetry.addData("is fieldCentric", isFieldCentric);
         opMode.telemetry.addData("current PoseX", getCurrentPos().position.x);
         opMode.telemetry.addData("current PoseY", getCurrentPos().position.y);
+        opMode.telemetry.addData("current heading", Math.toDegrees(getCurrentPos().heading.toDouble()));
     }
 }
