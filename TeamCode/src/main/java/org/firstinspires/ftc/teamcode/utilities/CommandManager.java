@@ -51,7 +51,9 @@ public class CommandManager {
         double dY = Math.abs(goalPosY - robotPosY);
         double targetHeading;
         if (limelightSybsystem.getIsRedAlliance()) {
-            targetHeading = Math.toRadians(180) - Math.atan(dY / dX) - Math.toRadians(90);
+//            targetHeading = Math.toRadians(180) - Math.atan(dY / dX) - Math.toRadians(90);
+            targetHeading = Math.toRadians(180) - Math.atan(dY / dX);
+
             if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
             if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         } else {

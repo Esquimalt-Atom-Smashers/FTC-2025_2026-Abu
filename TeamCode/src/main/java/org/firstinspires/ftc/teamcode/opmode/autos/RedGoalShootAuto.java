@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
 import org.firstinspires.ftc.teamcode.utilities.CommandManager;
-@Config
+@Disabled
 @Autonomous(name = "Experimental: RedGoalShootAuto")
 public class RedGoalShootAuto extends LinearOpMode {
 
