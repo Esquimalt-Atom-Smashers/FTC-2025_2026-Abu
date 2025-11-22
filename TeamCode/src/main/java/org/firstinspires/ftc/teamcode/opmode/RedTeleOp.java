@@ -61,7 +61,7 @@ public class RedTeleOp extends LinearOpMode {
 //            }
 
             //reset field centric
-            if (gamepad1.start || gamepad1.options) {
+            if (gamepad1.start || gamepad1.share) {
                 driveSubsystem.setDriveHeadingError();
             }
 //            //reset aimbot
