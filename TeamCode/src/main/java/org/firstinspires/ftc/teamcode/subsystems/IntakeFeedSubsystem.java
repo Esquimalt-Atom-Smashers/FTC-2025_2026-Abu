@@ -42,15 +42,15 @@ public class IntakeFeedSubsystem extends SubsystemBase {
 
     public void setIntakePower(ServoStates servoStates) {
         IntakeMotor.setPower(servoStates.servoPower);
+        feedServo.setPower(servoStates.servoPower);
     }
 
     public void setFeedPower(ServoStates servoStates) {
-        feedServo.setPower(servoStates.servoPower);
+//        feedServo.setPower(servoStates.servoPower);
         rearFeedServo.setPower(servoStates.servoPower);
     }
 
     public void stopArtifact() {
-        feedServo.setPower(ServoStates.STOPPED.servoPower);
         rearFeedServo.setPower(ServoStates.REVERSED.servoPower);
     }
 }

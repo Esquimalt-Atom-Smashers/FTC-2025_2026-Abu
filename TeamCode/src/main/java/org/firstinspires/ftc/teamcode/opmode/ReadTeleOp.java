@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotContainer;
-
+@Disabled
 @TeleOp(name = "ReadTeleOp (Blocks to Java)")
 public class ReadTeleOp extends LinearOpMode {
 
