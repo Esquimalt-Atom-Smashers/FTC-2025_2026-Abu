@@ -25,11 +25,15 @@ public class DriveSubsystem extends SubsystemBase{
     private Pose2d currentPose;
     public double driveHeadingError = 0.0;
 
-    public DriveSubsystem(OpMode opMode, Pose2d startingPose) {
+    public DriveSubsystem(OpMode opMode, Pose2d startingPose, boolean isRedAlliance) {
         this.opMode = opMode;
         mecanumDrive = new MecanumDrive(opMode.hardwareMap, startingPose);
-
+        getMecanumDrive().localizer.setPose(startingPose);
         isFieldCentric = true;
+
+        if(isRedAlliance) {
+            setDriveHeadingError();
+        }
     }
 
     public void drive(double drive, double strafe, double turn) {
