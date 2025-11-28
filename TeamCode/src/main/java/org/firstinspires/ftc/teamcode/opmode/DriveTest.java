@@ -33,7 +33,7 @@ public class DriveTest extends LinearOpMode {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, true);
-        driveSubsystem = new DriveSubsystem(this, new Pose2d(48,24,0));
+        driveSubsystem = new DriveSubsystem(this, new Pose2d((72 - 7),-(72 - 7),Math.toRadians(90fd)));
 
         buttonA = new PressAndReleaseButton();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
