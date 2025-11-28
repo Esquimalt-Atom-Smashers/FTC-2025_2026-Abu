@@ -14,18 +14,18 @@ import org.firstinspires.ftc.teamcode.utilities.CommandManager;
 import org.firstinspires.ftc.teamcode.utilities.PressAndReleaseButton;
 import org.firstinspires.ftc.teamcode.utilities.RobotUtility;
 @Config
-@TeleOp(name = "Kenny TeleOp", group = "AAA")
+@TeleOp(name = "Kenny Red TeleOp", group = "AAA")
 public class RedTeleOp extends LinearOpMode {
     DriveSubsystem driveSubsystem;
     IntakeFeedSubsystem intakeFeedSubsystem;
 //    PressAndReleaseButton buttonA;
     FlywheelSubsystem flywheelSubsystem;
-//    LimelightSybsystem limelightSybsystem;
-//    CommandManager commandManager;
+    LimelightSybsystem limelightSybsystem;
+    CommandManager commandManager;
     double targetRpm = PARAMS.farRPM;
 
     public static class Params {
-        public static double farRPM = 3600;
+        public static double farRPM = 3500;
         public static double nearRPM = 3100;
     }
     public static Params PARAMS = new Params();
@@ -34,19 +34,19 @@ public class RedTeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
-//        limelightSybsystem = new LimelightSybsystem(this, true);
+        limelightSybsystem = new LimelightSybsystem(this, true);
 
-        Pose2d startingPose = new Pose2d(0,0,0);
-//        if (RobotContainer.hasData()) {
-//            startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
-//            RobotContainer.markReceived();
-//        } else {
-//            startingPose = limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS: RobotUtility.BLUE_RESET_POS;
-//        }
+        Pose2d startingPose;
+        if (RobotContainer.hasData()) {
+            startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
+            RobotContainer.markReceived();
+        } else {
+            startingPose = limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS: RobotUtility.BLUE_RESET_POS;
+        }
         driveSubsystem = new DriveSubsystem(this, startingPose);
 
 //        buttonA = new PressAndReleaseButton();
-//        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
+        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {
@@ -64,10 +64,10 @@ public class RedTeleOp extends LinearOpMode {
             if (gamepad1.start || gamepad1.share) {
                 driveSubsystem.setDriveHeadingError();
             }
-//            //reset aimbot
-//            if (gamepad1.back || gamepad1.share) {
-//                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
-//            }
+            //reset aimbot
+            if (gamepad1.back || gamepad1.share) {
+                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
+            }
 
             //shooting
             if (gamepad1.right_trigger >= 0.3) {
@@ -96,19 +96,19 @@ public class RedTeleOp extends LinearOpMode {
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
             driveSubsystem.drive(drive,strafe,turn);
-//            if (gamepad1.left_trigger >= 0.3) {
-//                commandManager.aimbotAssistedDrive(drive, strafe);
-//            } else {
-//                driveSubsystem.drive(drive, strafe, turn);
-//            }
+            if (gamepad1.left_trigger >= 0.3) {
+                commandManager.aimbotAssistedDrive(drive, strafe);
+            } else {
+                driveSubsystem.drive(drive, strafe, turn);
+            }
 
-//            if (gamepad1.b) {
-//                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS : RobotUtility.BLUE_RESET_POS);
-//            }
+            if (gamepad1.b) {
+                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS : RobotUtility.BLUE_RESET_POS);
+            }
 
             driveSubsystem.periodic();
             flywheelSubsystem.runFlywheelControl();
-//            limelightSybsystem.periodic();
+            limelightSybsystem.periodic();
 //            buttonA.periodic(gamepad1.a);
 
 //            telemetry.addData("current heading", driveSubsystem.getHeading());
