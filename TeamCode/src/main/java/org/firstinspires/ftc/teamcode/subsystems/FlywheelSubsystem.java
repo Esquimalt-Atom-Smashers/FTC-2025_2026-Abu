@@ -44,7 +44,7 @@ public class FlywheelSubsystem extends BlocksOpModeCompanion {
     public final double RPM_TOLERANCE = 25.0;
 
     private static final double TICKS_PER_ROTATION = 28;
-    private double targetVelocity; //ticks per second
+    private static double targetVelocity; //ticks per second
 
     private final PIDFCoefficients FLYWHEEL_PIDF_SETTING = new PIDFCoefficients(200, 0, 0, 0);
 
@@ -111,7 +111,7 @@ public class FlywheelSubsystem extends BlocksOpModeCompanion {
         return flywheelMotor.getPower();
     }
 
-    public double rpmToTps(double rpm) {
+    public static double rpmToTps(double rpm) {
         return rpm * TICKS_PER_ROTATION / 60;
     }
 
@@ -123,15 +123,23 @@ public class FlywheelSubsystem extends BlocksOpModeCompanion {
     public static double getFlywheelRPM() {
         return -flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
     }
-
-    public double getTargetVelocity() {return targetVelocity;}
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "getTargetVelocity",
+            parameterLabels = {}
+    )
+    public static double getTargetVelocity() {return targetVelocity;}
 
     //custom PID
     public void setFlywheelMaxPower(double maxPower) {
         this.maxFlywheelPower = maxPower;
     }
-
-    public void setFlywheelTargetVelocity(double rpm) {
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "setTargetVelocity",
+            parameterLabels = {"rpm"}
+    )
+    public static void setFlywheelTargetVelocity(double rpm) {
         targetVelocity = rpmToTps(-rpm);
     }
 
@@ -205,8 +213,12 @@ public class FlywheelSubsystem extends BlocksOpModeCompanion {
             return lower;
         }
     }
-
-    public void runFlywheelControl() {
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "runFlyWheelControl",
+            parameterLabels = {""}
+    )
+    public static void runFlywheelControl() {
         double feedforward = flywheelFeedForward(targetVelocity);
         double pid = flywheelCustomPID(targetVelocity);
 

@@ -77,7 +77,7 @@ public class FlywheelTuner extends OpMode {
         double targetRPM = -motionProfiling();
         flywheelSubsystem.setFlywheelTargetVelocity(targetRPM);
         flywheelSubsystem.updateFlywheelPID();
-        flywheelSubsystem.runFlywheelControl();
+//        flywheelSubsystem.runFlywheelControl();
         telemetry.addData("targetRPM", -targetRPM);
         telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
         telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * -10000));
