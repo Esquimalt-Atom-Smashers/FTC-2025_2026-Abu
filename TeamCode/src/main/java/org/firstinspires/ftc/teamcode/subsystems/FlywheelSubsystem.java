@@ -12,12 +12,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
 
 import java.util.TreeMap;
 
 @Config
-public class FlywheelSubsystem extends SubsystemBase {
+public class FlywheelSubsystem extends BlocksOpModeCompanion {
     public static class Params {
         public double TOLERANCE = 28;
         public double kS = 0;
@@ -29,21 +33,27 @@ public class FlywheelSubsystem extends SubsystemBase {
         public double D = 0;
     }
     public static Params PARAMS = new Params();
-    private OpMode opMode;
+    private static OpMode opMode;
 
-    private DcMotorEx flywheelMotor;
-    private final String FLYWHEEL_MOTOR_NAME = "flywheelMotor";
-    private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    private static DcMotorEx flywheelMotor;
+    private static final String FLYWHEEL_MOTOR_NAME = "flywheelMotor";
+    private static final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
     public final double RPM_TOLERANCE = 25.0;
 
-    private final double TICKS_PER_ROTATION = 28;
+    private static final double TICKS_PER_ROTATION = 28;
     private double targetVelocity; //ticks per second
 
     private final PIDFCoefficients FLYWHEEL_PIDF_SETTING = new PIDFCoefficients(200, 0, 0, 0);
 
+    private static Servo hoodAngleServo;
+    private static final String HOOD_ANGLE_SERVO_NAME = "hoodAngleServo";
+
+    public final double FAR_SHOOTING_ANGLE = 0.0;
+    public final double CLOSE_SHOOTING_ANGLE = 0.0;
+
     //custom PID + feedforward
-    private PIDController flyWheelController;
-    private double maxFlywheelPower = 1.0;
+    private static PIDController flyWheelController;
+    private static double maxFlywheelPower = 1.0;
 
     //distance to rpm checking sheet
     public class FlywheelSetting {
@@ -69,6 +79,25 @@ public class FlywheelSubsystem extends SubsystemBase {
         flywheelMotor.setDirection(FLYWHEEL_DIRECTION);
         flywheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flyWheelController = new PIDController(PARAMS.P, PARAMS.I, PARAMS.D);
+
+        hoodAngleServo = opMode.hardwareMap.get(Servo.class, HOOD_ANGLE_SERVO_NAME);
+        hoodAngleServo.setDirection(Servo.Direction.FORWARD);
+    }
+
+    @ExportToBlocks(
+        comment = "",
+        tooltip = "initializeFlywheelSubsystem",
+        parameterLabels = {}
+    )
+
+    public static void initializeFlywheelSubsystem() {
+        flywheelMotor = opMode.hardwareMap.get(DcMotorEx.class, FLYWHEEL_MOTOR_NAME);
+        flywheelMotor.setDirection(FLYWHEEL_DIRECTION);
+        flywheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flyWheelController = new PIDController(PARAMS.P, PARAMS.I, PARAMS.D);
+
+        hoodAngleServo = opMode.hardwareMap.get(Servo.class, HOOD_ANGLE_SERVO_NAME);
+        hoodAngleServo.setDirection(Servo.Direction.FORWARD);
     }
 
     public void runWithDefaultPID(double rpm){
@@ -86,7 +115,12 @@ public class FlywheelSubsystem extends SubsystemBase {
         return rpm * TICKS_PER_ROTATION / 60;
     }
 
-    public double getFlywheelRPM() {
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "initializeFlywheelSubsystem",
+            parameterLabels = {}
+    )
+    public static double getFlywheelRPM() {
         return -flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
     }
 
@@ -105,14 +139,24 @@ public class FlywheelSubsystem extends SubsystemBase {
         flyWheelController.setPID(PARAMS.P, PARAMS.I, PARAMS.D);
     }
 
-    public void setFlywheelMotorPower(double power) {
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "setFlywheelMotorPower",
+            parameterLabels = {"power"}
+    )
+    public static void setFlywheelMotorPower(double power) {
         if (flywheelMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             flywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
         flywheelMotor.setPower(power);
     }
 
-    public double flywheelCustomPID(double targetVelocity) {
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "flyWheelCustomPID",
+            parameterLabels = {"targetVelocity"}
+    )
+    public static double flywheelCustomPID(double targetVelocity) {
         if (flywheelMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             flywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
@@ -120,9 +164,23 @@ public class FlywheelSubsystem extends SubsystemBase {
         return pid;
     }
 
-    public double flywheelFeedForward(double targetVelocity) {
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "flyWheelFeedForward",
+            parameterLabels = {"targetVelocity"}
+    )
+    public static double flywheelFeedForward(double targetVelocity) {
         double feedForward = PARAMS.kS * Math.signum(targetVelocity) + PARAMS.kV * targetVelocity + PARAMS.kA * (getFlywheelRPM() - targetVelocity);
         return feedForward;
+    }
+
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "setHoodAngle",
+            parameterLabels = {"hoodAngle"}
+    )
+    public static void setHoodAngle(double hoodAngle) {
+        hoodAngleServo.setPosition(hoodAngle);
     }
 
     //go through matching table
