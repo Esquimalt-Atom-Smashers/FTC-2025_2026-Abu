@@ -58,15 +58,15 @@ public class DriveBlueTest extends LinearOpMode {
 
             //intake control
             if (gamepad1.right_bumper) {
-                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
+                intakeFeedSubsystem.setIntakePower(-IntakeFeedSubsystem.PARAMS.feedPower);
             } else {
-                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.STOPPED);
+                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.PARAMS.feedPower);
             }
 
             if (gamepad1.left_bumper) {
-                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.SPINNING);
+                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.PARAMS.feedPower);
             } else {
-                intakeFeedSubsystem.stopArtifact();
+                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.PARAMS.stopPower);
             }
 
             //flywheel control

@@ -75,41 +75,41 @@ public class CommandManager {
         driveSubsystem.drive(drive, strafe, turn);
     }
 
-    public class ShootArtifactAction implements Action {
-//        TODO: adjust numbers from testing
-        private final double RPM_TOLERANCE = flywheelSubsystem.RPM_TOLERANCE;
-        private final double SHOOTING_RPM_DROP = -1.0;
-
-        public double targetVelocity;
-        public boolean isAccelerated;
-        public ShootArtifactAction(double targetRPM, double maxPower) {
-
-            flywheelSubsystem.setFlywheelTargetVelocity(flywheelSubsystem.rpmToTps(targetRPM));
-            flywheelSubsystem.setFlywheelMaxPower(maxPower);
-
-            intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
-            intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.REVERSED);
-            isAccelerated = false;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            flywheelSubsystem.runFlywheelControl();
-            if (!isAccelerated && Math.abs(flywheelSubsystem.getFlywheelRPM() - targetVelocity) < RPM_TOLERANCE) {
-                isAccelerated = true;
-                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
-                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.SPINNING);
-            }
-            if (isAccelerated && Math.abs(flywheelSubsystem.getFlywheelRPM() - targetVelocity) > SHOOTING_RPM_DROP) {
-                return false;
-            } else {
-                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.REVERSED);
-                return true;
-            }
-        }
-    }
-
-    public Action shootArtifactAction(double targetRPM, double maxPower) {return new ShootArtifactAction(targetRPM, maxPower);}
+//    public class ShootArtifactAction implements Action {
+////        TODO: adjust numbers from testing
+//        private final double RPM_TOLERANCE = flywheelSubsystem.RPM_TOLERANCE;
+//        private final double SHOOTING_RPM_DROP = -1.0;
+//
+//        public double targetVelocity;
+//        public boolean isAccelerated;
+//        public ShootArtifactAction(double targetRPM, double maxPower) {
+//
+//            flywheelSubsystem.setFlywheelTargetVelocity(flywheelSubsystem.rpmToTps(targetRPM));
+//            flywheelSubsystem.setFlywheelMaxPower(maxPower);
+//
+//            intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
+//            intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.REVERSED);
+//            isAccelerated = false;
+//        }
+//
+//        @Override
+//        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//            flywheelSubsystem.runFlywheelControl();
+//            if (!isAccelerated && Math.abs(flywheelSubsystem.getFlywheelRPM() - targetVelocity) < RPM_TOLERANCE) {
+//                isAccelerated = true;
+//                intakeFeedSubsystem.setIntakePower(IntakeFeedSubsystem.ServoStates.SPINNING);
+//                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.SPINNING);
+//            }
+//            if (isAccelerated && Math.abs(flywheelSubsystem.getFlywheelRPM() - targetVelocity) > SHOOTING_RPM_DROP) {
+//                return false;
+//            } else {
+//                intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.REVERSED);
+//                return true;
+//            }
+//        }
+//    }
+//
+//    public Action shootArtifactAction(double targetRPM, double maxPower) {return new ShootArtifactAction(targetRPM, maxPower);}
 
     public class Periodic implements Action{
         @Override

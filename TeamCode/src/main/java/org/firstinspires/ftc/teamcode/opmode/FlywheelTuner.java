@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
 @TeleOp
+@Config
 public class FlywheelTuner extends OpMode {
     public static class Params {
         public double stayTime = 10.0;
@@ -49,9 +50,15 @@ public class FlywheelTuner extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.a) {
-            intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.SPINNING);
+            intakeFeedSubsystem.setFeedPower(intakeFeedSubsystem.PARAMS.feedPower);
         } else {
-            intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.STOPPED);
+            intakeFeedSubsystem.setFeedPower(intakeFeedSubsystem.PARAMS.stopPower);
+        }
+
+        if (gamepad1.b) {
+            intakeFeedSubsystem.setSpIndexServoPower(1.0);
+        } else {
+            intakeFeedSubsystem.setSpIndexServoPower(0.0);
         }
 
         if (gamepad1.x) {
@@ -59,6 +66,12 @@ public class FlywheelTuner extends OpMode {
         }
         if (gamepad1.y) {
             flywheelSubsystem.setHoodAngle(flywheelSubsystem.PARAMS.FAR_SHOOTING_ANGLE);
+        }
+
+        if (gamepad1.left_trigger >= 0.1) {
+            intakeFeedSubsystem.setRearFeedServoPos(intakeFeedSubsystem.PARAMS.extendedPos);
+        } else {
+            intakeFeedSubsystem.setRearFeedServoPos(intakeFeedSubsystem.PARAMS.retractedPos);
         }
 
         double targetRPM = -motionProfiling();
@@ -69,6 +82,7 @@ public class FlywheelTuner extends OpMode {
         telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
         telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * -10000));
         telemetry.addData("hoodAngle", flywheelSubsystem.getHoodAngle());
+        telemetry.addData("rearFeedPos", intakeFeedSubsystem.getRearFeedServoPos());
         telemetry.update();
     }
 
