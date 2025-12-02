@@ -39,7 +39,7 @@ public class CommandManager {
     }
 
     public void aimbotAssistedDrive(double drive, double strafe) {
-//        driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
+        driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
 
         Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? limelightSybsystem.RED_GOAL_POSE: limelightSybsystem.BLUE_GOAL_POSE;
         double goalPosX = goalPos.position.x;
@@ -49,21 +49,22 @@ public class CommandManager {
 
         double dX = Math.abs(goalPosX - robotPosX);
         double dY = Math.abs(goalPosY - robotPosY);
+        double hyp = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
         double targetHeading;
         if (limelightSybsystem.getIsRedAlliance()) {
-            targetHeading = Math.toRadians(180) - Math.atan(dY / dX) + Math.toRadians(180);
-            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
-            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
+            targetHeading = Math.toRadians(180) - Math.acos(dX / hyp) - Math.toRadians(90);
+//            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
+//            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         } else {
-            targetHeading = Math.atan(dY / dX)  + Math.toRadians(90);
-            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
-            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
+            targetHeading = Math.toRadians(180) + (Math.toRadians(90) - Math.acos(dY / hyp));
+//            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
+//            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         }
 
-//        driveSubsystem.opMode.telemetry.addData("goal target heading", targetHeading);
-//        driveSubsystem.opMode.telemetry.addData("current heading", driveSubsystem.getCurrentPos().heading.toDouble());
-//        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
-//        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
+        driveSubsystem.opMode.telemetry.addData("goal target heading", targetHeading);
+        driveSubsystem.opMode.telemetry.addData("current heading", driveSubsystem.getCurrentPos().heading.toDouble());
+        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
+        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
 
         double turn;
         if (Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) >= ANGULAR_TOLERANCE) {

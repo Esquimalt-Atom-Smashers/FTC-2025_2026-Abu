@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
@@ -26,10 +29,20 @@ public class DriveBlueTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, false);
-        driveSubsystem = new DriveSubsystem(this, new Pose2d((72 - 7),(72 - 7),Math.toRadians(270)));
+
+        Pose2d startingPose;
+        if (RobotContainer.hasData()) {
+            startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
+            RobotContainer.markReceived();
+        } else {
+            startingPose = limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS: RobotUtility.BLUE_RESET_POS;
+        }
+        driveSubsystem = new DriveSubsystem(this, startingPose);
 
         buttonA = new PressAndReleaseButton();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
@@ -95,5 +108,6 @@ public class DriveBlueTest extends LinearOpMode {
             telemetry.update();
         }
         limelightSybsystem.stop();
+        RobotContainer.clear();
     }
 }

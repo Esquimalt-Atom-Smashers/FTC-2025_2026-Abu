@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
 import org.firstinspires.ftc.teamcode.utilities.CommandManager;
-@Disabled
 @TeleOp
 @Config
 public class LimelightTester extends LinearOpMode {
