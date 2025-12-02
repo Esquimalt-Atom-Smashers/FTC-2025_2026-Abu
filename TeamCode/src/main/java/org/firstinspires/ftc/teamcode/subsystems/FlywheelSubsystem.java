@@ -31,6 +31,9 @@ public class FlywheelSubsystem extends BlocksOpModeCompanion {
         public double P = 0.005;
         public double I = 0.001;
         public double D = 0;
+
+        public double CLOSE_SHOOTING_ANGLE = 0.0;
+        public double FAR_SHOOTING_ANGLE = 1.0;
     }
     public static Params PARAMS = new Params();
     private static OpMode opMode;
@@ -47,9 +50,6 @@ public class FlywheelSubsystem extends BlocksOpModeCompanion {
 
     private static Servo hoodAngleServo;
     private static final String HOOD_ANGLE_SERVO_NAME = "hoodAngleServo";
-
-    public final double FAR_SHOOTING_ANGLE = 0.0;
-    public final double CLOSE_SHOOTING_ANGLE = 0.0;
 
     //custom PID + feedforward
     private static PIDController flyWheelController;
@@ -181,6 +181,15 @@ public class FlywheelSubsystem extends BlocksOpModeCompanion {
     )
     public static void setHoodAngle(double hoodAngle) {
         hoodAngleServo.setPosition(hoodAngle);
+    }
+
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "getHoodAngle",
+            parameterLabels = {""}
+    )
+    public static double getHoodAngle() {
+        return hoodAngleServo.getPosition();
     }
 
     //go through matching table

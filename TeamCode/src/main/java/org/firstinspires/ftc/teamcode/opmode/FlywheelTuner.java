@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
-@Disabled
 @TeleOp
 public class FlywheelTuner extends OpMode {
     public static class Params {
@@ -45,7 +44,6 @@ public class FlywheelTuner extends OpMode {
         timer = new ElapsedTime();
         state = MotionProfilingStates.ACCLEARATING;
         telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-
     }
 
     @Override
@@ -56,6 +54,13 @@ public class FlywheelTuner extends OpMode {
             intakeFeedSubsystem.setFeedPower(IntakeFeedSubsystem.ServoStates.STOPPED);
         }
 
+        if (gamepad1.x) {
+            flywheelSubsystem.setHoodAngle(flywheelSubsystem.PARAMS.CLOSE_SHOOTING_ANGLE);
+        }
+        if (gamepad1.y) {
+            flywheelSubsystem.setHoodAngle(flywheelSubsystem.PARAMS.FAR_SHOOTING_ANGLE);
+        }
+
         double targetRPM = -motionProfiling();
         flywheelSubsystem.setFlywheelTargetVelocity(targetRPM);
         flywheelSubsystem.updateFlywheelPID();
@@ -63,6 +68,7 @@ public class FlywheelTuner extends OpMode {
         telemetry.addData("targetRPM", -targetRPM);
         telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
         telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * -10000));
+        telemetry.addData("hoodAngle", flywheelSubsystem.getHoodAngle());
         telemetry.update();
     }
 
