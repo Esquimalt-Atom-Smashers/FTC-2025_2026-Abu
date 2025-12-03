@@ -117,7 +117,7 @@ public class FlywheelSubsystem extends BlocksOpModeCompanion {
 
     @ExportToBlocks(
             comment = "",
-            tooltip = "initializeFlywheelSubsystem",
+            tooltip = "getFlywheelRPM",
             parameterLabels = {}
     )
     public static double getFlywheelRPM() {
