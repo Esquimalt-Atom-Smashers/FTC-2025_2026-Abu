@@ -35,8 +35,8 @@ public class IntakeFeedSubsystem extends SubsystemBase {
         public double stopPower = -1.0;
         public double feedPower = 1.0;
 
-        public double retractedPos = 0.2;
-        public double extendedPos = 0.0;
+        public double retractedPos = 0.49;
+        public double extendedPos = 0.19;
     }
     public static Params PARAMS = new Params();
 
