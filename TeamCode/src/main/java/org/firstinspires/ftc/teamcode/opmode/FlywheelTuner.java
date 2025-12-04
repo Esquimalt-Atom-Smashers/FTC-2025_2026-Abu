@@ -16,16 +16,19 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
 public class FlywheelTuner extends OpMode {
     public static class Params {
         public double stayTime = 10.0;
+        public double upperRPM = 4300;
+        public double lowerRPM = 4000;
+
     }
     public static Params PARAMS = new Params();
 
     private FlywheelSubsystem flywheelSubsystem;
     private IntakeFeedSubsystem intakeFeedSubsystem;
     private enum MotionProfilingStates{
-        ACCLEARATING(4000),
-        CONSTANT(3000),
-        DECELLERATING(3000);
-        private double targetRPM;
+        ACCLEARATING(PARAMS.upperRPM),
+        CONSTANT(PARAMS.lowerRPM),
+        DECELLERATING(PARAMS.lowerRPM);
+        public double targetRPM;
         private MotionProfilingStates(double targetRPM) {
             this.targetRPM = targetRPM;
         }
@@ -43,6 +46,10 @@ public class FlywheelTuner extends OpMode {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
         timer = new ElapsedTime();
+        MotionProfilingStates.ACCLEARATING.targetRPM = PARAMS.upperRPM;
+        MotionProfilingStates.CONSTANT.targetRPM = PARAMS.lowerRPM;
+        MotionProfilingStates.DECELLERATING.targetRPM = PARAMS.lowerRPM;
+
         state = MotionProfilingStates.ACCLEARATING;
         telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
     }
@@ -77,7 +84,7 @@ public class FlywheelTuner extends OpMode {
         double targetRPM = -motionProfiling();
         flywheelSubsystem.setFlywheelTargetVelocity(targetRPM);
         flywheelSubsystem.updateFlywheelPID();
-//        flywheelSubsystem.runFlywheelControl();
+        flywheelSubsystem.runFlywheelControl();
         telemetry.addData("targetRPM", -targetRPM);
         telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
         telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * -10000));
