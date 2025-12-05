@@ -41,7 +41,7 @@ public class DriveSubsystem extends BlocksOpModeCompanion {
 
         sensor_otos.setAngularUnit(AngleUnit.DEGREES);
         sensor_otos.setLinearUnit(DistanceUnit.INCH);
-        otosOffset = new SparkFunOTOS.Pose2D(0, 0, AngleUnit.RADIANS.fromUnit(AngleUnit.DEGREES, 270));
+        otosOffset = new SparkFunOTOS.Pose2D(0.3244, -5.3406, AngleUnit.RADIANS.fromUnit(AngleUnit.DEGREES, 270));
         sensor_otos.setOffset(otosOffset);
 
         double x = currentPose2D.getX(DistanceUnit.INCH);
@@ -84,9 +84,10 @@ public class DriveSubsystem extends BlocksOpModeCompanion {
             parameterLabels = {"drive", "strafe", "turn"}
     )
     public static void fieldCentricDrive(double drive, double strafe, double turn) {
-        double fieldCentricHeading = fieldForward - getCurrentPose2D().getHeading(AngleUnit.RADIANS);
-        double[] powerList = CourirControl.fieldCentricDrive(
-                new Pose2D(DistanceUnit.INCH, myPose.x, myPose.y, AngleUnit.RADIANS, fieldCentricHeading), drive, strafe, turn);
+        // double fieldCentricHeading = fieldForward - getCurrentPose2D().getHeading(AngleUnit.RADIANS);
+        // double[] powerList = CourirControl.fieldCentricDrive(
+        //     new Pose2D(DistanceUnit.INCH, myPose.x, myPose.y, AngleUnit.RADIANS, fieldCentricHeading), drive, strafe, turn);
+        double[] powerList = CourirControl.fieldCentricDrive(getCurrentPose2D(), drive, strafe, turn);
         setMotorPower(powerList[0], powerList[1], powerList[2], powerList[3]);
     }
 
@@ -97,6 +98,6 @@ public class DriveSubsystem extends BlocksOpModeCompanion {
     )
     public static Pose2D getCurrentPose2D() {
         myPose = sensor_otos.getPosition();
-        return new Pose2D(DistanceUnit.INCH, myPose.x, myPose.y, AngleUnit.DEGREES, myPose.h);
+        return new Pose2D(DistanceUnit.INCH, myPose.x, myPose.y, AngleUnit.RADIANS, myPose.h);
     }
 }

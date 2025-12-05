@@ -55,7 +55,7 @@
 //            parameterLabels = {}
 //    )
 //    public static double getFlywheelRPM() {
-//        return flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
+//        return -flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
 //    }
 //    @ExportToBlocks(
 //            comment = "",
