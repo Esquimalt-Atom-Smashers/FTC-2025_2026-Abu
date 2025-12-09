@@ -50,7 +50,7 @@ public class LimelightSybsystem extends SubsystemBase {
     public boolean getIsRedAlliance() {return isRedAlliance;}
 
     public Pose2d getBotPose2D(Pose2d pose2d) {
-        Pose2d returningPose = botPose != null? new Pose2d(botPose.getPosition().x * METER_TO_INCH, botPose.getPosition().y * METER_TO_INCH, Math.toRadians(180) + botPose.getOrientation().getYaw(AngleUnit.RADIANS)): pose2d;
+        Pose2d returningPose = botPose != null? new Pose2d(botPose.getPosition().x * METER_TO_INCH, botPose.getPosition().y * METER_TO_INCH, botPose.getOrientation().getYaw(AngleUnit.RADIANS)): pose2d;
         if (returningPose == pose2d) {return pose2d;}
         if (isRedAlliance) {
             returningPose = new Pose2d(-returningPose.position.x, returningPose.position.y, returningPose.heading.toDouble());

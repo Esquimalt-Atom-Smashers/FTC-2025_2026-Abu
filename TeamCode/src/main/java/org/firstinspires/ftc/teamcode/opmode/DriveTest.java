@@ -34,6 +34,7 @@ public class DriveTest extends LinearOpMode {
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, true);
         driveSubsystem = new DriveSubsystem(this, new Pose2d((72 - 7),-(72 - 7),Math.toRadians(180)));
+        driveSubsystem.setDriveHeadingErrorTo(Math.toRadians(90));
 
         buttonA = new PressAndReleaseButton();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
@@ -96,6 +97,7 @@ public class DriveTest extends LinearOpMode {
 
 //            telemetry.addData("current heading", driveSubsystem.getHeading());
 //            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
+            telemetry.addData("distance", driveSubsystem.currentPosToDistance());
             telemetry.addData("targetRPM", targetRpm);
             telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             telemetry.update();

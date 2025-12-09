@@ -133,10 +133,29 @@ public class FlywheelSubsystem extends SubsystemBase {
     //go through matching table
     //get distance in inch
     public FlywheelSetting distanceToFlywheelSetting(double distance) {
-        FlywheelSetting lower = MATCHING_MAP.floorEntry(distance).getValue();
-        FlywheelSetting higher = MATCHING_MAP.ceilingEntry(distance).getValue();
-        if (lower == null) return higher;
-        if (higher == null) return lower;
+        FlywheelSetting lower;
+        FlywheelSetting higher;
+        try {
+            lower = MATCHING_MAP.floorEntry(distance).getValue();
+        } catch(Exception e) {
+            try {
+            higher = MATCHING_MAP.floorEntry(distance).getValue();
+            return higher;
+            } catch(Exception e1) {
+                return new FlywheelSetting(3600, 30.0);
+            }
+        }
+
+        try {
+            higher = MATCHING_MAP.ceilingEntry(distance).getValue();
+        } catch (Exception e) {
+            try {
+                lower = MATCHING_MAP.floorEntry(distance).getValue();
+                return lower;
+            } catch(Exception e1) {
+                return new FlywheelSetting(3600, 30.0);
+            }
+        }
 
         double percentageDistance = (distance - MATCHING_MAP.floorKey(distance)) / (MATCHING_MAP.ceilingKey(distance) - MATCHING_MAP.floorKey(distance));
         if (!Double.isNaN(percentageDistance)) {
