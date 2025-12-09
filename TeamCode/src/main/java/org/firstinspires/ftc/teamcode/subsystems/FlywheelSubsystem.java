@@ -58,9 +58,14 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     private final TreeMap<Double, FlywheelSetting> MATCHING_MAP= new TreeMap<>();
     {
-        MATCHING_MAP.put(1.0 , new FlywheelSetting(3000, 20));
-        MATCHING_MAP.put(2.0, new FlywheelSetting(3500, 25));
-        MATCHING_MAP.put(3.0, new FlywheelSetting(4000, 30));
+        MATCHING_MAP.put(30.0 , new FlywheelSetting(3300, 20));
+        MATCHING_MAP.put(45.0, new FlywheelSetting(3050, 25));
+        MATCHING_MAP.put(60.0, new FlywheelSetting(3100, 30));
+        MATCHING_MAP.put(75.0, new FlywheelSetting(3100, 30));
+        MATCHING_MAP.put(90.0, new FlywheelSetting(3150, 30));
+        MATCHING_MAP.put(105.0, new FlywheelSetting(3350, 30));
+        MATCHING_MAP.put(120.0, new FlywheelSetting(3550, 30));
+        MATCHING_MAP.put(130.0, new FlywheelSetting(3600, 30));
     }
 
     public FlywheelSubsystem(OpMode opMode) {
@@ -130,6 +135,8 @@ public class FlywheelSubsystem extends SubsystemBase {
     public FlywheelSetting distanceToFlywheelSetting(double distance) {
         FlywheelSetting lower = MATCHING_MAP.floorEntry(distance).getValue();
         FlywheelSetting higher = MATCHING_MAP.ceilingEntry(distance).getValue();
+        if (lower == null) return higher;
+        if (higher == null) return lower;
 
         double percentageDistance = (distance - MATCHING_MAP.floorKey(distance)) / (MATCHING_MAP.ceilingKey(distance) - MATCHING_MAP.floorKey(distance));
         if (!Double.isNaN(percentageDistance)) {
