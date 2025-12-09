@@ -75,7 +75,6 @@ public class CommandManager {
 //        driveSubsystem.opMode.telemetry.addData("turn power", turn);
         driveSubsystem.drive(drive, strafe, turn);
     }
-
     public class ShootArtifactAction implements Action {
 //        TODO: adjust numbers from testing
         private final double RPM_TOLERANCE = flywheelSubsystem.RPM_TOLERANCE;

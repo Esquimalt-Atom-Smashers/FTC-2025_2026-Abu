@@ -75,10 +75,19 @@ public class DriveSubsystem extends SubsystemBase{
         driveHeadingError = mecanumDrive.localizer.getPose().heading.toDouble();
     }
 
+    public void setDriveHeadingErrorTo(double fieldForwardRadians) {
+        driveHeadingError = fieldForwardRadians;
+    }
+
     public Pose2d getCurrentPos() {
         mecanumDrive.updatePoseEstimate();
         currentPose = mecanumDrive.localizer.getPose();
         return currentPose;
+    }
+
+    public double currentPosToDistance() {
+        Pose2d currentPos = getCurrentPos();
+        return Math.sqrt(Math.pow(currentPos.position.x, 2) + Math.pow(currentPos.position.y, 2));
     }
 
     public MecanumDrive getMecanumDrive() {

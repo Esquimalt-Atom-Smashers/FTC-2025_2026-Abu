@@ -74,11 +74,8 @@ public class DriveTest extends LinearOpMode {
             }
 
             //flywheel control
-            if (gamepad1.dpad_up) {
-                targetRpm += 50;
-            } else if (gamepad1.dpad_down) {
-                targetRpm -= 50;
-            }
+            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(driveSubsystem.currentPosToDistance());
+            targetRpm = flywheelSetting.rpm;
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
             if (gamepad1.x) {
