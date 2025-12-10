@@ -134,35 +134,24 @@ public class FlywheelSubsystem extends SubsystemBase {
     //get distance in inch
     public FlywheelSetting distanceToFlywheelSetting(double distance) {
         FlywheelSetting lower;
-        FlywheelSetting higher;
-        try {
-            lower = MATCHING_MAP.floorEntry(distance).getValue();
-        } catch(Exception e) {
-            try {
-            higher = MATCHING_MAP.floorEntry(distance).getValue();
-            return higher;
-            } catch(Exception e1) {
-                return new FlywheelSetting(3600, 30.0);
-            }
-        }
-
-        try {
-            higher = MATCHING_MAP.ceilingEntry(distance).getValue();
+        try { lower = MATCHING_MAP.floorEntry(distance).getValue();
         } catch (Exception e) {
-            try {
-                lower = MATCHING_MAP.floorEntry(distance).getValue();
-                return lower;
-            } catch(Exception e1) {
-                return new FlywheelSetting(3600, 30.0);
-            }
+            return MATCHING_MAP.ceilingEntry(distance).getValue();
         }
+        FlywheelSetting higher;
+        try { higher = MATCHING_MAP.ceilingEntry(distance).getValue();
+        } catch (Exception e) {
+            return MATCHING_MAP.floorEntry(distance).getValue();
+        }
+        if (lower == null) return higher;
+        if (higher == null | lower == higher) return lower;
 
-        double percentageDistance = (distance - MATCHING_MAP.floorKey(distance)) / (MATCHING_MAP.ceilingKey(distance) - MATCHING_MAP.floorKey(distance));
-        if (!Double.isNaN(percentageDistance)) {
-            return new FlywheelSetting(lower.rpm + ((higher.rpm - lower.rpm) * percentageDistance), lower.hoodAngle + ((higher.hoodAngle - lower.hoodAngle) * percentageDistance));
-        } else {
-            return lower;
-        }
+        double percentageDistance = (distance - MATCHING_MAP.floorKey(distance))
+                / (MATCHING_MAP.ceilingKey(distance) - MATCHING_MAP.floorKey(distance));
+
+        return new FlywheelSetting(lower.rpm + ((higher.rpm - lower.rpm) * percentageDistance),
+                lower.hoodAngle + ((higher.hoodAngle - lower.hoodAngle) * percentageDistance));
+
     }
 
     public void runFlywheelControl() {

@@ -32,13 +32,15 @@ public class RedTeleOp extends LinearOpMode {
     }
     public static Params PARAMS = new Params();
 
+    public static final boolean ISREDALLIANCE = true;
+
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
-        limelightSybsystem = new LimelightSybsystem(this, true);
+        limelightSybsystem = new LimelightSybsystem(this, ISREDALLIANCE);
 
         Pose2d startingPose;
         if (RobotContainer.hasData()) {
@@ -50,7 +52,7 @@ public class RedTeleOp extends LinearOpMode {
         driveSubsystem = new DriveSubsystem(this, startingPose);
 
 //        buttonA = new PressAndReleaseButton();
-        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
+        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem, ISREDALLIANCE);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {

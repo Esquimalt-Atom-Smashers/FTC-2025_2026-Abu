@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
@@ -18,6 +19,8 @@ public class CommandManager {
     private IntakeFeedSubsystem intakeFeedSubsystem;
     private FlywheelSubsystem flywheelSubsystem;
     private LimelightSybsystem limelightSybsystem;
+
+    private boolean ISREDALLIANCE;
 
     //aimbot
     public static class Params {
@@ -31,11 +34,12 @@ public class CommandManager {
     private PIDFController turnController = new PIDFController(PARAMS.P, PARAMS.I, PARAMS.D, PARAMS.F);
     private double ANGULAR_TOLERANCE = 1.0;
 
-    public CommandManager(DriveSubsystem driveSubsystem, IntakeFeedSubsystem intakeFeedSubsystem, FlywheelSubsystem flywheelSubsystem, LimelightSybsystem limelightSybsystem) {
+    public CommandManager(DriveSubsystem driveSubsystem, IntakeFeedSubsystem intakeFeedSubsystem, FlywheelSubsystem flywheelSubsystem, LimelightSybsystem limelightSybsystem, boolean isRedAlliance) {
         this.driveSubsystem = driveSubsystem;
         this.intakeFeedSubsystem = intakeFeedSubsystem;
         this.flywheelSubsystem = flywheelSubsystem;
         this.limelightSybsystem = limelightSybsystem;
+        this.ISREDALLIANCE = isRedAlliance;
     }
 
     public void aimbotAssistedDrive(double drive, double strafe) {
@@ -74,6 +78,34 @@ public class CommandManager {
         }
 //        driveSubsystem.opMode.telemetry.addData("turn power", turn);
         driveSubsystem.drive(drive, strafe, turn);
+    }
+
+    public double getDistanceToGoal() {
+        Pose2d currentPos = driveSubsystem.getCurrentPos();
+        double driveDistanceEstimate;
+        Pose2d goalPos;
+//        if (ISREDALLIANCE) driveDistanceEstimate = Math.sqrt(Math.pow(currentPos.position.x, 2) + Math.pow(currentPos.position.y, 2));
+//        else driveDistanceEstimate = Math.sqrt(Math.pow(currentPos.position.x, 2) + Math.pow(currentPos.position.y, 2));
+        if (ISREDALLIANCE) {
+            goalPos = limelightSybsystem.RED_GOAL_POSE;
+        } else {
+            goalPos = limelightSybsystem.BLUE_GOAL_POSE;
+        }
+        driveDistanceEstimate = Math.sqrt(Math.pow(currentPos.position.x - goalPos.position.x, 2) + Math.pow(currentPos.position.y - goalPos.position.y, 2));
+        if (limelightSybsystem.getDistanceFromGoal() != 0) return limelightSybsystem.getDistanceFromGoal();
+        return driveDistanceEstimate;
+    }
+    public int returnDistanceToRPMResult(double distance)  {
+        int RPM;
+        if (distance < 30.0) RPM = 3250;
+        else if (distance < 45) RPM = 3250;
+        else if (distance < 60) RPM = 3100;
+        else if (distance < 75) RPM = 3100;
+        else if (distance < 90) RPM = 3250;
+        else if (distance < 105) RPM = 3350;
+        else if (distance < 120) RPM = 3550;
+        else RPM = 3750;
+        return RPM;
     }
     public class ShootArtifactAction implements Action {
 //        TODO: adjust numbers from testing

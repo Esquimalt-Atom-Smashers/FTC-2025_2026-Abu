@@ -27,6 +27,8 @@ public class DriveBlueTest extends LinearOpMode {
     CommandManager commandManager;
     double targetRpm = 4000;
 
+    final boolean ISREDALLIANCE = false;
+
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -45,7 +47,7 @@ public class DriveBlueTest extends LinearOpMode {
         driveSubsystem = new DriveSubsystem(this, startingPose);
 
         buttonA = new PressAndReleaseButton();
-        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
+        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem, ISREDALLIANCE);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSybsystem;
-@Disabled
+//@Disabled
 @TeleOp
 public class FlywheelMatchingTable extends LinearOpMode {
     @Override
@@ -21,12 +21,12 @@ public class FlywheelMatchingTable extends LinearOpMode {
                 telemetry.addData("required hood angle", flywheelSetting.hoodAngle);
             }
             if (gamepad1.b) {
-                FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(2.5);
+                FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(32.5);
                 telemetry.addData("required RPM", flywheelSetting.rpm);
                 telemetry.addData("required hood angle", flywheelSetting.hoodAngle);
             }
             if (gamepad1.x) {
-                FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(2.8);
+                FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(50.8);
                 telemetry.addData("required RPM", flywheelSetting.rpm);
                 telemetry.addData("required hood angle", flywheelSetting.hoodAngle);
             }

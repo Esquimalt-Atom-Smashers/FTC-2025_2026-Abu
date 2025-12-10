@@ -27,17 +27,18 @@ public class DriveTest extends LinearOpMode {
     LimelightSybsystem limelightSybsystem;
     CommandManager commandManager;
     double targetRpm = 4000;
+    public static final boolean ISREDALLIANCE = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
-        limelightSybsystem = new LimelightSybsystem(this, true);
+        limelightSybsystem = new LimelightSybsystem(this, ISREDALLIANCE);
         driveSubsystem = new DriveSubsystem(this, new Pose2d((72 - 7),-(72 - 7),Math.toRadians(180)));
         driveSubsystem.setDriveHeadingErrorTo(Math.toRadians(90));
 
         buttonA = new PressAndReleaseButton();
-        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem);
+        commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem, ISREDALLIANCE);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {
@@ -56,7 +57,7 @@ public class DriveTest extends LinearOpMode {
             }
 
             if (gamepad1.b) {
-                driveSubsystem.getMecanumDrive().localizer.setPose(new Pose2d((72 - 7),-(72 - 7),Math.toRadians(180)));
+                driveSubsystem.getMecanumDrive().localizer.setPose(new Pose2d((72 - 7),7,Math.toRadians(180)));
                 driveSubsystem.setDriveHeadingErrorTo(Math.toRadians(90));
             }
 
@@ -80,9 +81,9 @@ public class DriveTest extends LinearOpMode {
             }
 
             //flywheel control
-            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(driveSubsystem.currentPosToDistance());
-            targetRpm = flywheelSetting.rpm;
-            flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
+//            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
+//            targetRpm = flywheelSetting.rpm;
+//            flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
             if (gamepad1.x) {
                 commandManager.aimbotAssistedDrive(drive, strafe);
@@ -97,7 +98,7 @@ public class DriveTest extends LinearOpMode {
 
 //            telemetry.addData("current heading", driveSubsystem.getHeading());
 //            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
-            telemetry.addData("distance", driveSubsystem.currentPosToDistance());
+            telemetry.addData("distance", commandManager.getDistanceToGoal());
             telemetry.addData("targetRPM", targetRpm);
             telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             telemetry.update();

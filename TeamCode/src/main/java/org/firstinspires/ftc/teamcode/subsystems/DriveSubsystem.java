@@ -85,11 +85,6 @@ public class DriveSubsystem extends SubsystemBase{
         return currentPose;
     }
 
-    public double currentPosToDistance() {
-        Pose2d currentPos = getCurrentPos();
-        return Math.sqrt(Math.pow(currentPos.position.x, 2) + Math.pow(currentPos.position.y, 2));
-    }
-
     public MecanumDrive getMecanumDrive() {
         return mecanumDrive;
     }
