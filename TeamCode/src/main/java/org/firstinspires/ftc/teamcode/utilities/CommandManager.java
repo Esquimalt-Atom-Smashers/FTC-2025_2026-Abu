@@ -60,13 +60,13 @@ public class CommandManager {
 //            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
 //            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         } else {
-            targetHeading = Math.toRadians(180) + (Math.toRadians(90) - Math.acos(dY / hyp));
-//            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
-//            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
+            targetHeading = Math.toRadians(180) - Math.asin(dX / hyp);
+            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
+            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         }
 
-        driveSubsystem.opMode.telemetry.addData("goal target heading", targetHeading);
-        driveSubsystem.opMode.telemetry.addData("current heading", driveSubsystem.getCurrentPos().heading.toDouble());
+        driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
+        driveSubsystem.opMode.telemetry.addData("current heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
         driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
         driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
 
@@ -94,18 +94,6 @@ public class CommandManager {
         driveDistanceEstimate = Math.sqrt(Math.pow(currentPos.position.x - goalPos.position.x, 2) + Math.pow(currentPos.position.y - goalPos.position.y, 2));
         if (limelightSybsystem.getDistanceFromGoal() != 0) return limelightSybsystem.getDistanceFromGoal();
         return driveDistanceEstimate;
-    }
-    public int returnDistanceToRPMResult(double distance)  {
-        int RPM;
-        if (distance < 30.0) RPM = 3250;
-        else if (distance < 45) RPM = 3250;
-        else if (distance < 60) RPM = 3100;
-        else if (distance < 75) RPM = 3100;
-        else if (distance < 90) RPM = 3250;
-        else if (distance < 105) RPM = 3350;
-        else if (distance < 120) RPM = 3550;
-        else RPM = 3750;
-        return RPM;
     }
     public class ShootArtifactAction implements Action {
 //        TODO: adjust numbers from testing

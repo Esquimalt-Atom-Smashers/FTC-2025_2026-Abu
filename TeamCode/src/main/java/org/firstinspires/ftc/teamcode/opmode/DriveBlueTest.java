@@ -35,23 +35,23 @@ public class DriveBlueTest extends LinearOpMode {
 
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
-        limelightSybsystem = new LimelightSybsystem(this, false);
+        limelightSybsystem = new LimelightSybsystem(this, ISREDALLIANCE);
 
         Pose2d startingPose;
         if (RobotContainer.hasData()) {
             startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
             RobotContainer.markReceived();
         } else {
-            startingPose = limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS: RobotUtility.BLUE_RESET_POS;
+            startingPose = new Pose2d((72 - 7), -7, Math.toRadians(270));
         }
         driveSubsystem = new DriveSubsystem(this, startingPose);
+        driveSubsystem.setDriveHeadingError();
 
         buttonA = new PressAndReleaseButton();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem, ISREDALLIANCE);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {
-
             //drive control
             double drive = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_y);
             double strafe = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
@@ -63,6 +63,11 @@ public class DriveBlueTest extends LinearOpMode {
 
             if (gamepad1.back) {
                 driveSubsystem.setDriveHeadingError();
+            }
+
+            if (gamepad1.b) {
+                driveSubsystem.getMecanumDrive().localizer.setPose(new Pose2d((72 - 7),-7,Math.toRadians(270)));
+                driveSubsystem.setDriveHeadingErrorTo(Math.toRadians(90));
             }
 
             if (gamepad1.left_trigger >= 0.3) {
@@ -85,11 +90,8 @@ public class DriveBlueTest extends LinearOpMode {
             }
 
             //flywheel control
-            if (gamepad1.dpad_up) {
-                targetRpm += 50;
-            } else if (gamepad1.dpad_down) {
-                targetRpm -= 50;
-            }
+            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
+            targetRpm = flywheelSetting.rpm;
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
             if (gamepad1.x) {
@@ -102,9 +104,9 @@ public class DriveBlueTest extends LinearOpMode {
             limelightSybsystem.periodic();
             buttonA.periodic(gamepad1.a);
 
-            telemetry.addData("current heading", driveSubsystem.getHeading());
-            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
-            telemetry.addData("heading error", driveSubsystem.driveHeadingError);
+//            telemetry.addData("current heading", driveSubsystem.getHeading());
+//            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
+            telemetry.addData("distance", commandManager.getDistanceToGoal());
             telemetry.addData("targetRPM", targetRpm);
             telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             telemetry.update();

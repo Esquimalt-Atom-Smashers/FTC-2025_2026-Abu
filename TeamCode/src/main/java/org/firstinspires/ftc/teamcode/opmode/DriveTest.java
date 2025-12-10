@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
@@ -34,7 +35,15 @@ public class DriveTest extends LinearOpMode {
         intakeFeedSubsystem = new IntakeFeedSubsystem(this);
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, ISREDALLIANCE);
-        driveSubsystem = new DriveSubsystem(this, new Pose2d((72 - 7),-(72 - 7),Math.toRadians(180)));
+
+        Pose2d startingPos;
+        if (RobotContainer.hasData()) {
+            startingPos = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), RobotContainer.getHeading());
+            RobotContainer.markReceived();
+        } else {
+            startingPos =  new Pose2d((72 - 7),-(72 - 7),Math.toRadians(180));
+        }
+        driveSubsystem = new DriveSubsystem(this, startingPos);
         driveSubsystem.setDriveHeadingErrorTo(Math.toRadians(90));
 
         buttonA = new PressAndReleaseButton();
@@ -81,9 +90,9 @@ public class DriveTest extends LinearOpMode {
             }
 
             //flywheel control
-//            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
-//            targetRpm = flywheelSetting.rpm;
-//            flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
+            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
+            targetRpm = flywheelSetting.rpm;
+            flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
             if (gamepad1.x) {
                 commandManager.aimbotAssistedDrive(drive, strafe);
@@ -104,5 +113,6 @@ public class DriveTest extends LinearOpMode {
             telemetry.update();
         }
         limelightSybsystem.stop();
+        RobotContainer.clear();
     }
 }
