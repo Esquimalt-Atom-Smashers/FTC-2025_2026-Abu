@@ -28,6 +28,7 @@ public class CommandManager {
         public double I = 0.0;
         public double D = 0.0;
         public double F = 0.0;
+        public double headingError = 0.0;
     }
     public static Params PARAMS = new Params();
     private PIDFController turnController = new PIDFController(PARAMS.P, PARAMS.I, PARAMS.D, PARAMS.F);
@@ -59,15 +60,16 @@ public class CommandManager {
 //            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
 //            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         } else {
-            targetHeading = Math.toRadians(180) + (Math.toRadians(90) - Math.asin(dX/hyp)) - Math.toRadians(90);
+            double headingError = PARAMS.headingError;
+            targetHeading = (Math.toRadians(180) + (Math.toRadians(90) - Math.asin(dX/hyp)) - Math.toRadians(90)) + Math.toRadians(headingError);
             if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
             if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         }
 
         driveSubsystem.opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
-        driveSubsystem.opMode.telemetry.addData("current heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
-        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
-        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
+//        driveSubsystem.opMode.telemetry.addData("current heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
+//        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
+//        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
 
         double turn;
         if (Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) >= ANGULAR_TOLERANCE) {

@@ -15,11 +15,10 @@ import org.firstinspires.ftc.teamcode.utilities.CommandManager;
 import org.firstinspires.ftc.teamcode.utilities.PressAndReleaseButton;
 import org.firstinspires.ftc.teamcode.utilities.RobotUtility;
 
-@TeleOp(name = "Kenny Blue TeleOp", group = "test")
+@TeleOp(name = "Kenny Blue TeleOp", group = "AAA")
 public class BlueTeleOp extends LinearOpMode {
     DriveSubsystem driveSubsystem;
     IntakeFeedSubsystem intakeFeedSubsystem;
-    PressAndReleaseButton buttonA;
     FlywheelSubsystem flywheelSubsystem;
     LimelightSybsystem limelightSybsystem;
     CommandManager commandManager;
@@ -40,17 +39,16 @@ public class BlueTeleOp extends LinearOpMode {
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, ISREDALLIANCE);
 
-        Pose2d startingPose = new Pose2d(0,0,270);
-//        if (RobotContainer.hasData()) {
-//            startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
-//            RobotContainer.markReceived();
-//        } else {
-//            startingPose = limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS: RobotUtility.BLUE_RESET_POS;
-//        }
+        Pose2d startingPose;
+        if (RobotContainer.hasData()) {
+            startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
+            RobotContainer.markReceived();
+        } else {
+            startingPose = new Pose2d(0, 0, Math.toRadians(270));
+        }
         driveSubsystem = new DriveSubsystem(this, startingPose);
-        driveSubsystem.setDriveHeadingErrorTo(270);
+        driveSubsystem.setDriveHeadingErrorTo(Math.toRadians(270));
 
-        buttonA = new PressAndReleaseButton();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem, ISREDALLIANCE);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
@@ -62,12 +60,17 @@ public class BlueTeleOp extends LinearOpMode {
 
             //reset field centric
             if (gamepad1.start || gamepad1.share) {
-                driveSubsystem.setDriveHeadingError();
+                Pose2d currentPos = driveSubsystem.getCurrentPos();
+                driveSubsystem.getMecanumDrive().localizer.setPose(new Pose2d(currentPos.position.x, currentPos.position.y, Math.toRadians(270)));
             }
             //reset aimbot
-            if (gamepad1.back || gamepad1.share) {
+            if (gamepad1.triangle || gamepad1.y) {
                 driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
             }
+//            if (gamepad1.b || gamepad1.circle) {
+//                driveSubsystem.getMecanumDrive().localizer.setPose(new Pose2d((72 - 7),-7,Math.toRadians(270)));
+//                driveSubsystem.setDriveHeadingErrorTo(Math.toRadians(270));
+//            }
 
             //shooting
             if (gamepad1.right_trigger >= 0.3) {
@@ -84,18 +87,21 @@ public class BlueTeleOp extends LinearOpMode {
             }
 
             //flywheel control
-            if (gamepad1.dpad_up) {
-                targetRpm += 50;
-            } else if (gamepad1.dpad_down) {
-                targetRpm -= 50;
-            } else if (gamepad1.dpad_left) {
-                targetRpm = PARAMS.nearRPM;
-            } else if (gamepad1.dpad_right) {
-                targetRpm = PARAMS.farRPM;
-            }
+//            if (gamepad1.dpad_up) {
+//                targetRpm += 50;
+//            } else if (gamepad1.dpad_down) {
+//                targetRpm -= 50;
+//            } else if (gamepad1.dpad_left) {
+//                targetRpm = PARAMS.nearRPM;
+//            } else if (gamepad1.dpad_right) {
+//                targetRpm = PARAMS.farRPM;
+//            }
+//            flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
+            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
+            targetRpm = flywheelSetting.rpm;
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
-            if (gamepad1.x) {
+            if (gamepad1.left_trigger >= 0.3) {
                 commandManager.aimbotAssistedDrive(drive, strafe);
             } else {
                 driveSubsystem.drive(drive, strafe, turn);
@@ -103,7 +109,6 @@ public class BlueTeleOp extends LinearOpMode {
             driveSubsystem.periodic();
             flywheelSubsystem.runFlywheelControl();
             limelightSybsystem.periodic();
-            buttonA.periodic(gamepad1.a);
 
 //            telemetry.addData("current heading", driveSubsystem.getHeading());
 //            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
