@@ -62,10 +62,6 @@ public class RedTeleOp extends LinearOpMode {
             double strafe = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
             double turn = RobotUtility.deadZoneJoyStick(-gamepad1.right_stick_x);
 
-//            if (buttonA.getIsTrue()) {
-//                driveSubsystem.switchFieldCentric();
-//            }
-
             //reset field centric
             if (gamepad1.start || gamepad1.share) {
                 driveSubsystem.setDriveHeadingError();
@@ -90,18 +86,10 @@ public class RedTeleOp extends LinearOpMode {
             }
 
             //flywheel control
-            if (gamepad1.dpad_up) {
-                targetRpm += 50;
-            } else if (gamepad1.dpad_down) {
-                targetRpm -= 50;
-            } else if (gamepad1.dpad_left) {
-                targetRpm = PARAMS.nearRPM;
-            } else if (gamepad1.dpad_right) {
-                targetRpm = PARAMS.farRPM;
-            }
+            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
+            targetRpm = flywheelSetting.rpm;
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
-            driveSubsystem.drive(drive,strafe,turn);
             if (gamepad1.left_trigger >= 0.3) {
                 commandManager.aimbotAssistedDrive(drive, strafe);
             } else {
@@ -119,6 +107,7 @@ public class RedTeleOp extends LinearOpMode {
 
 //            telemetry.addData("current heading", driveSubsystem.getHeading());
 //            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
+            telemetry.addData("distance", commandManager.getDistanceToGoal());
             telemetry.addData("targetRPM", targetRpm);
             telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
             telemetry.update();
