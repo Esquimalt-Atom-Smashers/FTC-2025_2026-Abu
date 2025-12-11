@@ -28,7 +28,7 @@ public class CommandManager {
         public double I = 0.0;
         public double D = 0.0;
         public double F = 0.0;
-        public int direction = 1;
+        public double headingError = 1;
     }
     public static Params PARAMS = new Params();
     private PIDFController turnController = new PIDFController(PARAMS.P, PARAMS.I, PARAMS.D, PARAMS.F);
@@ -60,7 +60,8 @@ public class CommandManager {
 //            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
 //            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         } else {
-            targetHeading = Math.toRadians(180) - Math.asin(dX / hyp);
+            double headingError = PARAMS.headingError;
+            targetHeading = Math.toRadians(180) - Math.asin(dX / hyp) +headingError;
             if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
             if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         }
