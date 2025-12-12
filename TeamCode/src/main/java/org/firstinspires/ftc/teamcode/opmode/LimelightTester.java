@@ -31,7 +31,7 @@ public class LimelightTester extends LinearOpMode {
             telemetry.addData("ty", limelightSybsystem.getTy());
             telemetry.addData("oblisk tag id" ,limelightSybsystem.getTagId());
 
-            Pose2d currentPos = limelightSybsystem.getBotPose2D(new Pose2d(0,0,0));
+            Pose2d currentPos = limelightSybsystem.getBotPose2D(new Pose2d(0,0,0), true);
             telemetry.addData("currentPosX", currentPos.position.x);
             telemetry.addData("currentPosY", currentPos.position.y);
             telemetry.addData("currentPosHeading", Math.toDegrees(currentPos.heading.toDouble()));

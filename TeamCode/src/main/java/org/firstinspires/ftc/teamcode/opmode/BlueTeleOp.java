@@ -46,6 +46,7 @@ public class BlueTeleOp extends LinearOpMode {
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {
+            boolean forceReset = false;
             //drive control
             double drive = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_y);
             double strafe = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
@@ -57,7 +58,7 @@ public class BlueTeleOp extends LinearOpMode {
             }
             //reset aimbot
             if (gamepad1.back || gamepad1.share) {
-                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
+                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos(), true));
             }
 
             //shooting
@@ -77,8 +78,10 @@ public class BlueTeleOp extends LinearOpMode {
             //flywheel control
             if (gamepad1.triangle) {
                 isManualRPMControl = false;
+                forceReset = true;
             } else if (gamepad1.square) {
                 isManualRPMControl = true;
+                forceReset = false;
             }
             if (isManualRPMControl) {
                 if (gamepad1.dpad_up) {
@@ -97,7 +100,7 @@ public class BlueTeleOp extends LinearOpMode {
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
             if (gamepad1.left_trigger >= 0.3) {
-                commandManager.aimbotAssistedDrive(drive, strafe);
+                commandManager.aimbotAssistedDrive(drive, strafe, forceReset);
             } else {
                 driveSubsystem.drive(drive, strafe, turn);
             }

@@ -26,6 +26,7 @@ public class LimelightSybsystem extends SubsystemBase {
     public final Pose2d RED_GOAL_POSE = new Pose2d(-60, 65 ,0);
     public final Pose2d BLUE_GOAL_POSE = new Pose2d(-60, -65, 0);
     private double METER_TO_INCH = 39.37008;
+    private final double POSITIONAL_TOLARANCE = 1.0;
 
     private boolean isRedAlliance;
     private OpMode opMode;
@@ -49,11 +50,14 @@ public class LimelightSybsystem extends SubsystemBase {
 
     public boolean getIsRedAlliance() {return isRedAlliance;}
 
-    public Pose2d getBotPose2D(Pose2d pose2d) {
+    public Pose2d getBotPose2D(Pose2d pose2d, boolean forceReset) {
         Pose2d returningPose = botPose != null? new Pose2d(botPose.getPosition().x * METER_TO_INCH, botPose.getPosition().y * METER_TO_INCH, botPose.getOrientation().getYaw(AngleUnit.RADIANS)): pose2d;
         if (returningPose == pose2d) {return pose2d;}
         if (isRedAlliance) {
             returningPose = new Pose2d(returningPose.position.x, returningPose.position.y, returningPose.heading.toDouble());
+        }
+        if ((Math.abs(returningPose.position.x - pose2d.position.x) >= POSITIONAL_TOLARANCE || Math.abs(returningPose.position.y - pose2d.position.y) >= POSITIONAL_TOLARANCE) && !forceReset) {
+            return pose2d;
         }
         return returningPose;
     }

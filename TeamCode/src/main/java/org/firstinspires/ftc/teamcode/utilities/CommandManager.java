@@ -42,8 +42,8 @@ public class CommandManager {
         this.ISREDALLIANCE = isRedAlliance;
     }
 
-    public void aimbotAssistedDrive(double drive, double strafe) {
-        driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos()));
+    public void aimbotAssistedDrive(double drive, double strafe, boolean forceReset) {
+        driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getBotPose2D(driveSubsystem.getCurrentPos(), forceReset));
 
         Pose2d goalPos = limelightSybsystem.getIsRedAlliance()? limelightSybsystem.RED_GOAL_POSE: limelightSybsystem.BLUE_GOAL_POSE;
         double goalPosX = goalPos.position.x;
