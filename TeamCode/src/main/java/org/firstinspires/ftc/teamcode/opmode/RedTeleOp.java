@@ -24,7 +24,7 @@ public class RedTeleOp extends LinearOpMode {
     FlywheelSubsystem flywheelSubsystem;
     LimelightSybsystem limelightSybsystem;
     CommandManager commandManager;
-    double targetRpm = PARAMS.farRPM;
+    double targetRpm = PARAMS.nearRPM;
 
     public static class Params {
         public static double farRPM = 3500;
@@ -33,6 +33,7 @@ public class RedTeleOp extends LinearOpMode {
     public static Params PARAMS = new Params();
 
     public static final boolean ISREDALLIANCE = true;
+    boolean isManualRPMControl = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -86,8 +87,25 @@ public class RedTeleOp extends LinearOpMode {
             }
 
             //flywheel control
-            FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
-            targetRpm = flywheelSetting.rpm;
+            if (gamepad1.triangle) {
+                isManualRPMControl = false;
+            } else if (gamepad1.square) {
+                isManualRPMControl = true;
+            }
+            if (isManualRPMControl) {
+                if (gamepad1.dpad_up) {
+                    targetRpm += 50;
+                } else if (gamepad1.dpad_down) {
+                    targetRpm -= 50;
+                } else if (gamepad1.dpad_left) {
+                    targetRpm = PARAMS.nearRPM;
+                } else if (gamepad1.dpad_right) {
+                    targetRpm = PARAMS.farRPM;
+                }
+            } else {
+                FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
+                targetRpm = flywheelSetting.rpm;
+            }
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
             if (gamepad1.left_trigger >= 0.3) {
