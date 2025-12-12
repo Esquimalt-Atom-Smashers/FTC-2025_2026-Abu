@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.utilities.RobotUtility;
 public class RedTeleOp extends LinearOpMode {
     DriveSubsystem driveSubsystem;
     IntakeFeedSubsystem intakeFeedSubsystem;
-//    PressAndReleaseButton buttonA;
     FlywheelSubsystem flywheelSubsystem;
     LimelightSybsystem limelightSybsystem;
     CommandManager commandManager;
@@ -43,21 +42,13 @@ public class RedTeleOp extends LinearOpMode {
         flywheelSubsystem = new FlywheelSubsystem(this);
         limelightSybsystem = new LimelightSybsystem(this, ISREDALLIANCE);
 
-        Pose2d startingPose;
-        if (RobotContainer.hasData()) {
-            startingPose = new Pose2d(RobotContainer.getX(), RobotContainer.getY(), Math.toRadians(RobotContainer.getHeading()));
-            RobotContainer.markReceived();
-        } else {
-            startingPose = limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS: RobotUtility.BLUE_RESET_POS;
-        }
+        Pose2d startingPose = new Pose2d(0,0,90);
         driveSubsystem = new DriveSubsystem(this, startingPose);
-
-//        buttonA = new PressAndReleaseButton();
+        driveSubsystem.setDriveHeadingError();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem, ISREDALLIANCE);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
         while (opModeIsActive() && !isStopRequested()) {
-
             //drive control
             double drive = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_y);
             double strafe = RobotUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
@@ -113,16 +104,9 @@ public class RedTeleOp extends LinearOpMode {
             } else {
                 driveSubsystem.drive(drive, strafe, turn);
             }
-
-            if (gamepad1.b) {
-                driveSubsystem.getMecanumDrive().localizer.setPose(limelightSybsystem.getIsRedAlliance()? RobotUtility.RED_RESET_POS : RobotUtility.BLUE_RESET_POS);
-            }
-
             driveSubsystem.periodic();
             flywheelSubsystem.runFlywheelControl();
             limelightSybsystem.periodic();
-//            buttonA.periodic(gamepad1.a);
-
 //            telemetry.addData("current heading", driveSubsystem.getHeading());
 //            telemetry.addData("RR heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
             telemetry.addData("distance", commandManager.getDistanceToGoal());

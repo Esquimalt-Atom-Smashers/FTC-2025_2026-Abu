@@ -28,7 +28,7 @@ public class BlueTeleOp extends LinearOpMode {
         public static double farRPM = 3500;
         public static double nearRPM = 3100;
     }
-    public static RedTeleOp.Params PARAMS = new RedTeleOp.Params();
+    public static Params PARAMS = new Params();
     final boolean ISREDALLIANCE = false;
     boolean isManualRPMControl = true;
     @Override
@@ -41,7 +41,7 @@ public class BlueTeleOp extends LinearOpMode {
 
         Pose2d startingPose = new Pose2d(0,0,270);
         driveSubsystem = new DriveSubsystem(this, startingPose);
-        driveSubsystem.setDriveHeadingErrorTo(Math.toRadians(270));
+        driveSubsystem.setDriveHeadingError();
         commandManager = new CommandManager(driveSubsystem, intakeFeedSubsystem, flywheelSubsystem, limelightSybsystem, ISREDALLIANCE);
         waitForStart();
         flywheelSubsystem.setFlywheelTargetVelocity(-targetRpm);
