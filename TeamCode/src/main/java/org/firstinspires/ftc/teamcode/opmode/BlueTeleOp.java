@@ -23,7 +23,7 @@ public class BlueTeleOp extends LinearOpMode {
     FlywheelSubsystem flywheelSubsystem;
     LimelightSybsystem limelightSybsystem;
     CommandManager commandManager;
-    double targetRpm = PARAMS.farRPM;
+    double targetRpm = PARAMS.nearRPM;
 
     public static class Params {
         public static double farRPM = 3500;
@@ -31,7 +31,7 @@ public class BlueTeleOp extends LinearOpMode {
     }
     public static RedTeleOp.Params PARAMS = new RedTeleOp.Params();
     final boolean ISREDALLIANCE = false;
-
+    boolean isManualRPMControl = true;
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -84,14 +84,24 @@ public class BlueTeleOp extends LinearOpMode {
             }
 
             //flywheel control
-            if (gamepad1.dpad_up) {
-                targetRpm += 50;
-            } else if (gamepad1.dpad_down) {
-                targetRpm -= 50;
-            } else if (gamepad1.dpad_left) {
-                targetRpm = PARAMS.nearRPM;
-            } else if (gamepad1.dpad_right) {
-                targetRpm = PARAMS.farRPM;
+            if (gamepad1.triangle) {
+                isManualRPMControl = false;
+            } else if (gamepad1.square) {
+                isManualRPMControl = true;
+            }
+            if (isManualRPMControl) {
+                if (gamepad1.dpad_up) {
+                    targetRpm += 50;
+                } else if (gamepad1.dpad_down) {
+                    targetRpm -= 50;
+                } else if (gamepad1.dpad_left) {
+                    targetRpm = PARAMS.nearRPM;
+                } else if (gamepad1.dpad_right) {
+                    targetRpm = PARAMS.farRPM;
+                }
+            } else {
+                FlywheelSubsystem.FlywheelSetting flywheelSetting = flywheelSubsystem.distanceToFlywheelSetting(commandManager.getDistanceToGoal());
+                targetRpm = flywheelSetting.rpm;
             }
             flywheelSubsystem.setFlywheelTargetVelocity(targetRpm);
 
