@@ -11,8 +11,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeFeedSubsystem;
-@Disabled
 @TeleOp
+@Config
 public class FlywheelTuner extends OpMode {
     public static class Params {
         public double stayTime = 10.0;
@@ -37,6 +37,7 @@ public class FlywheelTuner extends OpMode {
     private MotionProfilingStates state;
     private MotionProfilingStates pastState;
     private ElapsedTime timer;
+    private ElapsedTime loopTimer;
 
     @Override
     public void init() {
@@ -45,7 +46,7 @@ public class FlywheelTuner extends OpMode {
         timer = new ElapsedTime();
         state = MotionProfilingStates.ACCLEARATING;
         telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-
+        loopTimer = new ElapsedTime();
     }
 
     @Override
@@ -63,6 +64,8 @@ public class FlywheelTuner extends OpMode {
         telemetry.addData("targetRPM", -targetRPM);
         telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
         telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * -10000));
+        telemetry.addData("latency time", loopTimer.milliseconds());
+        loopTimer.reset();
         telemetry.update();
     }
 

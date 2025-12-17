@@ -16,11 +16,11 @@ public class FlywheelController extends BlocksOpModeCompanion {
     public static class Params {
         public double TOLERANCE = 28;
         public double kS = 0;
-        public double kV = 0.000475;
+        public double kV = 0.000205;
         public double kA = 0;
 
-        public double P = 0.005;
-        public double I = 0.001;
+        public double P = 0.00005;
+        public double I = 0;
         public double D = 0;
 
         public double CLOSE_SHOOTING_ANGLE = 0.0;
@@ -32,6 +32,15 @@ public class FlywheelController extends BlocksOpModeCompanion {
     private static PIDController flyWheelController;
     public static Params PARAMS = new Params();
 
+    @ExportToBlocks(
+            comment = "",
+            tooltip = "setPID",
+            parameterLabels = {"P", "I", "D"}
+    )
+
+    public static void setPID(double P, double I, double D) {
+//        PAP
+    }
     @ExportToBlocks(
             comment = "",
             tooltip = "initializeFlywheelController",
