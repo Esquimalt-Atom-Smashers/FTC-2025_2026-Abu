@@ -17,8 +17,10 @@ import java.util.Properties;
 public class RobotPropertyParser {
 
     private static Properties robotProperties = new Properties();
-    public static final String FILE_LOCATION = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode";
-    public static final String FILE_NAME = "robot_properties.txt";
+    private static Properties autoSequence1Properties = new Properties();
+    private static final String FILE_LOCATION = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode";
+    private static final String FILE_NAME = "robot_properties.txt";
+    private static final String AUTO_SEQUENCE1_FILE_NAME = "auto_sequence1.txt";
 
     public static void loadProperties() {
         try {
@@ -26,6 +28,15 @@ public class RobotPropertyParser {
             robotProperties.load(new FileInputStream(FILE_LOCATION + "/"+ FILE_NAME));
         } catch (Exception e) {
             robotProperties = new Properties();
+        }
+    }
+
+    public static void loadAutoSequence1() {
+        try {
+            autoSequence1Properties.clear();
+            autoSequence1Properties.load(new FileInputStream(FILE_LOCATION + "/"+ AUTO_SEQUENCE1_FILE_NAME));
+        } catch (Exception e) {
+            autoSequence1Properties = new Properties();
         }
     }
 
@@ -43,9 +54,10 @@ public class RobotPropertyParser {
      */
     public static int getInt(String key) { return Integer.parseInt(robotProperties.getProperty(key)); }
 
+    public static String getString(String key) { return autoSequence1Properties.getProperty(key);}
+
     /**
-     * Probably won't be needed as this is really to save the properties when being set by FTC Dashboard etc
-     * Worth leaving for future needs
+     * Used to make separated back-up files in OnBot
      */
     public static void saveProperties(){
         try {
@@ -59,7 +71,7 @@ public class RobotPropertyParser {
             backupOutputStream.close();
 
             populatePropertiesFile();
-            OutputStream newOutputStream = new FileOutputStream(FILE_LOCATION+ "/"+ FILE_NAME);
+            OutputStream newOutputStream = new FileOutputStream(FILE_LOCATION + "/"+ FILE_NAME);
 
             robotProperties.store(newOutputStream,null);
             newOutputStream.flush();
@@ -71,6 +83,10 @@ public class RobotPropertyParser {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Used to save current changes into current files
+     */
     public static void populatePropertiesFile(){
 
         Field[] fields = org.firstinspires.ftc.teamcode.Properties.class.getDeclaredFields();
@@ -101,16 +117,67 @@ public class RobotPropertyParser {
             if(Modifier.isStatic(field1.getModifiers())){
                 String fieldName = field1.getName();
                 Class clazz = field1.getType();
-                telemetry.addData("field from Properties", fieldName);
-
                 if(robotProperties.containsKey(fieldName)){
-                    telemetry.addData("field", fieldName);
                     try {
                         if(clazz.isAssignableFrom(double.class)) {
                             field1.setDouble(fieldName,getDouble(fieldName));
                         }
                         if(clazz.isAssignableFrom(int.class)){
                             field1.setInt(fieldName,getInt(fieldName));
+                        }
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void populateAutoSequenceFile(){
+
+        Field[] fields = AutoSequence1.class.getDeclaredFields();
+        for (Field field1: fields){
+            if(Modifier.isStatic(field1.getModifiers())){
+                String fieldName = field1.getName();
+                Class clazz = field1.getType();
+                try {
+                    if(clazz.isAssignableFrom(double.class)) {
+                        double value = field1.getDouble(null);
+                        autoSequence1Properties.setProperty(fieldName,Double.toString(value));
+                    }
+                    if(clazz.isAssignableFrom(int.class)){
+                        int value = field1.getInt(null);
+                        autoSequence1Properties.setProperty(fieldName,Integer.toString(value));
+                    }
+                    if(clazz.isAssignableFrom(String.class)) {
+                        String content = autoSequence1Properties.getProperty(fieldName);
+                        field1.set(fieldName, content);
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+    public static void populateAutoSequenceClass(Telemetry telemetry){
+        loadProperties();
+
+        Field[] fields = AutoSequence1.class.getDeclaredFields();
+        for (Field field1: fields){
+            if(Modifier.isStatic(field1.getModifiers())){
+                String fieldName = field1.getName();
+                Class clazz = field1.getType();
+                if(autoSequence1Properties.containsKey(fieldName)){
+                    try {
+                        if(clazz.isAssignableFrom(double.class)) {
+                            field1.setDouble(fieldName,getDouble(fieldName));
+                        }
+                        if(clazz.isAssignableFrom(int.class)){
+                            field1.setInt(fieldName,getInt(fieldName));
+                        }
+                        if(clazz.isAssignableFrom(String.class)) {
+                            String content = autoSequence1Properties.getProperty(fieldName);
+                            field1.set(fieldName, content);
                         }
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);

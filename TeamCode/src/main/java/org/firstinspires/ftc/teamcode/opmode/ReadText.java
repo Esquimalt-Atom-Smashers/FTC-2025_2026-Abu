@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.AutoSequence1;
 import org.firstinspires.ftc.teamcode.Properties;
 import org.firstinspires.ftc.teamcode.RobotPropertyParser;
 
@@ -26,6 +27,7 @@ public class ReadText extends LinearOpMode {
 //                telemetry.addData("bad exception",e);
 //            }
             RobotPropertyParser.populateConstantsClass(this.telemetry);
+            RobotPropertyParser.populateAutoSequenceClass(this.telemetry);
 //            String appVersion = props.getProperty("STRAFE_OFFSET");
 //            if (appVersion != null) {
 //                telemetry.addData("strafing offset", appVersion);
@@ -33,8 +35,11 @@ public class ReadText extends LinearOpMode {
 //                telemetry.addData("exception", e1);
 //            }
             telemetry.addData("strafe offset", Properties.STRAFE_OFFSET);
+            telemetry.addData("action1", AutoSequence1.Action1);
+            telemetry.addData("action2",AutoSequence1.Action2);
             telemetry.update();
         }
         RobotPropertyParser.populatePropertiesFile();
+        RobotPropertyParser.populateAutoSequenceFile();
     }
 }
