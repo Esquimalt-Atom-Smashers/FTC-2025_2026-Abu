@@ -57,7 +57,7 @@ public class RobotPropertyParser {
     public static String getString(String key) { return autoSequence1Properties.getProperty(key);}
 
     /**
-     * Used to make separated back-up files in OnBot
+     * Used to make EXTRA separated back-up files in OnBot
      */
     public static void saveProperties(){
         try {
@@ -150,8 +150,8 @@ public class RobotPropertyParser {
                         autoSequence1Properties.setProperty(fieldName,Integer.toString(value));
                     }
                     if(clazz.isAssignableFrom(String.class)) {
-                        String content = autoSequence1Properties.getProperty(fieldName);
-                        field1.set(fieldName, content);
+                        String value = field1.get(null).toString();
+                        autoSequence1Properties.setProperty(fieldName, value);
                     }
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
@@ -160,7 +160,7 @@ public class RobotPropertyParser {
         }
     }
     public static void populateAutoSequenceClass(Telemetry telemetry){
-        loadProperties();
+        loadAutoSequence1();
 
         Field[] fields = AutoSequence1.class.getDeclaredFields();
         for (Field field1: fields){
