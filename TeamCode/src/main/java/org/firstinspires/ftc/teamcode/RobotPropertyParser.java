@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,6 +9,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
@@ -19,13 +18,13 @@ public class RobotPropertyParser {
     private static Properties robotProperties = new Properties();
     private static Properties autoSequence1Properties = new Properties();
     private static final String FILE_LOCATION = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode";
-    private static final String FILE_NAME = "robot_properties.txt";
-    private static final String AUTO_SEQUENCE1_FILE_NAME = "auto_sequence1.txt";
+    private static final String PROPERTIES_FILE_NAME = "robot_properties.txt";
+    private static final String AUTO_SEQUENCE1_FILE_NAME = "ActiveAuto.txt";
 
     public static void loadProperties() {
         try {
             robotProperties.clear();
-            robotProperties.load(new FileInputStream(FILE_LOCATION + "/"+ FILE_NAME));
+            robotProperties.load(new FileInputStream(FILE_LOCATION + "/"+ PROPERTIES_FILE_NAME));
         } catch (Exception e) {
             robotProperties = new Properties();
         }
@@ -45,16 +44,16 @@ public class RobotPropertyParser {
      * @param key The name of the value you would like to read
      * @return The obtained value
      */
-    public static double getDouble(String key) { return Double.parseDouble(robotProperties.getProperty(key)); }
+    public static double getDouble(String key, Properties propertiesFile) { return Double.parseDouble(propertiesFile.getProperty(key)); }
 
     /**
      * Gets an integer for the robot_properties.txt file located in onbot Java.
      * @param key The name of the value you would like to read
      * @return The obtained value
      */
-    public static int getInt(String key) { return Integer.parseInt(robotProperties.getProperty(key)); }
+    public static int getInt(String key, Properties propertiesFile) { return Integer.parseInt(propertiesFile.getProperty(key)); }
 
-    public static String getString(String key) { return autoSequence1Properties.getProperty(key);}
+    public static String getString(String key, Properties propertiesFile) { return propertiesFile.getProperty(key);}
 
     /**
      * Used to make EXTRA separated back-up files in OnBot
@@ -71,7 +70,7 @@ public class RobotPropertyParser {
             backupOutputStream.close();
 
             populatePropertiesFile();
-            OutputStream newOutputStream = new FileOutputStream(FILE_LOCATION + "/"+ FILE_NAME);
+            OutputStream newOutputStream = new FileOutputStream(FILE_LOCATION + "/"+ PROPERTIES_FILE_NAME);
 
             robotProperties.store(newOutputStream,null);
             newOutputStream.flush();
@@ -85,7 +84,7 @@ public class RobotPropertyParser {
     }
 
     /**
-     * Used to save current changes into current files
+     * Used to save current changes into the text files
      */
     public static void populatePropertiesFile(){
 
@@ -109,7 +108,10 @@ public class RobotPropertyParser {
             }
         }
     }
-    public static void populateConstantsClass(Telemetry telemetry){
+    /**
+     * Used to load values from the text file to the properties class
+     */
+    public static void populatePropertiesClass(){
         loadProperties();
 
         Field[] fields = org.firstinspires.ftc.teamcode.Properties.class.getDeclaredFields();
@@ -120,10 +122,10 @@ public class RobotPropertyParser {
                 if(robotProperties.containsKey(fieldName)){
                     try {
                         if(clazz.isAssignableFrom(double.class)) {
-                            field1.setDouble(fieldName,getDouble(fieldName));
+                            field1.setDouble(fieldName,getDouble(fieldName,robotProperties));
                         }
                         if(clazz.isAssignableFrom(int.class)){
-                            field1.setInt(fieldName,getInt(fieldName));
+                            field1.setInt(fieldName,getInt(fieldName,robotProperties));
                         }
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
@@ -135,7 +137,7 @@ public class RobotPropertyParser {
 
     public static void populateAutoSequenceFile(){
 
-        Field[] fields = AutoSequence1.class.getDeclaredFields();
+        Field[] fields = ActiveAutoSequence.class.getDeclaredFields();
         for (Field field1: fields){
             if(Modifier.isStatic(field1.getModifiers())){
                 String fieldName = field1.getName();
@@ -159,10 +161,33 @@ public class RobotPropertyParser {
             }
         }
     }
-    public static void populateAutoSequenceClass(Telemetry telemetry){
+    public static ArrayList<String> arrayFromAutoSequenceFile(){
+
+        Field[] fields = ActiveAutoSequence.class.getDeclaredFields();
+
+        ArrayList<String> actionList = new ArrayList<>();
+        for (Field field1: fields){
+            if(Modifier.isStatic(field1.getModifiers())){
+                Class clazz = field1.getType();
+                try {
+                    if(clazz.isAssignableFrom(String.class)) {
+                        String value = field1.get(null).toString();
+                        if (!value.equals("default")){
+                            actionList.add(value);
+                        }
+
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return actionList;
+    }
+    public static void populateAutoSequenceClass(){
         loadAutoSequence1();
 
-        Field[] fields = AutoSequence1.class.getDeclaredFields();
+        Field[] fields = ActiveAutoSequence.class.getDeclaredFields();
         for (Field field1: fields){
             if(Modifier.isStatic(field1.getModifiers())){
                 String fieldName = field1.getName();
@@ -170,14 +195,13 @@ public class RobotPropertyParser {
                 if(autoSequence1Properties.containsKey(fieldName)){
                     try {
                         if(clazz.isAssignableFrom(double.class)) {
-                            field1.setDouble(fieldName,getDouble(fieldName));
+                            field1.setDouble(fieldName,getDouble(fieldName,autoSequence1Properties));
                         }
                         if(clazz.isAssignableFrom(int.class)){
-                            field1.setInt(fieldName,getInt(fieldName));
+                            field1.setInt(fieldName,getInt(fieldName,autoSequence1Properties));
                         }
                         if(clazz.isAssignableFrom(String.class)) {
-                            String content = autoSequence1Properties.getProperty(fieldName);
-                            field1.set(fieldName, content);
+                            field1.set(fieldName, autoSequence1Properties.getProperty(fieldName));
                         }
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
