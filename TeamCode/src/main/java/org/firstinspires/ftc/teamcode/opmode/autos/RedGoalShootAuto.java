@@ -49,7 +49,6 @@ public class RedGoalShootAuto extends LinearOpMode {
                     default:
                         break;
                 }
-
             } catch (NoSuchFieldException e) {
                 break;
             } catch (IllegalAccessException e) {
