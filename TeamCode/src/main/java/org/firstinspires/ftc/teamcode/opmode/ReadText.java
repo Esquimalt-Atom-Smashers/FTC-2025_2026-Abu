@@ -13,18 +13,13 @@ public class ReadText extends LinearOpMode {
         Exception e1 = new Exception("none");
         java.util.Properties props = new java.util.Properties();
         RobotPropertyParser.populatePropertiesClass();
-        RobotPropertyParser.populateAutoSequenceClass();
-
         waitForStart();
         while (opModeIsActive()) {
-
-
             telemetry.addData("strafe offset", Properties.STRAFE_OFFSET);
             telemetry.addData("action1", ActiveAutoSequence.Action1);
             telemetry.addData("action2", ActiveAutoSequence.Action2);
             telemetry.update();
         }
         RobotPropertyParser.populatePropertiesFile();
-        RobotPropertyParser.populateAutoSequenceFile();
     }
 }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,11 +13,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Scanner;
 
 public class RobotPropertyParser {
 
     private static Properties robotProperties = new Properties();
     private static Properties autoSequence1Properties = new Properties();
+    private static File autoSequenceTxt;
     private static final String FILE_LOCATION = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode";
     private static final String PROPERTIES_FILE_NAME = "robot_properties.txt";
     private static final String AUTO_SEQUENCE1_FILE_NAME = "ActiveAuto.txt";
@@ -31,12 +34,7 @@ public class RobotPropertyParser {
     }
 
     public static void loadAutoSequence1() {
-        try {
-            autoSequence1Properties.clear();
-            autoSequence1Properties.load(new FileInputStream(FILE_LOCATION + "/"+ AUTO_SEQUENCE1_FILE_NAME));
-        } catch (Exception e) {
-            autoSequence1Properties = new Properties();
-        }
+        autoSequenceTxt = new File(FILE_LOCATION + "/" + AUTO_SEQUENCE1_FILE_NAME);
     }
 
     /**
@@ -135,79 +133,17 @@ public class RobotPropertyParser {
         }
     }
 
-    public static void populateAutoSequenceFile(){
-
-        Field[] fields = ActiveAutoSequence.class.getDeclaredFields();
-        for (Field field1: fields){
-            if(Modifier.isStatic(field1.getModifiers())){
-                String fieldName = field1.getName();
-                Class clazz = field1.getType();
-                try {
-                    if(clazz.isAssignableFrom(double.class)) {
-                        double value = field1.getDouble(null);
-                        autoSequence1Properties.setProperty(fieldName,Double.toString(value));
-                    }
-                    if(clazz.isAssignableFrom(int.class)){
-                        int value = field1.getInt(null);
-                        autoSequence1Properties.setProperty(fieldName,Integer.toString(value));
-                    }
-                    if(clazz.isAssignableFrom(String.class)) {
-                        String value = field1.get(null).toString();
-                        autoSequence1Properties.setProperty(fieldName, value);
-                    }
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
     public static ArrayList<String> arrayFromAutoSequenceFile(){
-
-        Field[] fields = ActiveAutoSequence.class.getDeclaredFields();
-
+        loadAutoSequence1();
         ArrayList<String> actionList = new ArrayList<>();
-        for (Field field1: fields){
-            if(Modifier.isStatic(field1.getModifiers())){
-                Class clazz = field1.getType();
-                try {
-                    if(clazz.isAssignableFrom(String.class)) {
-                        String value = field1.get(null).toString();
-                        if (!value.equals("default")){
-                            actionList.add(value);
-                        }
-
-                    }
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+        try(Scanner reader = new Scanner(autoSequenceTxt)) {
+            while (reader.hasNextLine()) {
+                String actionTxt = reader.nextLine();
+                actionList.add(actionTxt);
             }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
         return actionList;
-    }
-    public static void populateAutoSequenceClass(){
-        loadAutoSequence1();
-
-        Field[] fields = ActiveAutoSequence.class.getDeclaredFields();
-        for (Field field1: fields){
-            if(Modifier.isStatic(field1.getModifiers())){
-                String fieldName = field1.getName();
-                Class clazz = field1.getType();
-                if(autoSequence1Properties.containsKey(fieldName)){
-                    try {
-                        if(clazz.isAssignableFrom(double.class)) {
-                            field1.setDouble(fieldName,getDouble(fieldName,autoSequence1Properties));
-                        }
-                        if(clazz.isAssignableFrom(int.class)){
-                            field1.setInt(fieldName,getInt(fieldName,autoSequence1Properties));
-                        }
-                        if(clazz.isAssignableFrom(String.class)) {
-                            field1.set(fieldName, autoSequence1Properties.getProperty(fieldName));
-                        }
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        }
     }
 }
