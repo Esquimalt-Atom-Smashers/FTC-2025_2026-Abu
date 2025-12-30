@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
+import com.acmerobotics.roadrunner.Pose2d;
+
 import org.firstinspires.ftc.teamcode.subsystems.*;
 
 /**
@@ -45,7 +47,7 @@ public class RobotContainer {
      *
      * @return Current estimated pose
      */
-    public DriveSubsystem.Pose getPose() {
+    public Pose2d getPose() {
         return drive.getPose();
     }
 
@@ -55,17 +57,10 @@ public class RobotContainer {
      * Vision data is fused with drive localization.
      */
     public void updatePoseFromVision() {
-        VisionSubsystem.Pose visionPose =
-                vision.getLimelightPos(getPose().heading);
+        Pose2d visionPose = vision.getLimelightPos(getPose().heading.toDouble());
 
         if (visionPose != null) {
-            drive.setPose(
-                    new DriveSubsystem.Pose(
-                            visionPose.x,
-                            visionPose.y,
-                            visionPose.heading
-                    )
-            );
+            drive.setPose(visionPose);
         }
     }
 
@@ -74,7 +69,7 @@ public class RobotContainer {
      *
      * @param pose Target pose
      */
-    public void goToPose(DriveSubsystem.Pose pose) {
+    public void goToPose(Pose2d pose) {
         drive.goToPose(pose);
     }
 
