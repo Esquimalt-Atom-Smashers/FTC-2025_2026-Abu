@@ -80,18 +80,22 @@ public class IntakeTransferSubsystem implements SubsystemBase{
     }
 
 //--------------------Common functions across subsystems--------------------
+
+
     /**
-     * Runs every loop
+     * gets called from robot container every loop
      */
+    @Override
     public void periodic() {
 
     }
 
     /**
-     * Enables or disables telemetry output for this subsystem.
+     * Enables or disables telemetry output for this subsystem. defaults to true
      *
      * @param enabled True to enable telemetry, false to disable
      */
+    @Override
     public void enableSubsystemTelemetry(boolean enabled) {
 
     }
@@ -99,19 +103,25 @@ public class IntakeTransferSubsystem implements SubsystemBase{
     /**
      * Resets the subsystem to a known safe state.
      */
-    public void resetSubsystem(){
+    @Override
+    public void resetSubsystem() {
 
     }
 
     /**
-     * Safely shuts down the subsystem.
-     *
-     * Motors should stop and resources should be released.
+     * Safely shuts down the subsystem. Motors should stop
      */
+    @Override
     public void shutDownSubsystem() {
 
     }
 
+    /**
+     * Returns the current state of the subsystem.
+     *
+     * @return The current subsystem state (subsystem-specific enum)
+     */
+    @Override
     public Enum<?> getState() {
         return null;
     }

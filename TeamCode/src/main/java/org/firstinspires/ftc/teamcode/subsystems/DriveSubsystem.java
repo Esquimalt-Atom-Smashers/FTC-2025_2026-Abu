@@ -10,11 +10,11 @@ import com.acmerobotics.roadrunner.Pose2d;
  *
  * This class currently contains only structure and documentation.
  */
-public class DriveSubsystem {
+public class DriveSubsystem implements SubsystemBase {
 
     /**
      * Constructor for the DriveSubsystem.
-     *
+     * <p>
      * Drive motors, IMU, and localization systems
      * should be initialized here later.
      */
@@ -25,9 +25,9 @@ public class DriveSubsystem {
     /**
      * Drives the robot using field-centric control.
      *
-     * @param drive Forward/backward movement input
+     * @param drive  Forward/backward movement input
      * @param strafe Left/right movement input
-     * @param turn Rotational movement input
+     * @param turn   Rotational movement input
      */
     public void driveFieldCentric(double drive, double strafe, double turn) {
         // TODO: Convert field-centric inputs to robot-centric motion
@@ -37,9 +37,9 @@ public class DriveSubsystem {
     /**
      * Drives the robot using robot-centric control.
      *
-     * @param drive Forward/backward movement input
+     * @param drive  Forward/backward movement input
      * @param strafe Left/right movement input
-     * @param turn Rotational movement input
+     * @param turn   Rotational movement input
      */
     public void driveRobotCentric(double drive, double strafe, double turn) {
         // TODO: Apply motor power directly in robot reference frame
@@ -47,7 +47,7 @@ public class DriveSubsystem {
 
     /**
      * Resets the robot's heading to zero.
-     *
+     * <p>
      * Typically called at the start of a match or autonomous.
      */
     public void resetHeading() {
@@ -82,10 +82,10 @@ public class DriveSubsystem {
         // TODO: Implement path following or PID control
     }
 
-//--------------------Common functions across subsystems--------------------
     /**
      * Runs every loop
      */
+    @Override
     public void periodic() {
 
     }
@@ -95,6 +95,7 @@ public class DriveSubsystem {
      *
      * @param enabled True to enable telemetry, false to disable
      */
+    @Override
     public void enableSubsystemTelemetry(boolean enabled) {
 
     }
@@ -102,20 +103,30 @@ public class DriveSubsystem {
     /**
      * Resets the subsystem to a known safe state.
      */
-    public void resetSubsystem(){
+    @Override
+    public void resetSubsystem() {
 
     }
 
     /**
      * Safely shuts down the subsystem.
-     *
+     * <p>
      * Motors should stop and resources should be released.
      */
+    @Override
     public void shutDownSubsystem() {
 
     }
 
+    /**
+     * Returns the current state of the subsystem.
+     *
+     * @return The current subsystem state (subsystem-specific enum)
+     */
+    @Override
     public Enum<?> getState() {
         return null;
     }
+
+//--------------------Common functions across subsystems--------------------
 }

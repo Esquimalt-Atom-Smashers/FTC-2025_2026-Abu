@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
 import com.acmerobotics.roadrunner.Pose2d;
-
 import org.firstinspires.ftc.teamcode.subsystems.*;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem.BallColour;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem.Direction;
+
 
 /**
  * RobotContainer
@@ -39,17 +41,17 @@ public class RobotContainer {
      */
     public void runRobot() {
         // TODO: Update subsystems if needed
-        // Example: drive.update(), shooter.update()
+        // Example: drive.periodic(), shooter.periodic()
     }
 
     /**
-     * Returns the robot's current pose.
+     * Returns the robot's current pose. combining multiple sensors
      *
      * @return Current estimated pose
      */
     public Pose2d getPose() {
         return drive.getPose();
-    }
+    }//TODO add more code to integrate limelight
 
     /**
      * Updates the robot pose using vision data.
@@ -60,7 +62,7 @@ public class RobotContainer {
         Pose2d visionPose = vision.getLimelightPos(getPose().heading.toDouble());
 
         if (visionPose != null) {
-            drive.setPose(visionPose);
+            drive.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
         }
     }
 
@@ -80,11 +82,7 @@ public class RobotContainer {
      * @param hoodAngle Shooter hood angle
      * @param rpm Shooter flywheel speed
      */
-    public void shoot(
-            IntakeTransferSubsystem.BallColour ballColour,
-            double hoodAngle,
-            double rpm
-    ) {
+    public void shoot(BallColour ballColour, double hoodAngle, double rpm) {
         shooter.shoot(hoodAngle, rpm);
         intake.feedShooter(ballColour);
     }
@@ -97,9 +95,9 @@ public class RobotContainer {
      * @param direction Intake direction
      */
     public void intakeBalls(
-            IntakeTransferSubsystem.BallColour ballColour,
+            BallColour ballColour,
             int numberOfBalls,
-            IntakeTransferSubsystem.Direction direction
+            Direction direction
     ) {
         intake.intake(ballColour, numberOfBalls, direction);
     }

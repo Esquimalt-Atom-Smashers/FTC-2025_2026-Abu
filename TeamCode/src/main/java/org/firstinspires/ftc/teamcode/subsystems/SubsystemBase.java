@@ -1,20 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 public interface SubsystemBase {
-    /**
-     * Subsystem
-     *
-     * Common interface implemented by all robot subsystems.
-     * Provides lifecycle control, telemetry control, and state access.
-     */
-    public interface Subsystem {
-        /**
-         * Runs every loop
-         */
+        /** gets called from robot container every loop*/
         void periodic();
 
         /**
-         * Enables or disables telemetry output for this subsystem.
+         * Enables or disables telemetry output for this subsystem. defaults to true
          *
          * @param enabled True to enable telemetry, false to disable
          */
@@ -26,9 +17,7 @@ public interface SubsystemBase {
         void resetSubsystem();
 
         /**
-         * Safely shuts down the subsystem.
-         *
-         * Motors should stop and resources should be released.
+         * Safely shuts down the subsystem. Motors should stop
          */
         void shutDownSubsystem();
 
@@ -39,6 +28,6 @@ public interface SubsystemBase {
          */
         Enum<?> getState();
 
-    }
+
 
 }
