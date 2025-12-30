@@ -1,0 +1,111 @@
+package org.firstinspires.ftc.teamcode.utilities;
+
+import org.firstinspires.ftc.teamcode.subsystems.*;
+
+/**
+ * RobotContainer
+ *
+ * Central coordinator for all robot subsystems.
+ * Provides high-level robot actions and lifecycle control.
+ */
+public class RobotContainer {
+
+    // Subsystems
+    private final DriveSubsystem drive;
+    private final ShooterSubsystem shooter;
+    private final IntakeTransferSubsystem intake;
+    private final VisionSubsystem vision;
+    private final ReturnToBaseSubsystem returnToBase;
+
+    /**
+     * Constructor for RobotContainer.
+     *
+     * All subsystems are created and managed here.
+     */
+    public RobotContainer() {
+        drive = new DriveSubsystem();
+        shooter = new ShooterSubsystem();
+        intake = new IntakeTransferSubsystem();
+        vision = new VisionSubsystem();
+        returnToBase = new ReturnToBaseSubsystem();
+    }
+
+    /**
+     * Called periodically during OpMode loop.
+     *
+     * This method should be lightweight and safe to run every cycle.
+     */
+    public void runRobot() {
+        // TODO: Update subsystems if needed
+        // Example: drive.update(), shooter.update()
+    }
+
+    /**
+     * Returns the robot's current pose.
+     *
+     * @return Current estimated pose
+     */
+    public DriveSubsystem.Pose getPose() {
+        return drive.getPose();
+    }
+
+    /**
+     * Updates the robot pose using vision data.
+     *
+     * Vision data is fused with drive localization.
+     */
+    public void updatePoseFromVision() {
+        VisionSubsystem.Pose visionPose =
+                vision.getLimelightPos(getPose().heading);
+
+        if (visionPose != null) {
+            drive.setPose(
+                    new DriveSubsystem.Pose(
+                            visionPose.x,
+                            visionPose.y,
+                            visionPose.heading
+                    )
+            );
+        }
+    }
+
+    /**
+     * Commands the robot to drive to a target pose.
+     *
+     * @param pose Target pose
+     */
+    public void goToPose(DriveSubsystem.Pose pose) {
+        drive.goToPose(pose);
+    }
+
+    /**
+     * High-level shooting command.
+     *
+     * @param ballColour The ball color being shot
+     * @param hoodAngle Shooter hood angle
+     * @param rpm Shooter flywheel speed
+     */
+    public void shoot(
+            IntakeTransferSubsystem.BallColour ballColour,
+            double hoodAngle,
+            double rpm
+    ) {
+        shooter.shoot(hoodAngle, rpm);
+        intake.feedShooter(ballColour);
+    }
+
+    /**
+     * High-level intake command.
+     *
+     * @param ballColour Ball color to intake
+     * @param numberOfBalls Number of balls to intake
+     * @param direction Intake direction
+     */
+    public void intakeBalls(
+            IntakeTransferSubsystem.BallColour ballColour,
+            int numberOfBalls,
+            IntakeTransferSubsystem.Direction direction
+    ) {
+        intake.intake(ballColour, numberOfBalls, direction);
+    }
+}
