@@ -55,24 +55,28 @@ public class AutoActions {
         public ShooterSubsystem.FlywheelSetting flywheelSetting;
         public ElapsedTime shootTimer;
         public double seconds;
+        public boolean firstLoop = true;
         public ShootArtifactAction(double targetRPM, double seconds) {
-
-            shooterSubsystem.setCurrentState(ShooterSubsystem.ShooterState.MANUAL);
             flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRPM, 0);
-            shooterSubsystem.shoot(flywheelSetting);
+            shooterSubsystem.setTargetSetting(flywheelSetting);
 
-            intakeTransferSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
-            shootTimer = new ElapsedTime();
             this.seconds = seconds;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstLoop) {
+                shootTimer = new ElapsedTime();
+                firstLoop = false;
+                shooterSubsystem.setCurrentState(ShooterSubsystem.ShooterState.MANUAL);
+                intakeTransferSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
+            }
             shooterSubsystem.shoot(flywheelSetting);
             if (shootTimer.seconds() >= seconds) {
                 intakeTransferSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
                 return false;
             } else {
+                intakeTransferSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
                 return true;
             }
         }

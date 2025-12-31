@@ -71,7 +71,7 @@ public class RobotContainer {
         intake.periodic();
         vision.periodic();
         // TODO: Update subsystems if needed
-        if (telemetryTimer.seconds() >= 1.5) {
+        if (telemetryTimer.seconds() >= 1.0) {
             opMode.telemetry.clearAll();
             drivebase.addSubsystemTelemetry();
             shooter.addSubsystemTelemetry();

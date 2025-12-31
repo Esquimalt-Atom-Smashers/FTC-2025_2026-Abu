@@ -159,6 +159,10 @@ public class ShooterSubsystem implements SubsystemBase{
         shoot(distanceToFlywheelSetting(distance));
     }
 
+    public void setTargetSetting (FlywheelSetting targetSetting) {
+        this.targetSetting = targetSetting;
+    }
+
     //go through matching table
     //get distance in inch
     public FlywheelSetting distanceToFlywheelSetting(double distance) {

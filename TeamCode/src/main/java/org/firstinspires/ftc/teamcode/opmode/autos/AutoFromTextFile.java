@@ -79,8 +79,8 @@ public class AutoFromTextFile extends LinearOpMode {
         RobotContainer robotContainer = new RobotContainer(this,
                 startingPos, alliance,
                 DriveSubsystem.DriveSubsystemState.AUTO,
-                ShooterSubsystem.ShooterState.DISABLED,
-                IntakeTransferSubsystem.IntakeTransferState.DISABLED,
+                ShooterSubsystem.ShooterState.MANUAL,
+                IntakeTransferSubsystem.IntakeTransferState.INTAKING,
                 VisionSubsystem.VisionState.DISABLED);
         AutoActions autoActions = new AutoActions(robotContainer);
 

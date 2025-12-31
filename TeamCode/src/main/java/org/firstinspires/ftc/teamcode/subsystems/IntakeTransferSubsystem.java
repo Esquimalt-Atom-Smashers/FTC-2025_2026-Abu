@@ -53,10 +53,12 @@ public class IntakeTransferSubsystem implements SubsystemBase{
         FEEDING_SHOOTER,
         DISABLED
     }
-    IntakeTransferState currentState;
+    private IntakeTransferState currentState;
     private boolean isTelemetryEnabled = true;
+    private OpMode opMode;
 
     public IntakeTransferSubsystem(OpMode opMode, IntakeTransferState intakeTransferState) {
+        this.opMode = opMode;
         IntakeMotor = opMode.hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
         rearFeedServo = opMode.hardwareMap.get(CRServo.class, REAR_FEED_SERVO_NAME);
         feedServo = opMode.hardwareMap.get(CRServo.class, FEED_SERVO_NAME);
@@ -154,7 +156,20 @@ public class IntakeTransferSubsystem implements SubsystemBase{
 
     @Override
     public void addSubsystemTelemetry() {
-        if(isTelemetryEnabled) {}
+        if(isTelemetryEnabled) {
+            switch (currentState) {
+                case DISABLED:
+                    opMode.telemetry.addLine("Intake disabled");
+                    break;
+                case INTAKING:
+                    opMode.telemetry.addLine("Intaking");
+                    break;
+                case EJECTING:
+                    opMode.telemetry.addLine("Ejecting");
+                case FEEDING_SHOOTER:
+                    opMode.telemetry.addLine("Feeding Shooter");
+            }
+        }
     }
 
     /**

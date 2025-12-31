@@ -42,6 +42,12 @@ public class RedTeleOp extends LinearOpMode {
         while (opModeIsActive()) {
             robotContainer.drive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
             robotContainer.shooter.shoot(flywheelSetting);
+
+            if (gamepad1.a) {
+                robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
+            }else {
+                robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
+            }
             robotContainer.runRobot();
         }
         robotContainer.shutDownRobot();
