@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
 /**
  * IntakeTransferSubsystem
  *
@@ -11,13 +16,53 @@ package org.firstinspires.ftc.teamcode.subsystems;
  */
 public class IntakeTransferSubsystem implements SubsystemBase{
 
-    /**
-     * Returns the current state of the subsystem.
-     *
-     * @return The current subsystem state
-     */
-    public IntakeTransferSubsystem() {
+    private DcMotor IntakeMotor;
+    private final String INTAKE_MOTOR_NAME = "intakeMotor";
+    private final DcMotorSimple.Direction INTAKE_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
 
+    private CRServo feedServo;
+    private final String FEED_SERVO_NAME = "feedServo";
+    private final DcMotorSimple.Direction FEED_SERVO_DIRECTION = DcMotorSimple.Direction.FORWARD;
+
+    private CRServo rearFeedServo;
+    private final String REAR_FEED_SERVO_NAME = "rearFeedServo";
+    private final DcMotorSimple.Direction REAR_FEED_SERVO_DIRECTION = DcMotorSimple.Direction.FORWARD;
+
+    public enum ServoStates {
+        SPINNING(1.0),
+        STOPPED(0.0),
+        REVERSED(-1.0);
+
+        private double servoPower;
+        private ServoStates(double servoPower) {
+            this.servoPower = servoPower;
+        }
+    }
+
+    /**
+     * Represents the direction the intake should run.
+     */
+    public enum Direction {
+        LEFT,
+        RIGHT
+    }
+
+    public enum IntakeTransferState {
+        INTAKING,
+        EJECTING,
+        FEEDING_SHOOTER,
+        DISABLED
+    }
+    IntakeTransferState currentState;
+    public IntakeTransferSubsystem(OpMode opMode, IntakeTransferState intakeTransferState) {
+        IntakeMotor = opMode.hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
+        rearFeedServo = opMode.hardwareMap.get(CRServo.class, REAR_FEED_SERVO_NAME);
+        feedServo = opMode.hardwareMap.get(CRServo.class, FEED_SERVO_NAME);
+
+        IntakeMotor.setDirection(INTAKE_MOTOR_DIRECTION);
+        rearFeedServo.setDirection(REAR_FEED_SERVO_DIRECTION);
+        feedServo.setDirection(FEED_SERVO_DIRECTION);
+        this.currentState = intakeTransferState;
     }
 
     /**
@@ -31,18 +76,6 @@ public class IntakeTransferSubsystem implements SubsystemBase{
     }
 
     /**
-     * Represents the direction the intake should run.
-     */
-    public enum Direction {
-        LEFT,
-        RIGHT
-    }
-
-    public enum State{
-
-    }
-
-    /**
      * Runs the intake to collect or move balls.
      *
      * @param ballColour The color of ball to intake
@@ -53,11 +86,19 @@ public class IntakeTransferSubsystem implements SubsystemBase{
         // TODO: Implement intake logic
     }
 
+    public void intake() {
+        IntakeMotor.setPower(ServoStates.SPINNING.servoPower);
+        feedServo.setPower(ServoStates.SPINNING.servoPower);
+        rearFeedServo.setPower(ServoStates.REVERSED.servoPower);
+    }
+
     /**
      * Stops all intake and transfer motion.
      */
     public void stop() {
-        // TODO: Stop motors/servos
+        IntakeMotor.setPower(ServoStates.STOPPED.servoPower);
+        feedServo.setPower(ServoStates.STOPPED.servoPower);
+        rearFeedServo.setPower(ServoStates.STOPPED.servoPower);
     }
 
     /**
@@ -67,17 +108,24 @@ public class IntakeTransferSubsystem implements SubsystemBase{
      * @param ballColour The color of balls to eject
      */
     public void eject(int numberOfBalls, BallColour ballColour) {
-        // TODO: Implement eject logic
+    }
+
+    public void eject() {
+        IntakeMotor.setPower(ServoStates.REVERSED.servoPower);
+        feedServo.setPower(ServoStates.REVERSED.servoPower);
+        rearFeedServo.setPower(ServoStates.REVERSED.servoPower);
     }
 
     /**
      * Feeds a ball of a specific color into the shooter.
-     *
-     * @param ballColour The color of ball to feed
      */
-    public void feedShooter(BallColour ballColour) {
-        // TODO: Implement feeding logic
+    public void feedShooter() {
+        IntakeMotor.setPower(ServoStates.SPINNING.servoPower);
+        feedServo.setPower(ServoStates.SPINNING.servoPower);
+        rearFeedServo.setPower(ServoStates.SPINNING.servoPower);
     }
+
+
 
 //--------------------Common functions across subsystems--------------------
 
@@ -87,7 +135,18 @@ public class IntakeTransferSubsystem implements SubsystemBase{
      */
     @Override
     public void periodic() {
-
+        switch (currentState) {
+            case DISABLED:
+                stop();
+                break;
+            case INTAKING:
+                intake();
+                break;
+            case EJECTING:
+                eject();
+            case FEEDING_SHOOTER:
+                feedShooter();
+        }
     }
 
     /**
@@ -97,6 +156,11 @@ public class IntakeTransferSubsystem implements SubsystemBase{
      */
     @Override
     public void enableSubsystemTelemetry(boolean enabled) {
+
+    }
+
+    @Override
+    public void addSubsystemTelemetry() {
 
     }
 
@@ -122,8 +186,9 @@ public class IntakeTransferSubsystem implements SubsystemBase{
      * @return The current subsystem state (subsystem-specific enum)
      */
     @Override
-    public Enum<?> getState() {
-        return null;
+    public IntakeTransferState getState() {
+        return currentState;
     }
+    public void setState(IntakeTransferState intakeTransferState) {currentState = intakeTransferState;}
 }
 

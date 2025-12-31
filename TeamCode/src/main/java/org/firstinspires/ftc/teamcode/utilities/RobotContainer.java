@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.subsystems.*;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem.BallColour;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem.Direction;
+import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem.DriveSubsystemState;
 
 
 /**
@@ -21,17 +25,37 @@ public class RobotContainer {
     private final VisionSubsystem vision;
     private final ReturnToBaseSubsystem returnToBase;
 
+    private OpMode opMode;
+    private Pose2d robotPose;
+    private ElapsedTime telemetryTimer;
+
+    /**
+     * Represents the alliance color.
+     * Used for automatically selecting shooting behavior.
+     */
+    public enum Alliance {
+        RED,
+        BLUE
+    }
+    public Alliance alliance;
+    public static final Pose2d RED_GOAL_POSE = new Pose2d(-60, 65 ,0);
+    public static final Pose2d BLUE_GOAL_POSE = new Pose2d(-60, -65, 0);
+    private final double POSITIONAL_TOLARANCE = 1.0;
+
     /**
      * Constructor for RobotContainer.
      *
      * All subsystems are created and managed here.
      */
-    public RobotContainer() {
-        drive = new DriveSubsystem();
-        shooter = new ShooterSubsystem();
-        intake = new IntakeTransferSubsystem();
-        vision = new VisionSubsystem();
+    public RobotContainer(OpMode opMode, Pose2d robotPose, Alliance alliance, DriveSubsystemState driveState, ShooterSubsystem.ShooterState shooterState, IntakeTransferSubsystem.IntakeTransferState intakeTransferState, VisionSubsystem.VisionState visionState) {
+        drive = new DriveSubsystem(opMode, robotPose, driveState);
+        shooter = new ShooterSubsystem(opMode, alliance, shooterState, robotPose);
+        intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
+        vision = new VisionSubsystem(opMode, alliance, visionState);
         returnToBase = new ReturnToBaseSubsystem();
+
+        telemetryTimer = new ElapsedTime();
+        this.alliance = alliance;
     }
 
     /**
@@ -40,8 +64,19 @@ public class RobotContainer {
      * This method should be lightweight and safe to run every cycle.
      */
     public void runRobot() {
+        drive.periodic();
+        shooter.periodic();
+        intake.periodic();
+        vision.periodic();
         // TODO: Update subsystems if needed
-        // Example: drive.periodic(), shooter.periodic()
+        if (telemetryTimer.seconds() >= 1.5) {
+            drive.addSubsystemTelemetry();
+            shooter.addSubsystemTelemetry();
+            intake.addSubsystemTelemetry();
+            vision.addSubsystemTelemetry();
+            opMode.telemetry.update();
+            telemetryTimer.reset();
+        }
     }
 
     /**
@@ -58,11 +93,13 @@ public class RobotContainer {
      *
      * Vision data is fused with drive localization.
      */
-    public void updatePoseFromVision() {
-        Pose2d visionPose = vision.getLimelightPos(getPose().heading.toDouble());
-
+    public void updatePoseFromVision(boolean forceReset) {
+        Pose2d visionPose = vision.getLimelightPos();
+        Pose2d drivePose = getPose();
         if (visionPose != null) {
-            drive.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
+            if ((Math.abs(visionPose.position.x - drivePose.position.x) >= POSITIONAL_TOLARANCE || Math.abs(visionPose.position.y - drivePose.position.y) >= POSITIONAL_TOLARANCE) && !forceReset) {
+                drive.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
+            }
         }
     }
 
@@ -75,16 +112,10 @@ public class RobotContainer {
         drive.goToPose(pose);
     }
 
-    /**
-     * High-level shooting command.
-     *
-     * @param ballColour The ball color being shot
-     * @param hoodAngle Shooter hood angle
-     * @param rpm Shooter flywheel speed
-     */
-    public void shoot(BallColour ballColour, double hoodAngle, double rpm) {
-        shooter.shoot(hoodAngle, rpm);
-        intake.feedShooter(ballColour);
+    /**High-level shooting command.*/
+    public void shoot() {
+//        shooter.shoot(hoodAngle, rpm);// after ff apply
+        intake.feedShooter();
     }
 
     /**

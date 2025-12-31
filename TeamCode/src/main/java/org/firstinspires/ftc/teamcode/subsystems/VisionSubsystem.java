@@ -1,6 +1,16 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.utilities.RobotContainer.*;
+
+import java.util.List;
 
 /**
  * VisionSubsystem
@@ -10,17 +20,7 @@ import com.acmerobotics.roadrunner.Pose2d;
  *
  * This class currently contains only structure and documentation.
  */
-public class VisionSubsystem {
-
-    /**
-     * Represents the alliance color.
-     * Used for selecting alliance-specific targets.
-     */
-    public enum Alliance {
-        RED,
-        BLUE
-    }
-
+public class VisionSubsystem implements SubsystemBase{
     /**
      * Represents possible detected field patterns.
      */
@@ -30,25 +30,65 @@ public class VisionSubsystem {
         PATTERN3
     }
 
+    public enum VisionState{
+        DISABLED,
+        TRACKING_GOAL
+    }
+    private Limelight3A limelight3A;
+    private String LIMELIGHT_NAME = "limelight";
+
+    private final int RED_GOAL_APRILTAG_PIPELINE = 0;
+    private final int BLUE_GOAL_APRILTAG_PIPELINE = 1;
+    private final int PULL_RATE_HZ = 10;
+
+    public final Pose2d RED_GOAL_POSE = new Pose2d(-60, 65 ,0);
+    public final Pose2d BLUE_GOAL_POSE = new Pose2d(-60, -65, 0);
+    private double METER_TO_INCH = 39.37008;
+    private final double POSITIONAL_TOLARANCE = 1.0;
+
+    private Alliance alliance;
+    private OpMode opMode;
+    private VisionState currentState;
+
+    private Pose3D botPose;
+    private double ty = 0.0;
+    private int tagId = 0;
+    private Pose2d pose2d;
+    private boolean LLGotData = false;
+
     /**
      * Constructor for the VisionSubsystem.
      *
      * Vision hardware and pipelines should be
      * initialized here later.
      */
-    public VisionSubsystem() {
-        // Initialize vision hardware and pipelines here
+    public VisionSubsystem(OpMode opMode, Alliance alliance, VisionState visionState) {
+        limelight3A = opMode.hardwareMap.get(Limelight3A.class, LIMELIGHT_NAME);
+        limelight3A.setPollRateHz(PULL_RATE_HZ);
+        limelight3A.start();
+        this.alliance = alliance;
+        this.opMode = opMode;
+        currentState = visionState;
+        if (alliance == Alliance.RED) {
+            limelight3A.pipelineSwitch(RED_GOAL_APRILTAG_PIPELINE);
+        } else {
+            limelight3A.pipelineSwitch(BLUE_GOAL_APRILTAG_PIPELINE);
+        }
+    }
+
+    public void updateCurrentPose(Pose2d pose2d) {
+        this.pose2d = pose2d;
     }
 
     /**
      * Returns the robot's position estimated by the Limelight.
-     *
-     * @param currentHeading The robot's current heading (from IMU)
-     * @return The estimated pose from vision
+     ** @return The estimated pose from vision
      */
-    public Pose2d getLimelightPos(double currentHeading) {
-        // TODO: Read Limelight data and compute pose
-        return null;
+    public Pose2d getLimelightPos() {
+        limelight3A.updateRobotOrientation(Math.toDegrees(pose2d.heading.toDouble()));
+        if (botPose == null) return null;
+        Pose2d returningPose = new Pose2d(botPose.getPosition().x * METER_TO_INCH, botPose.getPosition().y * METER_TO_INCH, botPose.getOrientation().getYaw(AngleUnit.RADIANS));
+        return returningPose;
     }
 
     /**
@@ -72,13 +112,33 @@ public class VisionSubsystem {
         // TODO: Determine pattern from vision pipeline
         return null;
     }
-
 //--------------------Common functions across subsystems--------------------
     /**
      * Runs every loop
      */
     public void periodic() {
+        if (currentState != VisionState.DISABLED) {
 
+            LLResult result = limelight3A.getLatestResult();
+            if (result.isValid()) {
+                ty = result.getTy();
+                botPose = result.getBotpose_MT2();
+                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+                for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                    if (fr.getFiducialId() == 21 || fr.getFiducialId() == 22 || fr.getFiducialId() == 33){
+                        tagId = fr.getFiducialId();
+                    }
+                }
+                LLGotData = true;
+            } else {
+                ty = 0.0;
+                botPose = null;
+                tagId = 0;
+                LLGotData = false;
+            }
+        } else {
+            pauseSubsystem();
+        }
     }
 
     /**
@@ -90,11 +150,16 @@ public class VisionSubsystem {
 
     }
 
+    @Override
+    public void addSubsystemTelemetry() {
+        opMode.telemetry.addData("LL data", LLGotData);
+    }
+
     /**
      * Resets the subsystem to a known safe state.
      */
     public void resetSubsystem(){
-
+        limelight3A.resetDeviceConfigurationForOpMode();
     }
 
     /**
@@ -102,11 +167,16 @@ public class VisionSubsystem {
      *
      * Motors should stop and resources should be released.
      */
+    public void pauseSubsystem() {
+        limelight3A.pause();
+    }
+
     public void shutDownSubsystem() {
-
+        limelight3A.stop();
     }
 
-    public Enum<?> getState() {
-        return null;
+    public VisionState getState() {
+        return currentState;
     }
+    public void setCurrentState(VisionState visionState) {currentState = visionState;}
 }
