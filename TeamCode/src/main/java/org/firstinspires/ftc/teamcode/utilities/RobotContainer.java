@@ -19,11 +19,11 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem.DriveSubsystemSt
 public class RobotContainer {
 
     // Subsystems
-    private final DriveSubsystem drive;
-    private final ShooterSubsystem shooter;
-    private final IntakeTransferSubsystem intake;
-    private final VisionSubsystem vision;
-    private final ReturnToBaseSubsystem returnToBase;
+    public static DriveSubsystem drive;
+    public final ShooterSubsystem shooter;
+    public final IntakeTransferSubsystem intake;
+    public final VisionSubsystem vision;
+    public final ReturnToBaseSubsystem returnToBase;
 
     private OpMode opMode;
     private Pose2d robotPose;
@@ -77,6 +77,13 @@ public class RobotContainer {
             opMode.telemetry.update();
             telemetryTimer.reset();
         }
+    }
+
+    public void shutDownRobot() {
+        drive.shutDownSubsystem();
+        shooter.shutDownSubsystem();
+        intake.shutDownSubsystem();
+        vision.shutDownSubsystem();
     }
 
     /**

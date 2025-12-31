@@ -55,6 +55,8 @@ public class VisionSubsystem implements SubsystemBase{
     private int tagId = 0;
     private Pose2d pose2d;
     private boolean LLGotData = false;
+    boolean isTelemetryEnabled = true;
+
 
     /**
      * Constructor for the VisionSubsystem.
@@ -147,12 +149,12 @@ public class VisionSubsystem implements SubsystemBase{
      * @param enabled True to enable telemetry, false to disable
      */
     public void enableSubsystemTelemetry(boolean enabled) {
-
+        isTelemetryEnabled = enabled;
     }
 
     @Override
     public void addSubsystemTelemetry() {
-        opMode.telemetry.addData("LL data", LLGotData);
+        if (isTelemetryEnabled) {opMode.telemetry.addData("LL data", LLGotData);}
     }
 
     /**

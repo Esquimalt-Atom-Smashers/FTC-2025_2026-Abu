@@ -54,6 +54,8 @@ public class IntakeTransferSubsystem implements SubsystemBase{
         DISABLED
     }
     IntakeTransferState currentState;
+    private boolean isTelemetryEnabled = true;
+
     public IntakeTransferSubsystem(OpMode opMode, IntakeTransferState intakeTransferState) {
         IntakeMotor = opMode.hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
         rearFeedServo = opMode.hardwareMap.get(CRServo.class, REAR_FEED_SERVO_NAME);
@@ -93,15 +95,6 @@ public class IntakeTransferSubsystem implements SubsystemBase{
     }
 
     /**
-     * Stops all intake and transfer motion.
-     */
-    public void stop() {
-        IntakeMotor.setPower(ServoStates.STOPPED.servoPower);
-        feedServo.setPower(ServoStates.STOPPED.servoPower);
-        rearFeedServo.setPower(ServoStates.STOPPED.servoPower);
-    }
-
-    /**
      * Ejects a specified number of balls of a given color.
      *
      * @param numberOfBalls The number of balls to eject
@@ -137,7 +130,7 @@ public class IntakeTransferSubsystem implements SubsystemBase{
     public void periodic() {
         switch (currentState) {
             case DISABLED:
-                stop();
+                shutDownSubsystem();
                 break;
             case INTAKING:
                 intake();
@@ -156,12 +149,12 @@ public class IntakeTransferSubsystem implements SubsystemBase{
      */
     @Override
     public void enableSubsystemTelemetry(boolean enabled) {
-
+        isTelemetryEnabled = enabled;
     }
 
     @Override
     public void addSubsystemTelemetry() {
-
+        if(isTelemetryEnabled) {}
     }
 
     /**
@@ -177,7 +170,9 @@ public class IntakeTransferSubsystem implements SubsystemBase{
      */
     @Override
     public void shutDownSubsystem() {
-
+        IntakeMotor.setPower(ServoStates.STOPPED.servoPower);
+        feedServo.setPower(ServoStates.STOPPED.servoPower);
+        rearFeedServo.setPower(ServoStates.STOPPED.servoPower);
     }
 
     /**
