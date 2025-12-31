@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmode.autos;
 
-import static org.firstinspires.ftc.teamcode.utilities.RobotContainer.drive;
+import static org.firstinspires.ftc.teamcode.utilities.RobotContainer.drivebase;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -118,12 +117,12 @@ public class AutoFromTextFile extends LinearOpMode {
     }
 
     private Action redFarShootAction() {
-        return drive.getMecanumDrive().actionBuilder(drive.getPose()).
+        return drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
                 strafeToLinearHeading(new Vector2d(55, 18), Math.toRadians(72)).build();
     }
 
     private Action redThirdIntakeAction() {
-        return drive.getMecanumDrive().actionBuilder(drive.getPose())
+        return drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
                 .strafeToLinearHeading(new Vector2d(40, 30), Math.toRadians(90))
                 .strafeToLinearHeading(new Vector2d(40, 43), Math.toRadians(90))
                 .build();

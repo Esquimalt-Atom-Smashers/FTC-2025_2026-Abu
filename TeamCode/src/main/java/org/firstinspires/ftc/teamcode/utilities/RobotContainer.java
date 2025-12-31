@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem.DriveSubsystemSt
 public class RobotContainer {
 
     // Subsystems
-    public static DriveSubsystem drive;
+    public static DriveSubsystem drivebase;
     public final ShooterSubsystem shooter;
     public final IntakeTransferSubsystem intake;
     public final VisionSubsystem vision;
@@ -48,7 +48,8 @@ public class RobotContainer {
      * All subsystems are created and managed here.
      */
     public RobotContainer(OpMode opMode, Pose2d robotPose, Alliance alliance, DriveSubsystemState driveState, ShooterSubsystem.ShooterState shooterState, IntakeTransferSubsystem.IntakeTransferState intakeTransferState, VisionSubsystem.VisionState visionState) {
-        drive = new DriveSubsystem(opMode, robotPose, driveState);
+        this.opMode = opMode;
+        drivebase = new DriveSubsystem(opMode, robotPose, driveState);
         shooter = new ShooterSubsystem(opMode, alliance, shooterState, robotPose);
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
         vision = new VisionSubsystem(opMode, alliance, visionState);
@@ -64,13 +65,13 @@ public class RobotContainer {
      * This method should be lightweight and safe to run every cycle.
      */
     public void runRobot() {
-        drive.periodic();
+        drivebase.periodic();
         shooter.periodic();
         intake.periodic();
         vision.periodic();
         // TODO: Update subsystems if needed
         if (telemetryTimer.seconds() >= 1.5) {
-            drive.addSubsystemTelemetry();
+            drivebase.addSubsystemTelemetry();
             shooter.addSubsystemTelemetry();
             intake.addSubsystemTelemetry();
             vision.addSubsystemTelemetry();
@@ -80,7 +81,7 @@ public class RobotContainer {
     }
 
     public void shutDownRobot() {
-        drive.shutDownSubsystem();
+        drivebase.shutDownSubsystem();
         shooter.shutDownSubsystem();
         intake.shutDownSubsystem();
         vision.shutDownSubsystem();
@@ -92,7 +93,7 @@ public class RobotContainer {
      * @return Current estimated pose
      */
     public Pose2d getPose() {
-        return drive.getPose();
+        return drivebase.getPose();
     }//TODO add more code to integrate limelight
 
     /**
@@ -105,7 +106,7 @@ public class RobotContainer {
         Pose2d drivePose = getPose();
         if (visionPose != null) {
             if ((Math.abs(visionPose.position.x - drivePose.position.x) >= POSITIONAL_TOLARANCE || Math.abs(visionPose.position.y - drivePose.position.y) >= POSITIONAL_TOLARANCE) && !forceReset) {
-                drive.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
+                drivebase.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
             }
         }
     }
@@ -116,7 +117,7 @@ public class RobotContainer {
      * @param pose Target pose
      */
     public void goToPose(Pose2d pose) {
-        drive.goToPose(pose);
+        drivebase.goToPose(pose);
     }
 
     /**High-level shooting command.*/
@@ -138,5 +139,9 @@ public class RobotContainer {
             Direction direction
     ) {
         intake.intake(ballColour, numberOfBalls, direction);
+    }
+
+    public void drive(double drive, double strafe, double turn) {
+        drivebase.driveFieldCentric(drive, strafe, turn);
     }
 }

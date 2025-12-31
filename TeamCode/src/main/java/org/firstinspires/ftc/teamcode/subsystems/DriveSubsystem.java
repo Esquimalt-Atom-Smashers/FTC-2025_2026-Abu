@@ -117,7 +117,7 @@ public class DriveSubsystem implements SubsystemBase {
      */
     public Pose2d getPose() {
         mecanumDrive.updatePoseEstimate();
-        return currentPose = mecanumDrive.localizer.getPose();
+        return mecanumDrive.localizer.getPose();
     }
 
     /**
@@ -161,7 +161,7 @@ public class DriveSubsystem implements SubsystemBase {
     public void addSubsystemTelemetry() {
         if (isTelemetryEnabled) {
             Pose2d pose = getPose();
-            opMode.telemetry.addData("Pose", "X: %d, Y: %d, H: %d", pose.position.x, pose.position.y, Math.toDegrees(pose.heading.toDouble()));
+            opMode.telemetry.addData("Pose", "X: %.2f, Y: %.2f, H: %.2f", pose.position.x, pose.position.y, Math.toDegrees(pose.heading.toDouble()));
             opMode.telemetry.addData("FC Heading", getHeading());
         }
     }
@@ -178,11 +178,11 @@ public class DriveSubsystem implements SubsystemBase {
      */
     @Override
     public void shutDownSubsystem() {
-        mecanumDrive.setDrivePowers(
-                new PoseVelocity2d(
-                        new Vector2d(0, 0), 0
-                )
-        );
+//        mecanumDrive.setDrivePowers(
+//                new PoseVelocity2d(
+//                        new Vector2d(0, 0), 0
+//                )
+//        );
     }
 
     /**

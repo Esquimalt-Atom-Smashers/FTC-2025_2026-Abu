@@ -42,7 +42,7 @@ public class ShooterSubsystem implements SubsystemBase{
     public final double RPM_TOLERANCE = 25.0;
 
     private final double TICKS_PER_ROTATION = 28;
-    private FlywheelSetting targetSetting;
+    private FlywheelSetting targetSetting = new FlywheelSetting(0,0);
     //custom PID + feedforward
     private PIDController flyWheelController;
     private double maxFlywheelPower = 1.0;
@@ -92,6 +92,7 @@ public class ShooterSubsystem implements SubsystemBase{
         flyWheelController = new PIDController(PARAMS.P, PARAMS.I, PARAMS.D);
         currentState = state;
         setPose2d(pose2d);
+
     }
 
     public double getFlywheelPower() {
@@ -204,7 +205,7 @@ public class ShooterSubsystem implements SubsystemBase{
     @Override
     public void addSubsystemTelemetry() {
         if (isTelemetryEnabled) {
-            opMode.telemetry.addData("RPM", "Target: %d, Current : %d", targetSetting.rpm, getFlywheelRPM());
+            opMode.telemetry.addData("RPM", "Target: %.2f, Current : %.2f", targetSetting.rpm, getFlywheelRPM());
         }
     }
 
