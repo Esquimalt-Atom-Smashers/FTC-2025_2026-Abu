@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.utilities.Property;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 
 import java.util.TreeMap;
@@ -20,26 +22,27 @@ import java.util.TreeMap;
  *
  * This class currently contains only structure and documentation.
  */
+@Config
 public class ShooterSubsystem implements SubsystemBase{
-    boolean isTelemetryEnabled = true;
-    RobotContainer.Alliance alliance;
     public static class Params {
         public double TOLERANCE = 28;
         public double kS = 0;
-        public double kV = 0.000475;
+        public double kV = Property.kV;
         public double kA = 0;
 
-        public double P = 0.005;
-        public double I = 0.001;
+        public double P = 0;
+        public double I = 0;
         public double D = 0;
     }
     public static Params PARAMS = new Params();
     private OpMode opMode;
+    boolean isTelemetryEnabled = true;
+    RobotContainer.Alliance alliance;
 
     private DcMotorEx flywheelMotor;
     private final String FLYWHEEL_MOTOR_NAME = "flywheelMotor";
     private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
-    public final double RPM_TOLERANCE = 25.0;
+    public final double RPM_TOLERANCE = Property.TOLERANCE;
 
     private final double TICKS_PER_ROTATION = 28;
     private FlywheelSetting targetSetting = new FlywheelSetting(0,0);
@@ -49,7 +52,7 @@ public class ShooterSubsystem implements SubsystemBase{
     private Pose2d pose2d;
 
     //distance to rpm matching table, we are not using hood angle rn
-    public class FlywheelSetting {
+    public static class FlywheelSetting {
         public double rpm;
         public double hoodAngle;
 
@@ -92,7 +95,7 @@ public class ShooterSubsystem implements SubsystemBase{
         flyWheelController = new PIDController(PARAMS.P, PARAMS.I, PARAMS.D);
         currentState = state;
         setPose2d(pose2d);
-
+        setFlywheelMotorPower(0);
     }
 
     public double getFlywheelPower() {
@@ -108,7 +111,7 @@ public class ShooterSubsystem implements SubsystemBase{
     }
 
     public void setFlywheelMotorPower(double power) {
-        flywheelMotor.setPower(power);
+        flywheelMotor.setPower(-power);
     }
 
     public double flywheelCustomPID(double targetVelocity) {

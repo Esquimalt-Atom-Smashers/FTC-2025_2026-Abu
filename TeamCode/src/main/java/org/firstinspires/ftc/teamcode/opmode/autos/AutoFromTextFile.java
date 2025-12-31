@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.autos;
 
-import static org.firstinspires.ftc.teamcode.utilities.RobotContainer.drivebase;
+import static org.firstinspires.ftc.teamcode.utilities.Property.*;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
@@ -8,7 +8,6 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -17,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.utilities.AutoActions;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer.*;
 import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
@@ -33,8 +33,9 @@ public class AutoFromTextFile extends LinearOpMode {
         ArrayList<Action> actionList = new ArrayList<>();
         SequentialAction actionSequence;
 
-        //get the actions from the ActiveAutoSequence
+        //get the actions from the ActiveAutoSequence & property form Txt file
         ArrayList<String> actions = RobotPropertyParser.arrayFromAutoSequenceFile();
+        RobotPropertyParser.populatePropertiesClass();
 
         //Print auto title
         telemetry.addLine("Title: " + actions.get(0));
@@ -45,21 +46,21 @@ public class AutoFromTextFile extends LinearOpMode {
         Alliance alliance;
         switch (startingPosTxt) {
             case "RED.FAR":
-                startingPos = new Pose2d(65,16, Math.toRadians(180));
+                startingPos = new Pose2d(RED_FAR_X, RED_FAR_Y, Math.toRadians(RED_FAR_HEADING));
                 alliance = Alliance.RED;
                 telemetry.addLine("starting at RED.FAR");
                 break;
             case "RED.CLOSE":
-                startingPos = new Pose2d(-72 + 19.5, 72 - 18, Math.toRadians(53.5));
+                startingPos = new Pose2d(RED_CLOSE_X, RED_CLOSE_Y, Math.toRadians(RED_CLOSE_HEADING));
                 alliance = Alliance.RED;
                 telemetry.addLine("starting at RED.CLOSE");
             case "BLUE.FAR":
-                startingPos = new Pose2d(72 - 7, -16, Math.toRadians(180));
+                startingPos = new Pose2d(BLUE_FAR_X, BLUE_FAR_Y, Math.toRadians(BLUE_FAR_HEADING));
                 alliance = Alliance.BLUE;
                 telemetry.addLine("starting at BLUE.FAR");
                 break;
             case "BLUE.CLOSE":
-                startingPos = new Pose2d(-72 + 21.5, -72 + 17.5, Math.toRadians(143.65));
+                startingPos = new Pose2d(BLUE_CLOSE_X, BLUE_CLOSE_Y, Math.toRadians(BLUE_CLOSE_HEADING));
                 alliance = Alliance.BLUE;;
                 telemetry.addLine("starting at BLUE.CLOSE");
                 break;
@@ -81,15 +82,18 @@ public class AutoFromTextFile extends LinearOpMode {
                 ShooterSubsystem.ShooterState.DISABLED,
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.DISABLED);
+        AutoActions autoActions = new AutoActions(robotContainer);
+
         //cycle through the actions to add them to the roadrunner action array
         for (String action: actions){
             switch (action) {
                 case "RED.FAR.SHOOT":
-                    actionList.add(redFarShootAction());
+                    actionList.add(autoActions.redFarShootAction());
+                    actionList.add(autoActions.shootArtifactAction(FAR_SHOOT_RPM, SHOOTING_SECONDS));
                     telemetry.addLine("RED.FAR.SHOOT");
                     break;
                 case "RED.THIRD.INTAKE":
-                    actionList.add(redThirdIntakeAction());
+                    actionList.add(autoActions.redThirdIntakeAction());
                     telemetry.addLine("RED.THIRD.INTAKE");
                     break;
                 case "DELAY.HUNDRED.MS":
@@ -99,7 +103,6 @@ public class AutoFromTextFile extends LinearOpMode {
                     actionList.add(new SleepAction(1));
                     break;
                 default:
-                    printAction("default liner");
                     telemetry.addLine("I read:" + action);
                     break;
             }
@@ -116,19 +119,5 @@ public class AutoFromTextFile extends LinearOpMode {
         robotContainer.shutDownRobot();
     }
 
-    private Action redFarShootAction() {
-        return drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                strafeToLinearHeading(new Vector2d(55, 18), Math.toRadians(72)).build();
-    }
 
-    private Action redThirdIntakeAction() {
-        return drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
-                .strafeToLinearHeading(new Vector2d(40, 30), Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(40, 43), Math.toRadians(90))
-                .build();
-    }
-    private Action printAction(String line) {
-        return new InstantAction(() -> telemetry.addLine(line));
-
-    }
 }

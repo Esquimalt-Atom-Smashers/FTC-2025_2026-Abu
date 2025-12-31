@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.autos;
+package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -26,6 +26,7 @@ public class RedTeleOp extends LinearOpMode {
     Pose2d startingPose = new Pose2d(0, 0, Math.toRadians(90));
     RobotContainer.Alliance alliance = RobotContainer.Alliance.RED;
     double targetRpm = PARAMS.nearRPM;
+    ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -33,13 +34,14 @@ public class RedTeleOp extends LinearOpMode {
                 startingPose,
                 alliance,
                 DriveSubsystem.DriveSubsystemState.TELEOP_DRIVING,
-                ShooterSubsystem.ShooterState.DISABLED,
+                ShooterSubsystem.ShooterState.MANUAL,
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.DISABLED);
 
         waitForStart();
         while (opModeIsActive()) {
             robotContainer.drive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+            robotContainer.shooter.shoot(flywheelSetting);
             robotContainer.runRobot();
         }
         robotContainer.shutDownRobot();

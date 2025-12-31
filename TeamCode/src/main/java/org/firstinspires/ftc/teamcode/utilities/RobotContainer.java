@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem.DriveSubsystemSt
 public class RobotContainer {
 
     // Subsystems
-    public static DriveSubsystem drivebase;
+    public DriveSubsystem drivebase = null;
     public final ShooterSubsystem shooter;
     public final IntakeTransferSubsystem intake;
     public final VisionSubsystem vision;
@@ -54,6 +54,7 @@ public class RobotContainer {
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
         vision = new VisionSubsystem(opMode, alliance, visionState);
         returnToBase = new ReturnToBaseSubsystem();
+        shooter.shutDownSubsystem();
 
         telemetryTimer = new ElapsedTime();
         this.alliance = alliance;
@@ -71,6 +72,7 @@ public class RobotContainer {
         vision.periodic();
         // TODO: Update subsystems if needed
         if (telemetryTimer.seconds() >= 1.5) {
+            opMode.telemetry.clearAll();
             drivebase.addSubsystemTelemetry();
             shooter.addSubsystemTelemetry();
             intake.addSubsystemTelemetry();
