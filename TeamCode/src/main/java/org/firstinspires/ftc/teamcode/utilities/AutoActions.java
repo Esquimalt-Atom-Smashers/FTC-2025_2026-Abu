@@ -80,11 +80,7 @@ public class AutoActions {
                 return true;
             }
         }
-
-        public double getSeconds() {
-            return seconds;
-        }
-        }
+    }
 
     public ShootArtifactAction shootArtifactAction(double targetRPM, double seconds) {return new ShootArtifactAction(targetRPM, seconds);}
 }

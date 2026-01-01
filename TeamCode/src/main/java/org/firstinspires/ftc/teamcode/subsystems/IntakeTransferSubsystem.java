@@ -139,8 +139,10 @@ public class IntakeTransferSubsystem implements SubsystemBase{
                 break;
             case EJECTING:
                 eject();
+                break;
             case FEEDING_SHOOTER:
                 feedShooter();
+                break;
         }
     }
 
@@ -199,6 +201,22 @@ public class IntakeTransferSubsystem implements SubsystemBase{
     public IntakeTransferState getState() {
         return currentState;
     }
-    public void setState(IntakeTransferState intakeTransferState) {currentState = intakeTransferState;}
+    public void setState(IntakeTransferState intakeTransferState) {
+        currentState = intakeTransferState;
+        switch (currentState) {
+            case DISABLED:
+                shutDownSubsystem();
+                break;
+            case INTAKING:
+                intake();
+                break;
+            case EJECTING:
+                eject();
+                break;
+            case FEEDING_SHOOTER:
+                feedShooter();
+                break;
+        }
+    }
 }
 
