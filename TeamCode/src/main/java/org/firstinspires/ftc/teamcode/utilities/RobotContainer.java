@@ -71,8 +71,8 @@ public class RobotContainer {
         drivebase.periodic();
         shooter.periodic();
         intake.periodic();
-        vision.periodic();
         vision.updateCurrentPose(drivebase.getPose());
+        vision.periodic();
         // TODO: Update subsystems if needed
         if (telemetryTimer.seconds() >= Property.TELEMETRY_UPDATE_TIME) {
             opMode.telemetry.clearAll();

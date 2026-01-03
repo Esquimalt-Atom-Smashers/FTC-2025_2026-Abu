@@ -67,7 +67,6 @@ public class VisionSubsystem implements SubsystemBase{
     public VisionSubsystem(OpMode opMode, Alliance alliance, VisionState visionState, Pose2d pose) {
         limelight3A = opMode.hardwareMap.get(Limelight3A.class, LIMELIGHT_NAME);
         limelight3A.setPollRateHz(PULL_RATE_HZ);
-        limelight3A.start();
         this.alliance = alliance;
         this.opMode = opMode;
         currentState = visionState;
@@ -76,6 +75,7 @@ public class VisionSubsystem implements SubsystemBase{
         } else {
             limelight3A.pipelineSwitch(BLUE_GOAL_APRILTAG_PIPELINE);
         }
+        limelight3A.start();
         updateCurrentPose(pose);
     }
 
@@ -142,6 +142,10 @@ public class VisionSubsystem implements SubsystemBase{
             }
         } else {
             pauseSubsystem();
+            ty = 0.0;
+            botPose = null;
+            tagId = 0;
+            LLGotData = false;
         }
     }
 
@@ -159,9 +163,10 @@ public class VisionSubsystem implements SubsystemBase{
         if (isTelemetryEnabled) {
             opMode.telemetry.addData("LL data", LLGotData);
             Pose2d llPose = getLimelightPos();
-            opMode.telemetry.addData("LL Pose", "X: %.2f, Y: %.2f, H: %.2f", llPose.position.x, llPose.position.y, Math.toDegrees(llPose.heading.toDouble()));
+            if (getLimelightPos() != null) {
+                opMode.telemetry.addData("LL Pose", "X: %.2f, Y: %.2f, H: %.2f", llPose.position.x, llPose.position.y, Math.toDegrees(llPose.heading.toDouble()));
+            }
         }
-
     }
 
     /**
