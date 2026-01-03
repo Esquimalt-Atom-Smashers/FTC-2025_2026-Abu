@@ -1,14 +1,6 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_FAR_SHOOT_HEADING;
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_FAR_SHOOT_X;
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_FAR_SHOOT_Y;
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_THIRD_INTAKE_P1_HEADING;
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_THIRD_INTAKE_P1_X;
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_THIRD_INTAKE_P1_Y;
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_THIRD_INTAKE_P2_HEADING;
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_THIRD_INTAKE_P2_X;
-import static org.firstinspires.ftc.teamcode.utilities.Property.RED_THIRD_INTAKE_P2_Y;
+import static org.firstinspires.ftc.teamcode.utilities.Property.*;
 
 import androidx.annotation.NonNull;
 
@@ -37,16 +29,66 @@ public class AutoActions {
         visionSubsystem = robotContainer.vision;
     }
 
+    public class RedFarShootAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
+                    strafeToLinearHeading(new Vector2d(RED_FAR_SHOOT_X, RED_FAR_SHOOT_Y), Math.toRadians(RED_FAR_SHOOT_HEADING)).build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+
+
     public Action redFarShootAction() {
-        return drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                strafeToLinearHeading(new Vector2d(RED_FAR_SHOOT_X, RED_FAR_SHOOT_Y), Math.toRadians(RED_FAR_SHOOT_HEADING)).build();
+        return new RedFarShootAction();
+    }
+
+    public class RedThirdIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(RED_THIRD_INTAKE_P1_X, RED_THIRD_INTAKE_P1_Y), Math.toRadians(RED_THIRD_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(RED_THIRD_INTAKE_P2_X, RED_THIRD_INTAKE_P2_Y), Math.toRadians(RED_THIRD_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
     }
 
     public Action redThirdIntakeAction() {
-        return drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
-                .strafeToLinearHeading(new Vector2d(RED_THIRD_INTAKE_P1_X, RED_THIRD_INTAKE_P1_Y), Math.toRadians(RED_THIRD_INTAKE_P1_HEADING))
-                .strafeToLinearHeading(new Vector2d(RED_THIRD_INTAKE_P2_X, RED_THIRD_INTAKE_P2_Y), Math.toRadians(RED_THIRD_INTAKE_P2_HEADING))
-                .build();
+        return new RedThirdIntakeAction();
+    }
+
+    public class RedLoadingZoneIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(RED_LOAD_INTAKE_P1_X, RED_LOAD_INTAKE_P1_Y), Math.toRadians(RED_LOAD_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(RED_LOAD_INTAKE_P2_X, RED_LOAD_INTAKE_P2_Y), Math.toRadians(RED_LOAD_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+
+    public Action redLoadingZoneIntakeAction() {
+        return new RedLoadingZoneIntakeAction();
     }
 
     public class ShootArtifactAction implements Action {
