@@ -29,7 +29,6 @@ public class AutoActions {
     ShooterSubsystem shooterSubsystem;
     IntakeTransferSubsystem intakeTransferSubsystem;
     VisionSubsystem visionSubsystem;
-
     public AutoActions(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
         drivebase = robotContainer.drivebase;
@@ -83,4 +82,19 @@ public class AutoActions {
     }
 
     public ShootArtifactAction shootArtifactAction(double targetRPM, double seconds) {return new ShootArtifactAction(targetRPM, seconds);}
+
+    public class UpdatePoseFromVisionAction implements Action {
+        public boolean forceReset;
+        public UpdatePoseFromVisionAction(boolean forceReset) {
+            visionSubsystem.setCurrentState(VisionSubsystem.VisionState.TRACKING_GOAL);
+            this.forceReset = forceReset;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            return robotContainer.updatePoseFromVision(forceReset);
+        }
+    }
+
+    public Action updatePoseFromVisionAction(boolean forceReset) {return new UpdatePoseFromVisionAction(forceReset);}
 }

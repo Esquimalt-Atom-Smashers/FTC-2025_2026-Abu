@@ -96,6 +96,10 @@ public class AutoFromTextFile extends LinearOpMode {
                     actionList.add(autoActions.redThirdIntakeAction());
                     telemetry.addLine("RED.THIRD.INTAKE");
                     break;
+                case "UPDATE.POSE":
+                    actionList.add(autoActions.updatePoseFromVisionAction(false));
+                case "UPDATE.POSE.FORCED":
+                    actionList.add(autoActions.updatePoseFromVisionAction(true));
                 case "DELAY.HUNDRED.MS":
                     actionList.add(new SleepAction(0.1));
                     break;
