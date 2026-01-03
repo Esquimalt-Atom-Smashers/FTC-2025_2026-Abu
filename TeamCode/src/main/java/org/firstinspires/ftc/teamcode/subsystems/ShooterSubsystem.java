@@ -30,7 +30,7 @@ public class ShooterSubsystem implements SubsystemBase{
         public double kV = Property.kV;
         public double kA = 0;
 
-        public double P = 0;
+        public double P = Property.P;
         public double I = 0;
         public double D = 0;
     }
@@ -118,7 +118,7 @@ public class ShooterSubsystem implements SubsystemBase{
         if (flywheelMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             flywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        double pid = Range.clip(flyWheelController.calculate(flywheelMotor.getVelocity(), targetVelocity), -maxFlywheelPower, maxFlywheelPower);
+        double pid = Range.clip(flyWheelController.calculate(getFlywheelRPM(), targetVelocity), -maxFlywheelPower, maxFlywheelPower);
         return pid;
     }
 

@@ -19,15 +19,16 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 public class FlywheelTuner extends OpMode {
     public static class Params {
         public double stayTime = 10.0;
+        public double accelerateTime = 0.0;
     }
     public static Params PARAMS = new Params();
 
     private ShooterSubsystem flywheelSubsystem;
     private IntakeTransferSubsystem intakeFeedSubsystem;
     private enum MotionProfilingStates{
-        ACCLEARATING(4000),
-        CONSTANT(3000),
-        DECELLERATING(3000);
+        ACCLEARATING(3550),
+        CONSTANT(3550),
+        DECELLERATING(3550);
         private double targetRPM;
         private MotionProfilingStates(double targetRPM) {
             this.targetRPM = targetRPM;
@@ -60,11 +61,11 @@ public class FlywheelTuner extends OpMode {
             intakeFeedSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
         }
 
-        double targetRPM = -motionProfiling();
+        double targetRPM = motionProfiling();
         flywheelSubsystem.shoot(new ShooterSubsystem.FlywheelSetting(targetRPM, 0));
         intakeFeedSubsystem.periodic();
-        telemetry.addData("targetRPM", -targetRPM);
-        telemetry.addData("currentRPM", -flywheelSubsystem.getFlywheelRPM());
+        telemetry.addData("targetRPM", targetRPM);
+        telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
         telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * -10000));
         telemetry.addData("latency time", loopTimer.milliseconds());
         loopTimer.reset();
@@ -77,11 +78,11 @@ public class FlywheelTuner extends OpMode {
             pastState = state;
             state = MotionProfilingStates.CONSTANT;
             timer.reset();
-        } else if (timer.seconds() >= PARAMS.stayTime && state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.ACCLEARATING) {
+        } else if (timer.seconds() >= PARAMS.accelerateTime && state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.ACCLEARATING) {
             pastState = state;
             state = MotionProfilingStates.DECELLERATING;
             timer.reset();
-        } else if (timer.seconds() >= PARAMS.stayTime && state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.DECELLERATING) {
+        } else if (timer.seconds() >= PARAMS.accelerateTime && state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.DECELLERATING) {
             pastState = state;
             state = MotionProfilingStates.ACCLEARATING;
             timer.reset();
@@ -92,9 +93,18 @@ public class FlywheelTuner extends OpMode {
         }
 
         if (state == MotionProfilingStates.ACCLEARATING) {
-            targetRPM = MotionProfilingStates.CONSTANT.getTargetRPM() + (timer.seconds() / PARAMS.stayTime) * (MotionProfilingStates.ACCLEARATING.getTargetRPM() - MotionProfilingStates.CONSTANT.getTargetRPM());
+            if (PARAMS.accelerateTime == 0.0) {
+                targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM();
+            } else {
+                targetRPM = MotionProfilingStates.CONSTANT.getTargetRPM() + (timer.seconds() / PARAMS.accelerateTime) * (MotionProfilingStates.ACCLEARATING.getTargetRPM() - MotionProfilingStates.CONSTANT.getTargetRPM());
+            }
         } else if (state == MotionProfilingStates.DECELLERATING) {
-            targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM() - (timer.seconds() / PARAMS.stayTime) * (MotionProfilingStates.ACCLEARATING.getTargetRPM() - MotionProfilingStates.CONSTANT.getTargetRPM());
+
+            if (PARAMS.accelerateTime == 0.0) {
+                targetRPM = MotionProfilingStates.DECELLERATING.getTargetRPM();
+            } else {
+                targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM() - (timer.seconds() / PARAMS.accelerateTime) * (MotionProfilingStates.ACCLEARATING.getTargetRPM() - MotionProfilingStates.CONSTANT.getTargetRPM());
+            }
         } else if (state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.ACCLEARATING){
             targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM();
         } else {
