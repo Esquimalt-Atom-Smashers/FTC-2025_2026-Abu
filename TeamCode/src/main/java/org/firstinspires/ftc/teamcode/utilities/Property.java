@@ -4,6 +4,9 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class Property {
+    //GENERAL SETTINGS
+    public static volatile double TELEMETRY_UPDATE_TIME = 1.0;
+
     // AUTO POSITIONS
     public static volatile double RED_FAR_X = 65;
     public static volatile double RED_FAR_Y = 16;

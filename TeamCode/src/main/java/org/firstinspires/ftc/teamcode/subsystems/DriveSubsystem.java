@@ -41,7 +41,7 @@ public class DriveSubsystem implements SubsystemBase {
      * Drive motors, IMU, and localization systems
      * should be initialized here later.
      */
-    public DriveSubsystem(OpMode opMode, Pose2d startingPose, DriveSubsystemState state) {
+    public DriveSubsystem(OpMode opMode, DriveSubsystemState state, Pose2d startingPose) {
         this.opMode = opMode;
         mecanumDrive = new MecanumDrive(opMode.hardwareMap, startingPose);
         getMecanumDrive().localizer.setPose(startingPose);

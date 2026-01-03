@@ -64,7 +64,7 @@ public class VisionSubsystem implements SubsystemBase{
      * Vision hardware and pipelines should be
      * initialized here later.
      */
-    public VisionSubsystem(OpMode opMode, Alliance alliance, VisionState visionState) {
+    public VisionSubsystem(OpMode opMode, Alliance alliance, VisionState visionState, Pose2d pose) {
         limelight3A = opMode.hardwareMap.get(Limelight3A.class, LIMELIGHT_NAME);
         limelight3A.setPollRateHz(PULL_RATE_HZ);
         limelight3A.start();
@@ -76,10 +76,13 @@ public class VisionSubsystem implements SubsystemBase{
         } else {
             limelight3A.pipelineSwitch(BLUE_GOAL_APRILTAG_PIPELINE);
         }
+        updateCurrentPose(pose);
     }
 
+    /** Shall be run every loop **/
     public void updateCurrentPose(Pose2d pose2d) {
         this.pose2d = pose2d;
+        limelight3A.updateRobotOrientation(Math.toDegrees(pose2d.heading.toDouble()));
     }
 
     /**
@@ -120,7 +123,6 @@ public class VisionSubsystem implements SubsystemBase{
      */
     public void periodic() {
         if (currentState != VisionState.DISABLED) {
-
             LLResult result = limelight3A.getLatestResult();
             if (result.isValid()) {
                 ty = result.getTy();
@@ -154,7 +156,12 @@ public class VisionSubsystem implements SubsystemBase{
 
     @Override
     public void addSubsystemTelemetry() {
-        if (isTelemetryEnabled) {opMode.telemetry.addData("LL data", LLGotData);}
+        if (isTelemetryEnabled) {
+            opMode.telemetry.addData("LL data", LLGotData);
+            Pose2d llPose = getLimelightPos();
+            opMode.telemetry.addData("LL Pose", "X: %.2f, Y: %.2f, H: %.2f", llPose.position.x, llPose.position.y, Math.toDegrees(llPose.heading.toDouble()));
+        }
+
     }
 
     /**

@@ -29,14 +29,13 @@ public class RedTeleOp extends LinearOpMode {
     ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         robotContainer = new RobotContainer(this,
                 startingPose,
                 alliance,
                 DriveSubsystem.DriveSubsystemState.TELEOP_DRIVING,
                 ShooterSubsystem.ShooterState.MANUAL,
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
-                VisionSubsystem.VisionState.DISABLED);
+                VisionSubsystem.VisionState.TRACKING_GOAL);
 
         waitForStart();
         while (opModeIsActive()) {

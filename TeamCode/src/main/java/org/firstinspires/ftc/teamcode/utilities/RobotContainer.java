@@ -48,11 +48,13 @@ public class RobotContainer {
      * All subsystems are created and managed here.
      */
     public RobotContainer(OpMode opMode, Pose2d robotPose, Alliance alliance, DriveSubsystemState driveState, ShooterSubsystem.ShooterState shooterState, IntakeTransferSubsystem.IntakeTransferState intakeTransferState, VisionSubsystem.VisionState visionState) {
+        RobotPropertyParser.populatePropertiesClass();
+
         this.opMode = opMode;
-        drivebase = new DriveSubsystem(opMode, robotPose, driveState);
+        drivebase = new DriveSubsystem(opMode, driveState, robotPose);
         shooter = new ShooterSubsystem(opMode, alliance, shooterState, robotPose);
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
-        vision = new VisionSubsystem(opMode, alliance, visionState);
+        vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
         returnToBase = new ReturnToBaseSubsystem();
         shooter.shutDownSubsystem();
 
@@ -70,8 +72,9 @@ public class RobotContainer {
         shooter.periodic();
         intake.periodic();
         vision.periodic();
+        vision.updateCurrentPose(drivebase.getPose());
         // TODO: Update subsystems if needed
-        if (telemetryTimer.seconds() >= 1.0) {
+        if (telemetryTimer.seconds() >= Property.TELEMETRY_UPDATE_TIME) {
             opMode.telemetry.clearAll();
             drivebase.addSubsystemTelemetry();
             shooter.addSubsystemTelemetry();
@@ -103,14 +106,18 @@ public class RobotContainer {
      *
      * Vision data is fused with drive localization.
      */
-    public void updatePoseFromVision(boolean forceReset) {
-        Pose2d visionPose = vision.getLimelightPos();
+    public boolean updatePoseFromVision(boolean forceReset) {
         Pose2d drivePose = getPose();
+        vision.updateCurrentPose(drivePose);
+        Pose2d visionPose = vision.getLimelightPos();
         if (visionPose != null) {
             if ((Math.abs(visionPose.position.x - drivePose.position.x) >= POSITIONAL_TOLARANCE || Math.abs(visionPose.position.y - drivePose.position.y) >= POSITIONAL_TOLARANCE) && !forceReset) {
                 drivebase.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
+                return true;
             }
         }
+        //did not update pose
+        return false;
     }
 
     /**
