@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
+import org.firstinspires.ftc.teamcode.utilities.RobotPositionHolder;
 
 @Config
 @TeleOp(name = "Kenny Red TeleOp", group = "AAA")
@@ -22,13 +23,15 @@ public class RedTeleOp extends LinearOpMode {
         public static double nearRPM = 3100;
     }
     public static Params PARAMS = new Params();
-
     Pose2d startingPose = new Pose2d(0, 0, Math.toRadians(90));
     RobotContainer.Alliance alliance = RobotContainer.Alliance.RED;
     double targetRpm = PARAMS.nearRPM;
     ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
     @Override
     public void runOpMode() throws InterruptedException {
+        if (RobotPositionHolder.hasData()) {
+            startingPose = new Pose2d(RobotPositionHolder.getX(), RobotPositionHolder.getY(), RobotPositionHolder.getHeading());
+        }
         robotContainer = new RobotContainer(this,
                 startingPose,
                 alliance,
@@ -36,7 +39,10 @@ public class RedTeleOp extends LinearOpMode {
                 ShooterSubsystem.ShooterState.MANUAL,
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.TRACKING_GOAL);
-
+        if (RobotPositionHolder.hasData()) {
+            robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(90));
+            RobotPositionHolder.markReceived();
+        }
         waitForStart();
         while (opModeIsActive()) {
             robotContainer.drive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
@@ -50,5 +56,6 @@ public class RedTeleOp extends LinearOpMode {
             robotContainer.runRobot();
         }
         robotContainer.shutDownRobot();
+        RobotPositionHolder.clear();
     }
 }

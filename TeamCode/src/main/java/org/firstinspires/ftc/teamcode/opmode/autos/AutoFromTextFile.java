@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.utilities.Property.*;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.AutoActions;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer.*;
+import org.firstinspires.ftc.teamcode.utilities.RobotPositionHolder;
 import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 
 import java.util.ArrayList;
@@ -117,7 +119,6 @@ public class AutoFromTextFile extends LinearOpMode {
                     break;
             }
         }
-
         telemetry.update();
         waitForStart();
         //once robot starts do the prescribed actions from the action list.
@@ -126,6 +127,8 @@ public class AutoFromTextFile extends LinearOpMode {
                 new ParallelAction(actionSequence,
                         new InstantAction(robotContainer::runRobot))
         );
+        Pose2d lastPose = robotContainer.getPose();
+        RobotPositionHolder.storePos(lastPose.position.x, lastPose.position.y, lastPose.heading.toDouble());
         robotContainer.shutDownRobot();
     }
 
