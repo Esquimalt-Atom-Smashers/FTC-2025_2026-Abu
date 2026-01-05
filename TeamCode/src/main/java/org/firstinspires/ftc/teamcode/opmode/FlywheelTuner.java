@@ -26,9 +26,9 @@ public class FlywheelTuner extends OpMode {
     private ShooterSubsystem flywheelSubsystem;
     private IntakeTransferSubsystem intakeFeedSubsystem;
     private enum MotionProfilingStates{
-        ACCLEARATING(3550),
-        CONSTANT(3550),
-        DECELLERATING(3550);
+        ACCLEARATING(4500),
+        CONSTANT(4500),
+        DECELLERATING(4500);
         private double targetRPM;
         private MotionProfilingStates(double targetRPM) {
             this.targetRPM = targetRPM;

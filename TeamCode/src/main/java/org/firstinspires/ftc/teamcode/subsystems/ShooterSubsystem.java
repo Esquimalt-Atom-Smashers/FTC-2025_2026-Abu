@@ -116,7 +116,7 @@ public class ShooterSubsystem implements SubsystemBase{
     }
 
     public double getFlywheelRPM() {
-        return -flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
+        return flywheelMotor.getVelocity() / TICKS_PER_ROTATION * 60;
     }
 
     public void setFlywheelMotorPower(double power) {
