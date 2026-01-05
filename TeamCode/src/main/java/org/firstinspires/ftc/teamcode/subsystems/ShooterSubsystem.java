@@ -40,8 +40,11 @@ public class ShooterSubsystem implements SubsystemBase{
     RobotContainer.Alliance alliance;
 
     private DcMotorEx flywheelMotor;
+    private DcMotorEx secondFlywheelMotor;
     private final String FLYWHEEL_MOTOR_NAME = "flywheelMotor";
+    private final String SECOND_FLYWHEEL_MOTOR_NAME = "secondFlywheelMotor";
     private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    private final DcMotorSimple.Direction SECOND_FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
     public final double RPM_TOLERANCE = Property.TOLERANCE;
 
     private final double TICKS_PER_ROTATION = 28;
@@ -92,6 +95,12 @@ public class ShooterSubsystem implements SubsystemBase{
         flywheelMotor.setDirection(FLYWHEEL_DIRECTION);
         flywheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        secondFlywheelMotor = opMode.hardwareMap.get(DcMotorEx.class, FLYWHEEL_MOTOR_NAME);
+        secondFlywheelMotor.setDirection(SECOND_FLYWHEEL_DIRECTION);
+        secondFlywheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        secondFlywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         flyWheelController = new PIDController(PARAMS.P, PARAMS.I, PARAMS.D);
         currentState = state;
         setPose2d(pose2d);
@@ -112,6 +121,7 @@ public class ShooterSubsystem implements SubsystemBase{
 
     public void setFlywheelMotorPower(double power) {
         flywheelMotor.setPower(-power);
+        secondFlywheelMotor.setPower(-power);
     }
 
     public double flywheelCustomPID(double targetVelocity) {
