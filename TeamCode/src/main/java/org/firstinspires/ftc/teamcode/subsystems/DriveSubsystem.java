@@ -1,12 +1,16 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.utilities.Property.*;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 
 /**
  * DriveSubsystem
@@ -19,12 +23,14 @@ import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 public class DriveSubsystem implements SubsystemBase {
 
     public OpMode opMode;
+    public RobotContainer.Alliance alliance;
 
     private boolean isFieldCentric;
     private double speedMultiplier = 1.0;
 
     private MecanumDrive mecanumDrive;
     private Pose2d currentPose;
+    private Pose2d goalPos;
     public double driveHeadingError = 0.0;
     private boolean isTelemetryEnabled = true;
 
@@ -35,18 +41,32 @@ public class DriveSubsystem implements SubsystemBase {
         AUTO
     }
     public DriveSubsystemState currentState;
+
+    public static class Params {
+        public double P = 0.5;
+        public double I = 0.0;
+        public double D = 0.0;
+        public double F = 0.0;
+        public double ANGULAR_TOLERANCE = 1.0;
+    }
+    public static Params PARAMS = new Params();
+    private PIDFController turnController;
     /**
      * Constructor for the DriveSubsystem.
      * <p>
      * Drive motors, IMU, and localization systems
      * should be initialized here later.
      */
-    public DriveSubsystem(OpMode opMode, DriveSubsystemState state, Pose2d startingPose) {
+    public DriveSubsystem(OpMode opMode, RobotContainer.Alliance alliance, DriveSubsystemState state, Pose2d startingPose) {
         this.opMode = opMode;
+        this.alliance = alliance;
         mecanumDrive = new MecanumDrive(opMode.hardwareMap, startingPose);
         getMecanumDrive().localizer.setPose(startingPose);
+        this.currentPose = startingPose;
+        goalPos = alliance == RobotContainer.Alliance.RED? new Pose2d(RED_GOAL_X, RED_GOAL_Y, Math.toRadians(RED_GOAL_HEADING)): new Pose2d(BLUE_GOAL_X, BLUE_GOAL_Y, Math.toRadians(BLUE_GOAL_HEADING));
         isFieldCentric = true;
 
+        turnController = new PIDFController(PARAMS.P, PARAMS.I, PARAMS.D, PARAMS.F);
         setDriveHeadingError();
         currentState = state;
     }
@@ -59,7 +79,7 @@ public class DriveSubsystem implements SubsystemBase {
      * @param turn   Rotational movement input
      */
     public void driveFieldCentric(double drive, double strafe, double turn) {
-        double botHeading = getHeading();
+        double botHeading = getFieldCentricHeading();
         double rotX = strafe * Math.cos(botHeading) - drive * Math.sin(botHeading);
         double rotY = strafe * Math.sin(botHeading) + drive * Math.cos(botHeading);
 
@@ -83,6 +103,47 @@ public class DriveSubsystem implements SubsystemBase {
                 ));
     }
 
+    public void aimbotAssistedDrive(double drive, double strafe, double turn) {
+        double goalPosX = goalPos.position.x;
+        double goalPosY = goalPos.position.y;
+        currentPose = getPose();
+        double robotPosX = currentPose.position.x;
+        double robotPosY = currentPose.position.y;
+
+        double dX = Math.abs(goalPosX - robotPosX);
+        double dY = Math.abs(goalPosY - robotPosY);
+        double hyp = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
+        double targetHeading;
+
+        if (alliance == RobotContainer.Alliance.RED) {
+            targetHeading = Math.toRadians(180) - Math.acos(dX / hyp) - Math.toRadians(90);
+        } else {
+            targetHeading = (Math.toRadians(180) + (Math.toRadians(90) - Math.asin(dX/hyp)) - Math.toRadians(90));
+            if (Math.toDegrees(targetHeading) < -180) { targetHeading += Math.toRadians(360);}
+            if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
+        }
+
+        opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
+//        driveSubsystem.opMode.telemetry.addData("current heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
+//        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
+//        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
+
+        double turnSuggested;
+        if (Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(currentPose.heading.toDouble())) >= PARAMS.ANGULAR_TOLERANCE) {
+            turnSuggested = turnController.calculate(currentPose.heading.toDouble(), targetHeading);
+        } else {
+            turnSuggested = 0.0;
+        }
+
+        if (turnSuggested >= turn) {
+            turn = Range.clip(turn, -1.0, turnSuggested);
+        } else {
+            turn = Range.clip(turn, turnSuggested, 1.0);
+        }
+//        driveSubsystem.opMode.telemetry.addData("turn power", turn);
+        driveFieldCentric(drive, strafe, turn);
+    }
+
     public void switchFieldCentric() {
         isFieldCentric = !isFieldCentric;
     }
@@ -102,7 +163,7 @@ public class DriveSubsystem implements SubsystemBase {
     /**
      *@return heading for fieldCentric teleOp driving
      */
-    public double getHeading() {
+    public double getFieldCentricHeading() {
         //get radian
         double headingRadian = -(driveHeadingError - mecanumDrive.localizer.getPose().heading.toDouble());
         if (Math.toDegrees(headingRadian) >= 180) {
@@ -111,6 +172,11 @@ public class DriveSubsystem implements SubsystemBase {
             headingRadian += Math.toRadians(360);
         }
         return headingRadian;
+    }
+
+    public void setHeading (double degrees) {
+        currentPose = mecanumDrive.localizer.getPose();
+        mecanumDrive.localizer.setPose(new Pose2d(currentPose.position.x, currentPose.position.y, Math.toRadians(degrees)));
     }
     /**
      * @return The current Pose (position and heading)
@@ -125,6 +191,7 @@ public class DriveSubsystem implements SubsystemBase {
      * @param pose The pose to set as the current position
      */
     public void setPose(Pose2d pose) {
+        currentPose = pose;
         mecanumDrive.localizer.setPose(pose);
     }
 
@@ -134,6 +201,13 @@ public class DriveSubsystem implements SubsystemBase {
      */
     public void goToPose(Pose2d pose) {
         // TODO: Implement path following or PID control, if we want to.
+    }
+
+    public double getDistanceToGoal() {
+        getPose();
+        double driveDistanceEstimate;
+        driveDistanceEstimate = Math.sqrt(Math.pow(currentPose.position.x - goalPos.position.x, 2) + Math.pow(currentPose.position.y - goalPos.position.y, 2));
+        return driveDistanceEstimate;
     }
 
     public MecanumDrive getMecanumDrive() {
@@ -162,7 +236,7 @@ public class DriveSubsystem implements SubsystemBase {
         if (isTelemetryEnabled) {
             Pose2d pose = getPose();
             opMode.telemetry.addData("Pose", "X: %.2f, Y: %.2f, H: %.2f", pose.position.x, pose.position.y, Math.toDegrees(pose.heading.toDouble()));
-            opMode.telemetry.addData("FC Heading", getHeading());
+            opMode.telemetry.addData("FC Heading", getFieldCentricHeading());
         }
     }
 

@@ -7,6 +7,15 @@ public class Property {
     //GENERAL SETTINGS
     public static volatile double TELEMETRY_UPDATE_TIME = 1.0;
 
+    // GOAL POSITIONS
+    public static volatile double RED_GOAL_X = -60;
+    public static volatile double RED_GOAL_Y = 65;
+    public static volatile double RED_GOAL_HEADING = 0;
+
+    public static volatile double BLUE_GOAL_X = -60;
+    public static volatile double BLUE_GOAL_Y = -65;
+    public static volatile double BLUE_GOAL_HEADING = 0;
+
     // AUTO POSITIONS
     public static volatile double RED_FAR_X = 65;
     public static volatile double RED_FAR_Y = 16;

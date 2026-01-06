@@ -38,8 +38,6 @@ public class RobotContainer {
         BLUE
     }
     public Alliance alliance;
-    public static final Pose2d RED_GOAL_POSE = new Pose2d(-60, 65 ,0);
-    public static final Pose2d BLUE_GOAL_POSE = new Pose2d(-60, -65, 0);
     private final double POSITIONAL_TOLARANCE = 1.0;
 
     /**
@@ -51,7 +49,7 @@ public class RobotContainer {
         RobotPropertyParser.populatePropertiesClass();
 
         this.opMode = opMode;
-        drivebase = new DriveSubsystem(opMode, driveState, robotPose);
+        drivebase = new DriveSubsystem(opMode, alliance, driveState, robotPose);
         shooter = new ShooterSubsystem(opMode, alliance, shooterState, robotPose);
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
         vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
@@ -130,24 +128,13 @@ public class RobotContainer {
     }
 
     /**High-level shooting command.*/
-    public void shoot() {
-//        shooter.shoot(hoodAngle, rpm);// after ff apply
-        intake.feedShooter();
-    }
-
-    /**
-     * High-level intake command.
-     *
-     * @param ballColour Ball color to intake
-     * @param numberOfBalls Number of balls to intake
-     * @param direction Intake direction
-     */
-    public void intakeBalls(
-            BallColour ballColour,
-            int numberOfBalls,
-            Direction direction
-    ) {
-        intake.intake(ballColour, numberOfBalls, direction);
+    public void shoot(double manualTargetRPM, boolean isManualRPMControl) {
+        if (isManualRPMControl) {
+            shooter.shoot(new ShooterSubsystem.FlywheelSetting(manualTargetRPM, 0));
+        } else {
+            ShooterSubsystem.FlywheelSetting flywheelSetting = shooter.distanceToFlywheelSetting(drivebase.getDistanceToGoal());
+            shooter.shoot(flywheelSetting);
+        }
     }
 
     public void drive(double drive, double strafe, double turn) {

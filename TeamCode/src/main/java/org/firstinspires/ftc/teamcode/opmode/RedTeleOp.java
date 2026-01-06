@@ -11,24 +11,25 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.utilities.InputUtility;
+import org.firstinspires.ftc.teamcode.utilities.Property;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 import org.firstinspires.ftc.teamcode.utilities.RobotPositionHolder;
+import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 
 @Config
 @TeleOp(name = "Kenny Red TeleOp", group = "AAA")
 public class RedTeleOp extends LinearOpMode {
     RobotContainer robotContainer;
-    public static class Params {
-        public static double farRPM = 3500;
-        public static double nearRPM = 3100;
-    }
-    public static Params PARAMS = new Params();
     Pose2d startingPose = new Pose2d(0, 0, Math.toRadians(90));
     RobotContainer.Alliance alliance = RobotContainer.Alliance.RED;
-    double targetRpm = PARAMS.nearRPM;
+    double targetRpm;
     ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
+    boolean isManualRPMControl = true;
     @Override
     public void runOpMode() throws InterruptedException {
+        RobotPropertyParser.populatePropertiesClass();
+        targetRpm = Property.CLOSE_SHOOT_RPM;
         if (RobotPositionHolder.hasData()) {
             startingPose = new Pose2d(RobotPositionHolder.getX(), RobotPositionHolder.getY(), RobotPositionHolder.getHeading());
         }
@@ -45,14 +46,46 @@ public class RedTeleOp extends LinearOpMode {
         }
         waitForStart();
         while (opModeIsActive()) {
-            robotContainer.drive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
-            robotContainer.shooter.shoot(flywheelSetting);
+            boolean forceReset = false;
+            //drive control
+            double drive = InputUtility.deadZoneJoyStick(-gamepad1.left_stick_y);
+            double strafe = InputUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
+            double turn = InputUtility.deadZoneJoyStick(-gamepad1.right_stick_x);
 
-            if (gamepad1.a) {
+            //reset field centric
+            if (gamepad1.start || gamepad1.share) {
+                robotContainer.drivebase.setHeading(alliance == RobotContainer.Alliance.RED? 90: 270);
+            }
+            //reset aimbot
+            if (gamepad1.back || gamepad1.share) {
+                robotContainer.updatePoseFromVision(true);
+            }
+
+            //shooting && intake control
+            if (gamepad1.right_trigger >= 0.3) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
-            }else {
+            } else if (gamepad1.right_bumper) {
+                robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.EJECTING);
+            } else {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
             }
+
+            //flywheel control
+            if (gamepad1.triangle) {
+                isManualRPMControl = false;
+                forceReset = true;
+            } else if (gamepad1.square) {
+                isManualRPMControl = true;
+                forceReset = false;
+            }
+                
+
+            if (gamepad1.left_trigger >= 0.3) {
+                commandManager.aimbotAssistedDrive(drive, strafe, forceReset);
+            } else {
+                driveSubsystem.drive(drive, strafe, turn);
+            }
+            telemetry.addData("manualRPM", isManualRPMControl);
             robotContainer.runRobot();
         }
         robotContainer.shutDownRobot();
