@@ -96,7 +96,7 @@ public class ShooterSubsystem implements SubsystemBase{
         flywheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        secondFlywheelMotor = opMode.hardwareMap.get(DcMotorEx.class, FLYWHEEL_MOTOR_NAME);
+        secondFlywheelMotor = opMode.hardwareMap.get(DcMotorEx.class, SECOND_FLYWHEEL_MOTOR_NAME);
         secondFlywheelMotor.setDirection(SECOND_FLYWHEEL_DIRECTION);
         secondFlywheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         secondFlywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

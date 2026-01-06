@@ -20,16 +20,21 @@ public class FlywheelTuner extends OpMode {
     public static class Params {
         public double stayTime = 10.0;
         public double accelerateTime = 0.0;
+        public double maxRPM = 4000;
+        public double minRPM = 3000;
     }
+
     public static Params PARAMS = new Params();
 
     private ShooterSubsystem flywheelSubsystem;
     private IntakeTransferSubsystem intakeFeedSubsystem;
-    private enum MotionProfilingStates{
-        ACCLEARATING(4500),
-        CONSTANT(4500),
-        DECELLERATING(4500);
+
+    private enum MotionProfilingStates {
+        ACCLEARATING(PARAMS.maxRPM),
+        CONSTANT(PARAMS.minRPM),
+        DECELLERATING(PARAMS.minRPM);
         private double targetRPM;
+
         private MotionProfilingStates(double targetRPM) {
             this.targetRPM = targetRPM;
         }
@@ -38,6 +43,7 @@ public class FlywheelTuner extends OpMode {
             return targetRPM;
         }
     }
+
     private MotionProfilingStates state;
     private MotionProfilingStates pastState;
     private ElapsedTime timer;
@@ -46,7 +52,7 @@ public class FlywheelTuner extends OpMode {
     @Override
     public void init() {
         intakeFeedSubsystem = new IntakeTransferSubsystem(this, IntakeTransferSubsystem.IntakeTransferState.INTAKING);
-        flywheelSubsystem = new ShooterSubsystem(this, RobotContainer.Alliance.RED, ShooterSubsystem.ShooterState.MANUAL, new Pose2d(0,0,0));
+        flywheelSubsystem = new ShooterSubsystem(this, RobotContainer.Alliance.RED, ShooterSubsystem.ShooterState.MANUAL, new Pose2d(0, 0, 0));
         timer = new ElapsedTime();
         state = MotionProfilingStates.ACCLEARATING;
         telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -74,42 +80,46 @@ public class FlywheelTuner extends OpMode {
 
     private double motionProfiling() {
         double targetRPM;
-        if (timer.seconds() >= PARAMS.stayTime && state == MotionProfilingStates.ACCLEARATING) {
-            pastState = state;
-            state = MotionProfilingStates.CONSTANT;
-            timer.reset();
-        } else if (timer.seconds() >= PARAMS.accelerateTime && state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.ACCLEARATING) {
-            pastState = state;
-            state = MotionProfilingStates.DECELLERATING;
-            timer.reset();
-        } else if (timer.seconds() >= PARAMS.accelerateTime && state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.DECELLERATING) {
-            pastState = state;
-            state = MotionProfilingStates.ACCLEARATING;
-            timer.reset();
-        } else if (timer.seconds() >= PARAMS.stayTime && state == MotionProfilingStates.DECELLERATING) {
-            pastState = state;
-            state = MotionProfilingStates.CONSTANT;
-            timer.reset();
-        }
+        if (PARAMS.maxRPM == PARAMS.minRPM) {
+            targetRPM = PARAMS.maxRPM;
+        } else {
+            if (timer.seconds() >= PARAMS.stayTime && state == MotionProfilingStates.ACCLEARATING) {
+                pastState = state;
+                state = MotionProfilingStates.CONSTANT;
+                timer.reset();
+            } else if (timer.seconds() >= PARAMS.accelerateTime && state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.ACCLEARATING) {
+                pastState = state;
+                state = MotionProfilingStates.DECELLERATING;
+                timer.reset();
+            } else if (timer.seconds() >= PARAMS.accelerateTime && state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.DECELLERATING) {
+                pastState = state;
+                state = MotionProfilingStates.ACCLEARATING;
+                timer.reset();
+            } else if (timer.seconds() >= PARAMS.stayTime && state == MotionProfilingStates.DECELLERATING) {
+                pastState = state;
+                state = MotionProfilingStates.CONSTANT;
+                timer.reset();
+            }
 
-        if (state == MotionProfilingStates.ACCLEARATING) {
-            if (PARAMS.accelerateTime == 0.0) {
+            if (state == MotionProfilingStates.ACCLEARATING) {
+                if (PARAMS.accelerateTime == 0.0) {
+                    targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM();
+                } else {
+                    targetRPM = MotionProfilingStates.CONSTANT.getTargetRPM() + (timer.seconds() / PARAMS.accelerateTime) * (MotionProfilingStates.ACCLEARATING.getTargetRPM() - MotionProfilingStates.CONSTANT.getTargetRPM());
+                }
+            } else if (state == MotionProfilingStates.DECELLERATING) {
+
+                if (PARAMS.accelerateTime == 0.0) {
+                    targetRPM = MotionProfilingStates.DECELLERATING.getTargetRPM();
+                } else {
+                    targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM() - (timer.seconds() / PARAMS.accelerateTime) * (MotionProfilingStates.ACCLEARATING.getTargetRPM() - MotionProfilingStates.CONSTANT.getTargetRPM());
+                }
+            } else if (state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.ACCLEARATING) {
                 targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM();
             } else {
-                targetRPM = MotionProfilingStates.CONSTANT.getTargetRPM() + (timer.seconds() / PARAMS.accelerateTime) * (MotionProfilingStates.ACCLEARATING.getTargetRPM() - MotionProfilingStates.CONSTANT.getTargetRPM());
+                targetRPM = MotionProfilingStates.CONSTANT.getTargetRPM();
             }
-        } else if (state == MotionProfilingStates.DECELLERATING) {
-
-            if (PARAMS.accelerateTime == 0.0) {
-                targetRPM = MotionProfilingStates.DECELLERATING.getTargetRPM();
-            } else {
-                targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM() - (timer.seconds() / PARAMS.accelerateTime) * (MotionProfilingStates.ACCLEARATING.getTargetRPM() - MotionProfilingStates.CONSTANT.getTargetRPM());
-            }
-        } else if (state == MotionProfilingStates.CONSTANT && pastState == MotionProfilingStates.ACCLEARATING){
-            targetRPM = MotionProfilingStates.ACCLEARATING.getTargetRPM();
-        } else {
-            targetRPM = MotionProfilingStates.CONSTANT.getTargetRPM();
         }
-        return targetRPM;
+            return targetRPM;
     }
 }
