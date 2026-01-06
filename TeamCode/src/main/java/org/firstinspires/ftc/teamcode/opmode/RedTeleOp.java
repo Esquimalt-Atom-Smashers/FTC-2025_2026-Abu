@@ -78,12 +78,24 @@ public class RedTeleOp extends LinearOpMode {
                 isManualRPMControl = true;
                 forceReset = false;
             }
-                
 
+            if (isManualRPMControl) {
+                if (gamepad1.dpad_up) {
+                    targetRpm += 50;
+                } else if (gamepad1.dpad_down) {
+                    targetRpm -= 50;
+                } else if (gamepad1.dpad_left) {
+                    targetRpm = Property.CLOSE_SHOOT_RPM;
+                } else if (gamepad1.dpad_right) {
+                    targetRpm = Property.FAR_SHOOT_RPM;
+                }
+            }
+            robotContainer.shoot(targetRpm, isManualRPMControl);
             if (gamepad1.left_trigger >= 0.3) {
-                commandManager.aimbotAssistedDrive(drive, strafe, forceReset);
+                robotContainer.updatePoseFromVision(forceReset);
+                robotContainer.drivebase.aimbotAssistedDrive(drive, strafe, turn);
             } else {
-                driveSubsystem.drive(drive, strafe, turn);
+                robotContainer.drivebase.driveFieldCentric(drive, strafe, turn);
             }
             telemetry.addData("manualRPM", isManualRPMControl);
             robotContainer.runRobot();
