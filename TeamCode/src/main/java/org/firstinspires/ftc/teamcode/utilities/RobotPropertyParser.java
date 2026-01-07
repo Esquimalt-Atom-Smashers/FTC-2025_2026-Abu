@@ -21,9 +21,9 @@ public class RobotPropertyParser {
     private static Properties robotProperties = new Properties();
     private static Properties autoSequence1Properties = new Properties();
     private static File autoSequenceTxt;
-    private static final String FILE_LOCATION = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode";
-    private static final String PROPERTIES_FILE_NAME = "robot_properties.txt";
-    private static final String AUTO_SEQUENCE1_FILE_NAME = "ActiveAuto.txt";
+    public static final String FILE_LOCATION = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode";
+    public static final String PROPERTIES_FILE_NAME = "robot_properties.txt";
+    public static final String AUTO_SEQUENCE1_FILE_NAME = "ActiveAuto.txt";
 
     public static void loadProperties() {
         try {
@@ -266,7 +266,6 @@ public class RobotPropertyParser {
             field.setAccessible(true);
             field.setDouble(null, value);
         } catch (NoSuchFieldException e) {
-            System.out.println("Unknown property: " + fieldName);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }

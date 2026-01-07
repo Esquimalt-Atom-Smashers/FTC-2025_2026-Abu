@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmode.autos;
 
 import static org.firstinspires.ftc.teamcode.utilities.Property.*;
+import static org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser.AUTO_SEQUENCE1_FILE_NAME;
+import static org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser.FILE_LOCATION;
+import static org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser.PROPERTIES_FILE_NAME;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
@@ -23,7 +26,11 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer.*;
 import org.firstinspires.ftc.teamcode.utilities.RobotPositionHolder;
 import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Properties;
 
 @Autonomous(name = "Experimental: AutoFromTextFile")
 public class AutoFromTextFile extends LinearOpMode {
@@ -131,6 +138,4 @@ public class AutoFromTextFile extends LinearOpMode {
         RobotPositionHolder.storePos(lastPose.position.x, lastPose.position.y, lastPose.heading.toDouble());
         robotContainer.shutDownRobot();
     }
-
-
 }
