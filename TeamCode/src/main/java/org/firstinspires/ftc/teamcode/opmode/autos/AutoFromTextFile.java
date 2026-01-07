@@ -95,6 +95,19 @@ public class AutoFromTextFile extends LinearOpMode {
 
         //cycle through the actions to add them to the roadrunner action array
         for (String action: actions){
+            if (action.startsWith("GO.TO.POSE2D")) {
+                String inside = action.substring(
+                            action.indexOf("(") + 1,
+                            action.indexOf(")")
+                    );
+
+                    String[] nums = inside.split(",");
+                    double x = Double.parseDouble(nums[0].trim());
+                    double y = Double.parseDouble(nums[1].trim());
+                    double heading = Double.parseDouble(nums[2].trim());
+                    actionList.add(autoActions.goToPoseAction(x, y, heading));
+                    telemetry.addLine("GO.TO.POSE2D(" + x + ", "+ y + ", "+ heading +")");
+            }
             switch (action) {
                 case "RED.FAR.SHOOT":
                     actionList.add(autoActions.redFarShootAction());
@@ -112,9 +125,11 @@ public class AutoFromTextFile extends LinearOpMode {
                 case "UPDATE.POSE":
                     actionList.add(autoActions.updatePoseFromVisionAction(false));
                     telemetry.addLine("UPDATE.POSE");
+                    break;
                 case "FORCED.UPDATE.POSE":
                     actionList.add(autoActions.updatePoseFromVisionAction(true));
                     telemetry.addLine("UPDATE.POSE.FORCED");
+                    break;
                 case "DELAY.HUNDRED.MS":
                     actionList.add(new SleepAction(0.1));
                     break;
