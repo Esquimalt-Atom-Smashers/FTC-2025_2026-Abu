@@ -198,9 +198,11 @@ public class RobotPropertyParser {
                         double y = Double.parseDouble(nums[1].trim());
                         double heading = Double.parseDouble(nums[2].trim());
 
-                        setField("RED_GOAL_X", x);
-                        setField("RED_GOAL_Y", y);
-                        setField("RED_GOAL_HEADING", heading);
+                        String fieldName = key.replace(".", "_");
+
+                        setField(fieldName + "_X", x);
+                        setField(fieldName + "_Y", y);
+                        setField(fieldName + "_HEADING", heading);
 
 //                        if (allowCommands) {
 //                            System.out.println("Override pose2d -> x:" + x +
@@ -262,7 +264,7 @@ public class RobotPropertyParser {
     // =========================
     private static void setField(String fieldName, double value) {
         try {
-            Field field = Properties.class.getDeclaredField(fieldName);
+            Field field = Property.class.getDeclaredField(fieldName);
             field.setAccessible(true);
             field.setDouble(null, value);
         } catch (NoSuchFieldException e) {
