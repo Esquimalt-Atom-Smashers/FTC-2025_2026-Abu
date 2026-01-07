@@ -50,6 +50,7 @@ public class ShooterSubsystem implements SubsystemBase{
     private PIDController flyWheelController;
     private double maxFlywheelPower = 1.0;
     private Pose2d pose2d;
+    private Pose2d goalPos;
 
     //distance to rpm matching table, we are not using hood angle rn
     public static class FlywheelSetting {
@@ -85,7 +86,7 @@ public class ShooterSubsystem implements SubsystemBase{
      * Shooter motors, hood servos, and sensors
      * should be initialized here later.
      */
-    public ShooterSubsystem(OpMode opMode, RobotContainer.Alliance alliance, ShooterState state, Pose2d pose2d) {
+    public ShooterSubsystem(OpMode opMode, RobotContainer.Alliance alliance, ShooterState state, Pose2d pose2d, Pose2d goalPos) {
         this.opMode = opMode;
         this.alliance = alliance;
         flywheelMotor = opMode.hardwareMap.get(DcMotorEx.class, FLYWHEEL_MOTOR_NAME);
@@ -96,6 +97,7 @@ public class ShooterSubsystem implements SubsystemBase{
         currentState = state;
         setPose2d(pose2d);
         setFlywheelMotorPower(0);
+        this.goalPos = goalPos;
     }
 
     public double getFlywheelPower() {
@@ -149,12 +151,6 @@ public class ShooterSubsystem implements SubsystemBase{
      * Shoots using preconfigured settings based on alliance color & increase feedforward.
      */
     public void shoot(RobotContainer.Alliance alliance, Pose2d robotPose) {
-        Pose2d goalPos;
-        if (alliance == RobotContainer.Alliance.RED) {
-            goalPos = RobotContainer.RED_GOAL_POSE;
-        } else {
-            goalPos = RobotContainer.BLUE_GOAL_POSE;
-        }
         double distance = Math.sqrt(Math.pow(robotPose.position.x - goalPos.position.x, 2) + Math.pow(robotPose.position.y - goalPos.position.y, 2));
         shoot(distanceToFlywheelSetting(distance));
     }

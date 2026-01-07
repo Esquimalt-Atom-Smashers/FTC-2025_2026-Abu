@@ -46,7 +46,7 @@ public class FlywheelTuner extends OpMode {
     @Override
     public void init() {
         intakeFeedSubsystem = new IntakeTransferSubsystem(this, IntakeTransferSubsystem.IntakeTransferState.INTAKING);
-        flywheelSubsystem = new ShooterSubsystem(this, RobotContainer.Alliance.RED, ShooterSubsystem.ShooterState.MANUAL, new Pose2d(0,0,0));
+        flywheelSubsystem = new ShooterSubsystem(this, RobotContainer.Alliance.RED, ShooterSubsystem.ShooterState.MANUAL, new Pose2d(0,0,0), new Pose2d(0,0,0));
         timer = new ElapsedTime();
         state = MotionProfilingStates.ACCLEARATING;
         telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());

@@ -1,5 +1,12 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
+import static org.firstinspires.ftc.teamcode.utilities.Property.BLUE_GOAL_HEADING;
+import static org.firstinspires.ftc.teamcode.utilities.Property.BLUE_GOAL_X;
+import static org.firstinspires.ftc.teamcode.utilities.Property.BLUE_GOAL_Y;
+import static org.firstinspires.ftc.teamcode.utilities.Property.RED_GOAL_HEADING;
+import static org.firstinspires.ftc.teamcode.utilities.Property.RED_GOAL_X;
+import static org.firstinspires.ftc.teamcode.utilities.Property.RED_GOAL_Y;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -27,6 +34,7 @@ public class RobotContainer {
 
     private OpMode opMode;
     private Pose2d robotPose;
+    public Pose2d goalPos;
     private ElapsedTime telemetryTimer;
 
     /**
@@ -47,10 +55,11 @@ public class RobotContainer {
      */
     public RobotContainer(OpMode opMode, Pose2d robotPose, Alliance alliance, DriveSubsystemState driveState, ShooterSubsystem.ShooterState shooterState, IntakeTransferSubsystem.IntakeTransferState intakeTransferState, VisionSubsystem.VisionState visionState) {
         RobotPropertyParser.populatePropertiesClass();
+        goalPos = alliance == RobotContainer.Alliance.RED? new Pose2d(RED_GOAL_X, RED_GOAL_Y, Math.toRadians(RED_GOAL_HEADING)): new Pose2d(BLUE_GOAL_X, BLUE_GOAL_Y, Math.toRadians(BLUE_GOAL_HEADING));
 
         this.opMode = opMode;
-        drivebase = new DriveSubsystem(opMode, alliance, driveState, robotPose);
-        shooter = new ShooterSubsystem(opMode, alliance, shooterState, robotPose);
+        drivebase = new DriveSubsystem(opMode, alliance, driveState, robotPose, goalPos);
+        shooter = new ShooterSubsystem(opMode, alliance, shooterState, robotPose, goalPos);
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
         vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
         returnToBase = new ReturnToBaseSubsystem();

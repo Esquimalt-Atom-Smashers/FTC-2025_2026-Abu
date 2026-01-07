@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.utilities.Property.*;
-
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -30,7 +28,6 @@ public class DriveSubsystem implements SubsystemBase {
 
     private MecanumDrive mecanumDrive;
     private Pose2d currentPose;
-    private Pose2d goalPos;
     public double driveHeadingError = 0.0;
     private boolean isTelemetryEnabled = true;
 
@@ -51,24 +48,25 @@ public class DriveSubsystem implements SubsystemBase {
     }
     public static Params PARAMS = new Params();
     private PIDFController turnController;
+    private Pose2d goalPos;
     /**
      * Constructor for the DriveSubsystem.
      * <p>
      * Drive motors, IMU, and localization systems
      * should be initialized here later.
      */
-    public DriveSubsystem(OpMode opMode, RobotContainer.Alliance alliance, DriveSubsystemState state, Pose2d startingPose) {
+    public DriveSubsystem(OpMode opMode, RobotContainer.Alliance alliance, DriveSubsystemState state, Pose2d startingPose, Pose2d goalPose) {
         this.opMode = opMode;
         this.alliance = alliance;
         mecanumDrive = new MecanumDrive(opMode.hardwareMap, startingPose);
         getMecanumDrive().localizer.setPose(startingPose);
         this.currentPose = startingPose;
-        goalPos = alliance == RobotContainer.Alliance.RED? new Pose2d(RED_GOAL_X, RED_GOAL_Y, Math.toRadians(RED_GOAL_HEADING)): new Pose2d(BLUE_GOAL_X, BLUE_GOAL_Y, Math.toRadians(BLUE_GOAL_HEADING));
         isFieldCentric = true;
 
         turnController = new PIDFController(PARAMS.P, PARAMS.I, PARAMS.D, PARAMS.F);
         setDriveHeadingError();
         currentState = state;
+        this.goalPos = goalPose;
     }
 
     /**
