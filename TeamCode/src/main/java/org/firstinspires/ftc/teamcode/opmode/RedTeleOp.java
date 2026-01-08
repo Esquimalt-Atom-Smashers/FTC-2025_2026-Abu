@@ -28,7 +28,7 @@ public class RedTeleOp extends LinearOpMode {
     boolean isManualRPMControl = true;
     @Override
     public void runOpMode() throws InterruptedException {
-        RobotPropertyParser.populatePropertiesClass();
+        RobotPropertyParser.loadTeleOp();
         targetRpm = Property.CLOSE_SHOOT_RPM;
         if (RobotPositionHolder.hasData()) {
             startingPose = new Pose2d(RobotPositionHolder.getX(), RobotPositionHolder.getY(), RobotPositionHolder.getHeading());

@@ -107,46 +107,6 @@ public class RobotPropertyParser {
             }
         }
     }
-    /**
-     * Used to load values from the text file to the properties class
-     */
-    public static void populatePropertiesClass(){
-        loadProperties();
-
-        Field[] fields = Property.class.getDeclaredFields();
-        for (Field field1: fields){
-            if(Modifier.isStatic(field1.getModifiers())){
-                String fieldName = field1.getName();
-                Class clazz = field1.getType();
-                if(robotProperties.containsKey(fieldName)){
-                    try {
-                        if(clazz.isAssignableFrom(double.class)) {
-                            field1.setDouble(fieldName,getDouble(fieldName,robotProperties));
-                        }
-                        if(clazz.isAssignableFrom(int.class)){
-                            field1.setInt(fieldName,getInt(fieldName,robotProperties));
-                        }
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        }
-    }
-
-    public static ArrayList<String> arrayFromAutoSequenceFile(){
-        loadAutoSequence1();
-        ArrayList<String> actionList = new ArrayList<>();
-        try(Scanner reader = new Scanner(autoSequenceTxt)) {
-            while (reader.hasNextLine()) {
-                String actionTxt = reader.nextLine();
-                actionList.add(actionTxt);
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return actionList;
-    }
 
     public static void loadTeleOp() {
         loadFile(FILE_LOCATION + "/" + PROPERTIES_FILE_NAME, false);
@@ -223,33 +183,6 @@ public class RobotPropertyParser {
                 } else if (allowCommands) {
                     actionList.add(line);
                 }
-
-                // =========================
-                // AUTO COMMANDS
-                // =========================
-//                else if (allowCommands && line.equals("FAR.SHOOT.POS")) {
-//                    System.out.println("I am doing FAR.SHOOT.POS command");
-//                }
-//
-//                else if (allowCommands && line.startsWith("GO.TO.POSE2D")) {
-//                    String inside = line.substring(
-//                            line.indexOf("(") + 1,
-//                            line.indexOf(")")
-//                    );
-//
-//                    String[] nums = inside.split(",");
-//                    double x = Double.parseDouble(nums[0].trim());
-//                    double y = Double.parseDouble(nums[1].trim());
-//                    double heading = Double.parseDouble(nums[2].trim());
-//
-//                    System.out.println(
-//                            "I am going to " + x + "," + y + "," + heading
-//                    );
-//                }
-
-                // =========================
-                // UNKNOWN / TYPO
-                // =========================
             }
 
         } catch (Exception e) {

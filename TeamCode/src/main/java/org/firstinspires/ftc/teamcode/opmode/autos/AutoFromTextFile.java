@@ -43,9 +43,7 @@ public class AutoFromTextFile extends LinearOpMode {
         SequentialAction actionSequence;
 
         //get the actions from the ActiveAutoSequence & property form Txt file
-        ArrayList<String> actions = RobotPropertyParser.arrayFromAutoSequenceFile();
-        RobotPropertyParser.populatePropertiesClass();
-
+        ArrayList<String> actions = RobotPropertyParser.loadAuto();
         //Print auto title
         telemetry.addLine("Title: " + actions.get(0));
         actions.remove(0);
@@ -107,6 +105,7 @@ public class AutoFromTextFile extends LinearOpMode {
                     double heading = Double.parseDouble(nums[2].trim());
                     actionList.add(autoActions.goToPoseAction(x, y, heading));
                     telemetry.addLine("GO.TO.POSE2D(" + x + ", "+ y + ", "+ heading +")");
+                    break;
             }
             switch (action) {
                 case "RED.FAR.SHOOT":
@@ -132,9 +131,11 @@ public class AutoFromTextFile extends LinearOpMode {
                     break;
                 case "DELAY.HUNDRED.MS":
                     actionList.add(new SleepAction(0.1));
+                    telemetry.addLine("DELAY.HUNDRED.MS");
                     break;
                 case "DELAY.ONE.S":
                     actionList.add(new SleepAction(1));
+                    telemetry.addLine("DELAY.ONE.S");
                     break;
                 default:
                     telemetry.addLine("I read:" + action);
