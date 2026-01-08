@@ -163,7 +163,7 @@ public class AutoActions {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return robotContainer.updatePoseFromVision(forceReset);
+            return !robotContainer.updatePoseFromVision(forceReset);
         }
     }
 

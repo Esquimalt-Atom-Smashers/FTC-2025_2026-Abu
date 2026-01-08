@@ -37,7 +37,6 @@ public class AutoFromTextFile extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d startingPos;
-
         //array list for roadrunner to control actions in sequence
         ArrayList<Action> actionList = new ArrayList<>();
         SequentialAction actionSequence;
@@ -61,6 +60,7 @@ public class AutoFromTextFile extends LinearOpMode {
                 startingPos = new Pose2d(RED_CLOSE_X, RED_CLOSE_Y, Math.toRadians(RED_CLOSE_HEADING));
                 alliance = Alliance.RED;
                 telemetry.addLine("starting at RED.CLOSE");
+                break;
             case "BLUE.FAR":
                 startingPos = new Pose2d(BLUE_FAR_X, BLUE_FAR_Y, Math.toRadians(BLUE_FAR_HEADING));
                 alliance = Alliance.BLUE;
@@ -81,32 +81,19 @@ public class AutoFromTextFile extends LinearOpMode {
                     throw new Exception("Invalid starting position");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
-                }}
+                }
+        }
         actions.remove(0);
         RobotContainer robotContainer = new RobotContainer(this,
                 startingPos, alliance,
                 DriveSubsystem.DriveSubsystemState.AUTO,
                 ShooterSubsystem.ShooterState.MANUAL,
                 IntakeTransferSubsystem.IntakeTransferState.INTAKING,
-                VisionSubsystem.VisionState.DISABLED);
+                VisionSubsystem.VisionState.TRACKING_GOAL);
         AutoActions autoActions = new AutoActions(robotContainer);
 
         //cycle through the actions to add them to the roadrunner action array
         for (String action: actions){
-            if (action.startsWith("GO.TO.POSE2D")) {
-                String inside = action.substring(
-                            action.indexOf("(") + 1,
-                            action.indexOf(")")
-                    );
-
-                    String[] nums = inside.split(",");
-                    double x = Double.parseDouble(nums[0].trim());
-                    double y = Double.parseDouble(nums[1].trim());
-                    double heading = Double.parseDouble(nums[2].trim());
-                    actionList.add(autoActions.goToPoseAction(x, y, heading));
-                    telemetry.addLine("GO.TO.POSE2D(" + x + ", "+ y + ", "+ heading +")");
-                    break;
-            }
             switch (action) {
                 case "RED.FAR.SHOOT":
                     actionList.add(autoActions.redFarShootAction());
@@ -138,7 +125,21 @@ public class AutoFromTextFile extends LinearOpMode {
                     telemetry.addLine("DELAY.ONE.S");
                     break;
                 default:
-                    telemetry.addLine("I read:" + action);
+                    if (action.startsWith("GO.TO.POSE2D")) {
+                        String inside = action.substring(
+                                action.indexOf("(") + 1,
+                                action.indexOf(")")
+                        );
+
+                        String[] nums = inside.split(",");
+                        double x = Double.parseDouble(nums[0].trim());
+                        double y = Double.parseDouble(nums[1].trim());
+                        double heading = Double.parseDouble(nums[2].trim());
+                        actionList.add(autoActions.goToPoseAction(x, y, heading));
+                        telemetry.addLine("GO.TO.POSE2D(" + x + ", "+ y + ", "+ heading +")");
+                    } else {
+                        telemetry.addLine("I read:" + action);
+                    }
                     break;
             }
         }
