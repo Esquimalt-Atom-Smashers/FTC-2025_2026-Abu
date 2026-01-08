@@ -138,7 +138,7 @@ public class DriveSubsystem implements SubsystemBase {
         } else {
             turn = Range.clip(turn, turnSuggested, 1.0);
         }
-//        driveSubsystem.opMode.telemetry.addData("turn power", turn);
+        opMode.telemetry.addData("turn power", turnSuggested);
         driveFieldCentric(drive, strafe, turn);
     }
 
