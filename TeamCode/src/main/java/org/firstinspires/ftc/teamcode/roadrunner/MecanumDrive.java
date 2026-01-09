@@ -63,7 +63,7 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
         // drive model parameters
-        public double inPerTick = 1;
+        public double inPerTick = 0.00197895600226128707934654701309;
         public double lateralInPerTick = inPerTick;
         public double trackWidthTicks = 12.5 * 0.9979;
 
@@ -249,7 +249,7 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new OTOSLocalizer(hardwareMap, pose);
+        localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
