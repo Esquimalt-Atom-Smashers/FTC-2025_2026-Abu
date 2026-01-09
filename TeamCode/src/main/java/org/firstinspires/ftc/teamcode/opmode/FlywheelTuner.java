@@ -27,7 +27,7 @@ public class FlywheelTuner extends OpMode {
     public static Params PARAMS = new Params();
 
     private ShooterSubsystem flywheelSubsystem;
-    private IntakeTransferSubsystem intakeFeedSubsystem;
+//    private IntakeTransferSubsystem intakeFeedSubsystem;
 
     private enum MotionProfilingStates {
         ACCLEARATING(PARAMS.maxRPM),
@@ -51,7 +51,7 @@ public class FlywheelTuner extends OpMode {
 
     @Override
     public void init() {
-        intakeFeedSubsystem = new IntakeTransferSubsystem(this, IntakeTransferSubsystem.IntakeTransferState.INTAKING);
+//        intakeFeedSubsystem = new IntakeTransferSubsystem(this, IntakeTransferSubsystem.IntakeTransferState.INTAKING);
         flywheelSubsystem = new ShooterSubsystem(this, RobotContainer.Alliance.RED, ShooterSubsystem.ShooterState.MANUAL, new Pose2d(0, 0, 0));
         timer = new ElapsedTime();
         state = MotionProfilingStates.ACCLEARATING;
@@ -61,15 +61,15 @@ public class FlywheelTuner extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.a) {
-            intakeFeedSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
-        } else {
-            intakeFeedSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
-        }
+//        if (gamepad1.a) {
+//            intakeFeedSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
+//        } else {
+//            intakeFeedSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
+//        }
 
         double targetRPM = motionProfiling();
         flywheelSubsystem.shoot(new ShooterSubsystem.FlywheelSetting(targetRPM, 0));
-        intakeFeedSubsystem.periodic();
+//        intakeFeedSubsystem.periodic();
         telemetry.addData("targetRPM", targetRPM);
         telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
         telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * -10000));

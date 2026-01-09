@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 import org.firstinspires.ftc.teamcode.utilities.RobotPositionHolder;
 
-@Config
+@Config @Disabled
 @TeleOp(name = "Kenny Red TeleOp", group = "AAA")
 public class RedTeleOp extends LinearOpMode {
     RobotContainer robotContainer;
