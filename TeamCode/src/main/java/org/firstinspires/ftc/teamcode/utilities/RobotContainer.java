@@ -114,6 +114,7 @@ public class RobotContainer {
     public boolean updatePoseFromVision(boolean forceReset) {
         Pose2d drivePose = getPose();
         vision.updateCurrentPose(drivePose);
+        vision.periodic();
         Pose2d visionPose = vision.getLimelightPos();
         if (visionPose != null) {
             if ((Math.abs(visionPose.position.x - drivePose.position.x) >= POSITIONAL_TOLARANCE || Math.abs(visionPose.position.y - drivePose.position.y) >= POSITIONAL_TOLARANCE) && !forceReset) {
