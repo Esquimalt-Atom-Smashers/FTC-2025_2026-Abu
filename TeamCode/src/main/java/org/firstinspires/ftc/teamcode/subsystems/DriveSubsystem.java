@@ -133,7 +133,7 @@ public class DriveSubsystem implements SubsystemBase {
             turnSuggested = 0.0;
         }
 
-        if (turnSuggested >= turn) {
+        if (turnSuggested >= 0) {
             turn = Range.clip(turn, -1.0, turnSuggested);
         } else {
             turn = Range.clip(turn, turnSuggested, 1.0);
