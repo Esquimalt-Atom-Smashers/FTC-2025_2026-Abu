@@ -21,9 +21,9 @@ public class Property {
     public static volatile double RED_FAR_Y = 16;
     public static volatile double RED_FAR_HEADING = 180;
 
-    public static volatile double RED_CLOSE_X = -72 + 19.5;
-    public static volatile double RED_CLOSE_Y = 72 - 18;
-    public static volatile double RED_CLOSE_HEADING = 53.5;
+    public static volatile double RED_CLOSE_X = -52.5;
+    public static volatile double RED_CLOSE_Y = 54;
+    public static volatile double RED_CLOSE_HEADING = 36.5;
 
     public static volatile double BLUE_FAR_X = 72 - 7;
     public static volatile double BLUE_FAR_Y = -16;
@@ -42,7 +42,7 @@ public class Property {
 
     public static volatile double RED_CLOSE_SHOOT_X = -23;
     public static volatile double RED_CLOSE_SHOOT_Y = 24;
-    public static volatile double RED_CLOSE_SHOOT_HEADING = 36.5;
+    public static volatile double RED_CLOSE_SHOOT_HEADING = 40;
 
     public static volatile double RED_FIRST_INTAKE_P1_X = -18;
     public static volatile double RED_FIRST_INTAKE_P1_Y = 40;
