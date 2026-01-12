@@ -16,6 +16,8 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem.BallCol
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem.Direction;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem.DriveSubsystemState;
 
+import java.util.ArrayList;
+
 
 /**
  * RobotContainer
@@ -34,6 +36,7 @@ public class RobotContainer {
 
     private OpMode opMode;
     private Pose2d robotPose;
+    private String opModeTelemetry;
     public Pose2d goalPos;
     private ElapsedTime telemetryTimer;
 
@@ -84,10 +87,15 @@ public class RobotContainer {
             drivebase.addSubsystemTelemetry();
             shooter.addSubsystemTelemetry();
             intake.addSubsystemTelemetry();
-            vision.addSubsystemTelemetry();
+            vision.addSubsystemTelemetry();;
+            opMode.telemetry.addLine(opModeTelemetry);
             opMode.telemetry.update();
             telemetryTimer.reset();
         }
+    }
+
+    public void addOpModeTelemetry(String line) {
+        opModeTelemetry = line;
     }
 
     public void shutDownRobot() {

@@ -100,9 +100,26 @@ public class AutoFromTextFile extends LinearOpMode {
                     actionList.add(autoActions.shootArtifactAction(FAR_SHOOT_RPM, SHOOTING_SECONDS));
                     telemetry.addLine("RED.FAR.SHOOT");
                     break;
+                case "RED.CLOSE.SHOOT":
+                    actionList.add(autoActions.redCloseShootAction());
+                    actionList.add(autoActions.shootArtifactAction(CLOSE_SHOOT_RPM, SHOOTING_SECONDS));
+                    telemetry.addLine("RED.CLOSE.SHOOT");
+                    break;
+                case "RED.FIRST.INTAKE":
+                    actionList.add(autoActions.redFirstIntakeAction());
+                    telemetry.addLine("RED.FIRST.INTAKE");
+                    break;
+                case "RED.SECOND.INTAKE":
+                    actionList.add(autoActions.redSecondIntakeAction());
+                    telemetry.addLine("RED.SECOND.INTAKE");
+                    break;
                 case "RED.THIRD.INTAKE":
                     actionList.add(autoActions.redThirdIntakeAction());
                     telemetry.addLine("RED.THIRD.INTAKE");
+                    break;
+                case "RED.GATE.INTAKE":
+                    actionList.add(autoActions.redGateIntakeAction());
+                    telemetry.addLine("RED.GATE.INTAKE");
                     break;
                 case "RED.LOAD.INTAKE":
                     actionList.add(autoActions.redLoadingZoneIntakeAction());

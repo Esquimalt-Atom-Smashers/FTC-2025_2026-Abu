@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -45,9 +46,69 @@ public class AutoActions {
         }
     }
 
-
     public Action redFarShootAction() {
         return new RedFarShootAction();
+    }
+
+    public Action redCloseShootAction() {
+        return new RedCloseShootAction();
+    }
+
+    public class RedCloseShootAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
+                        strafeToLinearHeading(new Vector2d(RED_CLOSE_SHOOT_X, RED_CLOSE_SHOOT_Y), Math.toRadians(RED_CLOSE_SHOOT_HEADING)).build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+
+    public class RedFirstIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(RED_FIRST_INTAKE_P1_X, RED_FIRST_INTAKE_P1_Y), Math.toRadians(RED_FIRST_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(RED_FIRST_INTAKE_P2_X, RED_FIRST_INTAKE_P2_Y), Math.toRadians(RED_FIRST_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+
+    public Action redFirstIntakeAction() {
+        return new RedFirstIntakeAction();
+    }
+
+    public class RedSecondIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(RED_SECOND_INTAKE_P1_X, RED_SECOND_INTAKE_P1_Y), Math.toRadians(RED_SECOND_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(RED_SECOND_INTAKE_P2_X, RED_SECOND_INTAKE_P2_Y), Math.toRadians(RED_SECOND_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+
+    public Action redSecondIntakeAction() {
+        return new RedSecondIntakeAction();
     }
 
     public class RedThirdIntakeAction implements Action{
@@ -69,6 +130,28 @@ public class AutoActions {
 
     public Action redThirdIntakeAction() {
         return new RedThirdIntakeAction();
+    }
+
+    public class RedGateIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(RED_GATE_INTAKE_P1_X, RED_GATE_INTAKE_P1_Y), Math.toRadians(RED_GATE_INTAKE_P1_HEADING))
+                        .stopAndAdd(new SleepAction(GATE_INTAKE_DELAY_SECOND))
+                        .strafeToLinearHeading(new Vector2d(RED_GATE_INTAKE_P2_X, RED_GATE_INTAKE_P2_Y), Math.toRadians(RED_GATE_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+
+    public Action redGateIntakeAction() {
+        return new RedGateIntakeAction();
     }
 
     public class RedLoadingZoneIntakeAction implements Action{
@@ -156,14 +239,20 @@ public class AutoActions {
 
     public class UpdatePoseFromVisionAction implements Action {
         public boolean forceReset;
+        public int failedTimes;
         public UpdatePoseFromVisionAction(boolean forceReset) {
             visionSubsystem.setCurrentState(VisionSubsystem.VisionState.TRACKING_GOAL);
             this.forceReset = forceReset;
+            this.failedTimes = 0;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return !robotContainer.updatePoseFromVision(forceReset);
+            boolean updateSuccessful = robotContainer.updatePoseFromVision(forceReset);
+            if (!updateSuccessful) {
+                failedTimes ++;
+            }
+            return updateSuccessful && failedTimes < 5;
         }
     }
 

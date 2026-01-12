@@ -16,7 +16,7 @@ public class Property {
     public static volatile double BLUE_GOAL_Y = -65;
     public static volatile double BLUE_GOAL_HEADING = 0;
 
-    // AUTO POSITIONS
+    // AUTO POSITION
     public static volatile double RED_FAR_X = 65;
     public static volatile double RED_FAR_Y = 16;
     public static volatile double RED_FAR_HEADING = 180;
@@ -40,6 +40,26 @@ public class Property {
     public static volatile double RED_FAR_SHOOT_Y = 17;
     public static volatile double RED_FAR_SHOOT_HEADING = 74;
 
+    public static volatile double RED_CLOSE_SHOOT_X = -23;
+    public static volatile double RED_CLOSE_SHOOT_Y = 24;
+    public static volatile double RED_CLOSE_SHOOT_HEADING = 36.5;
+
+    public static volatile double RED_FIRST_INTAKE_P1_X = -18;
+    public static volatile double RED_FIRST_INTAKE_P1_Y = 40;
+    public static volatile double RED_FIRST_INTAKE_P1_HEADING = 90;
+
+    public static volatile double RED_FIRST_INTAKE_P2_X = -18;
+    public static volatile double RED_FIRST_INTAKE_P2_Y = 60;
+    public static volatile double RED_FIRST_INTAKE_P2_HEADING = 90;
+
+    public static volatile double RED_SECOND_INTAKE_P1_X = 12;
+    public static volatile double RED_SECOND_INTAKE_P1_Y = 40;
+    public static volatile double RED_SECOND_INTAKE_P1_HEADING = 90;
+
+    public static volatile double RED_SECOND_INTAKE_P2_X = 12;
+    public static volatile double RED_SECOND_INTAKE_P2_Y = 65;
+    public static volatile double RED_SECOND_INTAKE_P2_HEADING = 90;
+
     public static volatile double RED_THIRD_INTAKE_P1_X = 38;
     public static volatile double RED_THIRD_INTAKE_P1_Y = 30;
     public static volatile double RED_THIRD_INTAKE_P1_HEADING = 90;
@@ -47,6 +67,16 @@ public class Property {
     public static volatile double RED_THIRD_INTAKE_P2_X = 38;
     public static volatile double RED_THIRD_INTAKE_P2_Y = 55;
     public static volatile double RED_THIRD_INTAKE_P2_HEADING = 90;
+
+    public static volatile double RED_GATE_INTAKE_P1_X = 8;
+    public static volatile double RED_GATE_INTAKE_P1_Y = 62;
+    public static volatile double RED_GATE_INTAKE_P1_HEADING = 110;
+
+    public static volatile double RED_GATE_INTAKE_P2_X = 12;
+    public static volatile double RED_GATE_INTAKE_P2_Y = 63;
+    public static volatile double RED_GATE_INTAKE_P2_HEADING = 110;
+
+    public static volatile double GATE_INTAKE_DELAY_SECOND = 2.0;
 
     public static volatile double RED_LOAD_INTAKE_P1_X = 48;
     public static volatile double RED_LOAD_INTAKE_P1_Y = 65;

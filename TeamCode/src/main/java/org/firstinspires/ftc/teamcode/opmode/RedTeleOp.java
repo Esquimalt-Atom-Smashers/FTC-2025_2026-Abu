@@ -97,7 +97,7 @@ public class RedTeleOp extends LinearOpMode {
             } else {
                 robotContainer.drivebase.driveFieldCentric(drive, strafe, turn);
             }
-            telemetry.addData("manualRPM", isManualRPMControl);
+            robotContainer.addOpModeTelemetry("isManualRPM: " + isManualRPMControl);
             robotContainer.runRobot();
         }
         robotContainer.shutDownRobot();
