@@ -88,6 +88,16 @@ public class ShooterSubsystem implements SubsystemBase{
      * Shooter motors, hood servos, and sensors
      * should be initialized here later.
      */
+
+    // turret setting
+    private DcMotorEx turretMotor;
+    private final String TURRET_MOTOR_NAME = "turretMotor";
+    private final DcMotorSimple.Direction TURRET_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    private final double lowerTickLimit = -1;
+    private final double upperTickLimit = -1;
+    private final double turretRange = 360;
+    private double currentTurretHeading;
+    private double targetTurretHeading;
     public ShooterSubsystem(OpMode opMode, RobotContainer.Alliance alliance, ShooterState state, Pose2d pose2d) {
         this.opMode = opMode;
         this.alliance = alliance;
@@ -105,6 +115,11 @@ public class ShooterSubsystem implements SubsystemBase{
         currentState = state;
         setPose2d(pose2d);
         setFlywheelMotorPower(0);
+
+        turretMotor = opMode.hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
+        turretMotor.setDirection(TURRET_MOTOR_DIRECTION);
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     public double getFlywheelPower() {
@@ -195,6 +210,19 @@ public class ShooterSubsystem implements SubsystemBase{
         return new FlywheelSetting(lower.rpm + ((higher.rpm - lower.rpm) * percentageDistance),
                 lower.hoodAngle + ((higher.hoodAngle - lower.hoodAngle) * percentageDistance));
 
+    }
+
+    public void setTurretMotorPower(double turretMotorPower) {
+        turretMotor.setPower(turretMotorPower);
+    }
+
+    public void setTargetTurretHeading(double targetTurretHeading) {
+        this.targetTurretHeading = targetTurretHeading;
+    }
+
+    public double getCurrentTurretHeading() {
+        currentTurretHeading = turretMotor.getCurrentPosition() / (upperTickLimit - lowerTickLimit) * turretRange;
+        return currentTurretHeading;
     }
 //--------------------Common functions across subsystems--------------------
     /**
