@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.utilities;
 
 import com.acmerobotics.dashboard.config.Config;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 @Config
 public class Property {
     //GENERAL SETTINGS
@@ -92,4 +95,29 @@ public class Property {
     public static volatile double P = 0.005;
 
     public static volatile double SHOOTING_SECONDS = 5.0;
+
+    public static void reset() {
+        Field[] fields = Property.class.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                // Only touch static doubles
+                if (!Modifier.isStatic(field.getModifiers()) ||
+                        field.getType() != double.class) {
+                    continue;
+                }
+
+                Field defaultField =
+                        PropertyDefaults.class.getDeclaredField(field.getName());
+
+                double defaultValue = defaultField.getDouble(null);
+                field.setDouble(null, defaultValue);
+
+            } catch (NoSuchFieldException ignored) {
+                // Field exists in Property but not in PropertyDefaults → skip
+            } catch (IllegalAccessException ignored) {
+                // Should never happen if fields are public
+            }
+        }
+    }
 }
