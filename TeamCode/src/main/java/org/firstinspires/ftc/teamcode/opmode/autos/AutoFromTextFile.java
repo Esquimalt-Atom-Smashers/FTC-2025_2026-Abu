@@ -166,10 +166,10 @@ public class AutoFromTextFile extends LinearOpMode {
         actionSequence = new SequentialAction(actionList);
         Actions.runBlocking(
                 new ParallelAction(actionSequence,
-                        new InstantAction(robotContainer::runRobot))
+                        new InstantAction(robotContainer::runRobot),
+                        new InstantAction(robotContainer::updatePositionHolderAuto)
+                )
         );
-        Pose2d lastPose = robotContainer.getPose();
-        RobotPositionHolder.storePos(lastPose.position.x, lastPose.position.y, lastPose.heading.toDouble());
         robotContainer.shutDownRobot();
     }
 }

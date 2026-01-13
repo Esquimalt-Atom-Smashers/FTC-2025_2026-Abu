@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -20,7 +21,13 @@ import java.util.List;
  *
  * This class currently contains only structure and documentation.
  */
+@Config
 public class VisionSubsystem implements SubsystemBase{
+    public static class Params {
+        public double redHeadingOffset = 0.0;
+        public double blueHeadingOffset = 0.0;
+    }
+    public static Params PARAMS = new Params();
     /**
      * Represents possible detected field patterns.
      */
@@ -90,7 +97,7 @@ public class VisionSubsystem implements SubsystemBase{
      ** @return The estimated pose from vision
      */
     public Pose2d getLimelightPos() {
-        limelight3A.updateRobotOrientation(Math.toDegrees(pose2d.heading.toDouble()));
+        limelight3A.updateRobotOrientation(alliance == Alliance.RED? Math.toDegrees(pose2d.heading.toDouble()) + PARAMS.redHeadingOffset : Math.toDegrees(pose2d.heading.toDouble()) + PARAMS.blueHeadingOffset);
         if (botPose == null) return null;
         Pose2d returningPose = new Pose2d(botPose.getPosition().x * METER_TO_INCH, botPose.getPosition().y * METER_TO_INCH, botPose.getOrientation().getYaw(AngleUnit.RADIANS));
         return returningPose;

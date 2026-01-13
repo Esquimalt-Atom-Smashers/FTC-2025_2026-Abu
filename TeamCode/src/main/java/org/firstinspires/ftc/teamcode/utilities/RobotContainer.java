@@ -39,7 +39,8 @@ public class RobotContainer {
     private String opModeTelemetry;
     public Pose2d goalPos;
     private ElapsedTime telemetryTimer;
-
+    private boolean isAuto = false;
+    private ElapsedTime autoTimer;
     /**
      * Represents the alliance color.
      * Used for automatically selecting shooting behavior.
@@ -69,6 +70,12 @@ public class RobotContainer {
 
         telemetryTimer = new ElapsedTime();
         this.alliance = alliance;
+
+        if (driveState == DriveSubsystemState.AUTO) {
+            isAuto = true;
+            autoTimer = new ElapsedTime();
+            autoTimer.reset();
+        }
     }
 
     /**
@@ -84,6 +91,7 @@ public class RobotContainer {
         vision.periodic();
         // TODO: Update subsystems if needed
         if (telemetryTimer.seconds() >= Property.TELEMETRY_UPDATE_TIME) {
+            opMode.telemetry.clearAll();
             drivebase.addSubsystemTelemetry();
             shooter.addSubsystemTelemetry();
             intake.addSubsystemTelemetry();
@@ -98,6 +106,12 @@ public class RobotContainer {
         opModeTelemetry = line;
     }
 
+    public void updatePositionHolderAuto() {
+        Pose2d lastPose = getPose();
+        RobotPositionHolder.storePos(lastPose.position.x, lastPose.position.y, lastPose.heading.toDouble());
+        if (isAuto && autoTimer.seconds() >= 29.5) {
+        }
+    }
     public void shutDownRobot() {
         drivebase.shutDownSubsystem();
         shooter.shutDownSubsystem();
