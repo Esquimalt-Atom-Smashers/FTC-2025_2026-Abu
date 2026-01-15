@@ -31,7 +31,7 @@ public class AutoActions {
         visionSubsystem = robotContainer.vision;
     }
 
-    public class RedFarShootAction implements Action{
+    public class BlueFarShootAction implements Action{
         public Action path;
         public boolean firstRun = true;
 
@@ -39,15 +39,15 @@ public class AutoActions {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                    strafeToLinearHeading(new Vector2d(RED_FAR_SHOOT_X, RED_FAR_SHOOT_Y), Math.toRadians(RED_FAR_SHOOT_HEADING)).build();
+                    strafeToLinearHeading(new Vector2d(BLUE_FAR_SHOOT_X, BLUE_FAR_SHOOT_Y), Math.toRadians(BLUE_FAR_SHOOT_HEADING)).build();
                 firstRun = false;
             }
             return path.run(telemetryPacket);
         }
     }
 
-    public Action redFarShootAction() {
-        return new RedFarShootAction();
+    public Action blueFarShootAction() {
+        return new BlueFarShootAction();
     }
 
     public Action redCloseShootAction() {
@@ -67,6 +67,25 @@ public class AutoActions {
             }
             return path.run(telemetryPacket);
         }
+    }
+
+    public class RedFarShootAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
+                        strafeToLinearHeading(new Vector2d(RED_FAR_SHOOT_X, RED_FAR_SHOOT_Y), Math.toRadians(RED_FAR_SHOOT_HEADING)).build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+
+    public Action redFarShootAction() {
+        return new RedFarShootAction();
     }
 
     public class RedFirstIntakeAction implements Action{

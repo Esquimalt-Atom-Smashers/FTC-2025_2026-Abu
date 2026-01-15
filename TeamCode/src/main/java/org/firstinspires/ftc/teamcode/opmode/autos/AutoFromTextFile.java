@@ -99,21 +99,31 @@ public class AutoFromTextFile extends LinearOpMode {
                 case "RED.FAR.SHOOT":
                     actionList.add(autoActions.redFarShootAction());
                     actionList.add(autoActions.shootArtifactAction(FAR_SHOOT_RPM, SHOOTING_SECONDS));
-                    telemetry.addLine("RED.FAR.SHOOT");
+                    telemetry.addLine("BLUE.FAR.SHOOT");
                     break;
                 case "RED.CLOSE.SHOOT":
                     actionList.add(autoActions.redCloseShootAction());
                     actionList.add(autoActions.shootArtifactAction(CLOSE_SHOOT_RPM, SHOOTING_SECONDS));
                     telemetry.addLine("RED.CLOSE.SHOOT");
                     break;
-                case "RED.FIRST.INTAKE":
-                    actionList.add(autoActions.redFirstIntakeAction());
-                    telemetry.addLine("RED.FIRST.INTAKE");
+                case "BLUE.FAR.SHOOT":
+                    actionList.add(autoActions.blueFarShootAction());
+                    actionList.add(autoActions.shootArtifactAction(FAR_SHOOT_RPM, SHOOTING_SECONDS));
+                    telemetry.addLine("BLUE.FAR.SHOOT");
                     break;
-                case "RED.SECOND.INTAKE":
-                    actionList.add(autoActions.redSecondIntakeAction());
-                    telemetry.addLine("RED.SECOND.INTAKE");
-                    break;
+//                case "BLUE.CLOSE.SHOOT":
+//                    actionList.add(autoActions.blueFarShootAction());
+//                    actionList.add(autoActions.shootArtifactAction(CLOSE_SHOOT_RPM, SHOOTING_SECONDS));
+//                    telemetry.addLine("RED.CLOSE.SHOOT");
+//                    break;
+//                case "BLUE.FIRST.INTAKE":
+//                    actionList.add(autoActions.blueFirstIntakeAction());
+//                    telemetry.addLine("BLUE.FIRST.INTAKE");
+//                    break;
+//                case "BLUE.SECOND.INTAKE":
+//                    actionList.add(autoActions.redSecondIntakeAction());
+//                    telemetry.addLine("RED.SECOND.INTAKE");
+//                    break;
                 case "RED.THIRD.INTAKE":
                     actionList.add(autoActions.redThirdIntakeAction());
                     telemetry.addLine("RED.THIRD.INTAKE");
