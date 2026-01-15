@@ -92,10 +92,12 @@ public class RedTeleOp extends LinearOpMode {
             }
             robotContainer.shoot(targetRpm, isManualRPMControl);
             if (gamepad1.left_trigger >= 0.3) {
-                robotContainer.updatePoseFromVision(forceReset);
                 robotContainer.drivebase.aimbotAssistedDrive(drive, strafe, turn);
             } else {
                 robotContainer.drivebase.driveFieldCentric(drive, strafe, turn);
+            }
+            if (gamepad1.x) {
+                robotContainer.updatePoseFromVision(forceReset);
             }
             robotContainer.addOpModeTelemetry("isManualRPM: " + isManualRPMControl);
             robotContainer.runRobot();

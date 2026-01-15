@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.Range;
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
  *
  * This class currently contains only structure and documentation.
  */
+@Config
 public class DriveSubsystem implements SubsystemBase {
 
     public OpMode opMode;
@@ -49,6 +52,7 @@ public class DriveSubsystem implements SubsystemBase {
     public static Params PARAMS = new Params();
     private PIDFController turnController;
     private Pose2d goalPos;
+    private String aimbotLine;
     /**
      * Constructor for the DriveSubsystem.
      * <p>
@@ -63,7 +67,7 @@ public class DriveSubsystem implements SubsystemBase {
         this.currentPose = startingPose;
         isFieldCentric = true;
 
-        turnController = new PIDFController(PARAMS.P, PARAMS.I, PARAMS.D, PARAMS.F);
+        turnController = new PIDController(PARAMS.P, PARAMS.I, PARAMS.D);
         setDriveHeadingError();
         currentState = state;
         this.goalPos = goalPose;
@@ -121,7 +125,6 @@ public class DriveSubsystem implements SubsystemBase {
             if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         }
 
-        opMode.telemetry.addData("goal target heading", Math.toDegrees(targetHeading));
 //        driveSubsystem.opMode.telemetry.addData("current heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
 //        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
 //        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
@@ -135,10 +138,12 @@ public class DriveSubsystem implements SubsystemBase {
 
         if (turnSuggested >= 0) {
             turn = Range.clip(turn, -1.0, turnSuggested);
+            turn = Range.clip(turn, -1.0, PARAMS.F);
         } else {
             turn = Range.clip(turn, turnSuggested, 1.0);
+            turn = Range.clip(turn, -PARAMS.F, 1.0);
         }
-        opMode.telemetry.addData("turn power", turnSuggested);
+        aimbotLine = "goal target heading: " + Math.toDegrees(targetHeading) + "turn power: " + turnSuggested;
         driveFieldCentric(drive, strafe, turn);
     }
 
@@ -180,6 +185,7 @@ public class DriveSubsystem implements SubsystemBase {
      * @return The current Pose (position and heading)
      */
     public Pose2d getPose() {
+        mecanumDrive.updatePoseEstimate();
         return mecanumDrive.localizer.getPose();
     }
 
@@ -234,6 +240,7 @@ public class DriveSubsystem implements SubsystemBase {
             Pose2d pose = getPose();
             opMode.telemetry.addData("Pose", "X: %.2f, Y: %.2f, H: %.2f", pose.position.x, pose.position.y, Math.toDegrees(pose.heading.toDouble()));
             opMode.telemetry.addData("FC Heading", getFieldCentricHeading());
+            opMode.telemetry.addLine(aimbotLine);
         }
     }
 
