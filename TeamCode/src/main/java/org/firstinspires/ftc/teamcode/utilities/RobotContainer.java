@@ -139,7 +139,7 @@ public class RobotContainer {
         vision.periodic();
         Pose2d visionPose = vision.getLimelightPos();
         if (visionPose != null) {
-            if ((Math.abs(visionPose.position.x - drivePose.position.x) >= POSITIONAL_TOLARANCE || Math.abs(visionPose.position.y - drivePose.position.y) >= POSITIONAL_TOLARANCE) && !forceReset) {
+            if ((Math.abs(visionPose.position.x - drivePose.position.x) <= POSITIONAL_TOLARANCE && Math.abs(visionPose.position.y - drivePose.position.y) <= POSITIONAL_TOLARANCE) && !forceReset) {
                 drivebase.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
                 return true;
             }

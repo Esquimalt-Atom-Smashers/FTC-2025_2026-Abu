@@ -102,5 +102,6 @@ public class RedTeleOp extends LinearOpMode {
         }
         robotContainer.shutDownRobot();
         RobotPositionHolder.clear();
+        Property.reset();
     }
 }

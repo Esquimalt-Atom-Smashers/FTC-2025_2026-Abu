@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.AutoActions;
+import org.firstinspires.ftc.teamcode.utilities.Property;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer.*;
 import org.firstinspires.ftc.teamcode.utilities.RobotPositionHolder;
@@ -164,12 +165,16 @@ public class AutoFromTextFile extends LinearOpMode {
         waitForStart();
         //once robot starts do the prescribed actions from the action list.
         actionSequence = new SequentialAction(actionList);
-        Actions.runBlocking(
-                new ParallelAction(actionSequence,
-                        new InstantAction(robotContainer::runRobot),
-                        new InstantAction(robotContainer::updatePositionHolderAuto)
-                )
-        );
-        robotContainer.shutDownRobot();
+        try {
+            Actions.runBlocking(
+                    new ParallelAction(actionSequence,
+                            new InstantAction(robotContainer::runRobot)
+                    )
+            );
+        } finally {
+            robotContainer.shutDownRobot();
+            robotContainer.updatePositionHolderAuto();
+            Property.reset();
+        }
     }
 }

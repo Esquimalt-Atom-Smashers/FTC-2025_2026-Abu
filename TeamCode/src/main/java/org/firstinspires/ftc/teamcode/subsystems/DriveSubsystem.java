@@ -180,7 +180,6 @@ public class DriveSubsystem implements SubsystemBase {
      * @return The current Pose (position and heading)
      */
     public Pose2d getPose() {
-        mecanumDrive.updatePoseEstimate();
         return mecanumDrive.localizer.getPose();
     }
 
