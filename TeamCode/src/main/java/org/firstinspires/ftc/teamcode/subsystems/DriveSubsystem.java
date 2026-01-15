@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 
@@ -43,11 +44,12 @@ public class DriveSubsystem implements SubsystemBase {
     public DriveSubsystemState currentState;
 
     public static class Params {
-        public double P = 0.5;
+        public double P = 0.08;
         public double I = 0.0;
         public double D = 0.0;
-        public double F = 0.0;
-        public double ANGULAR_TOLERANCE = 1.0;
+        public double MIN_TURN_POWER = 0.07;
+        public double ANGULAR_TOLERANCE = 5.0;
+        public double MAX_TURN_POWER = 0.5;
     }
     public static Params PARAMS = new Params();
     private PIDFController turnController;
@@ -127,23 +129,20 @@ public class DriveSubsystem implements SubsystemBase {
 
 //        driveSubsystem.opMode.telemetry.addData("current heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
 //        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
-//        driveSubsystem.opMode.telemetry.addData("is within tolerance", Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble())) <= ANGULAR_TOLERANCE);
 
+        double turnError = AngleUnit.normalizeDegrees(Math.toDegrees(targetHeading - currentPose.heading.toDouble()));
         double turnSuggested;
-        if (Math.abs(Math.toDegrees(targetHeading) - Math.toDegrees(currentPose.heading.toDouble())) >= PARAMS.ANGULAR_TOLERANCE) {
-            turnSuggested = turnController.calculate(currentPose.heading.toDouble(), targetHeading);
-        } else {
-            turnSuggested = 0.0;
-        }
+        turnSuggested = turnController.calculate(0.0, turnError) + Math.signum(turnError) * PARAMS.MIN_TURN_POWER;
 
         if (turnSuggested >= 0) {
-            turn = Range.clip(turn, -1.0, turnSuggested);
-            turn = Range.clip(turn, -1.0, PARAMS.F);
+            turn = Range.clip(turn, -PARAMS.MIN_TURN_POWER, turnSuggested);
         } else {
-            turn = Range.clip(turn, turnSuggested, 1.0);
-            turn = Range.clip(turn, -PARAMS.F, 1.0);
+            turn = Range.clip(turn, turnSuggested, PARAMS.MIN_TURN_POWER);
         }
-        aimbotLine = "goal target heading: " + Math.toDegrees(targetHeading) + "turn power: " + turnSuggested;
+        if (Math.abs(turnError) <= PARAMS.ANGULAR_TOLERANCE) {
+            turn = 0.0;
+        }
+        aimbotLine = "goal target heading: " + Math.toDegrees(targetHeading) + "\nturn power: " + turn + "\nis with in Tolerance :" + turnError;
         driveFieldCentric(drive, strafe, turn);
     }
 
