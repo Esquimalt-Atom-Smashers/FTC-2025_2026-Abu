@@ -49,7 +49,7 @@ public class Property {
 
     public static volatile double BLUE_FAR_SHOOT_X = 55;
     public static volatile double BLUE_FAR_SHOOT_Y = -17;
-    public static volatile double BLUE_FAR_SHOOT_HEADING = 180;
+    public static volatile double BLUE_FAR_SHOOT_HEADING = 110;
 
     public static volatile double RED_FIRST_INTAKE_P1_X = -18;
     public static volatile double RED_FIRST_INTAKE_P1_Y = 40;
@@ -92,6 +92,23 @@ public class Property {
     public static volatile double RED_LOAD_INTAKE_P2_X = 70;
     public static volatile double RED_LOAD_INTAKE_P2_Y = 65;
     public static volatile double RED_LOAD_INTAKE_P2_HEADING = 0;
+
+    public static volatile double BLUE_THIRD_INTAKE_P1_X = 38;
+    public static volatile double BLUE_THIRD_INTAKE_P1_Y = -30;
+    public static volatile double BLUE_THIRD_INTAKE_P1_HEADING = 270;
+
+    public static volatile double BLUE_THIRD_INTAKE_P2_X = 38;
+    public static volatile double BLUE_THIRD_INTAKE_P2_Y = -55;
+    public static volatile double BLUE_THIRD_INTAKE_P2_HEADING = 270;
+
+    public static volatile double BLUE_LOAD_INTAKE_P1_X = 48;
+    public static volatile double BLUE_LOAD_INTAKE_P1_Y = -65;
+    public static volatile double BLUE_LOAD_INTAKE_P1_HEADING = 0;
+
+    public static volatile double BLUE_LOAD_INTAKE_P2_X = 70;
+    public static volatile double BLUE_LOAD_INTAKE_P2_Y = -65;
+    public static volatile double BLUE_LOAD_INTAKE_P2_HEADING = 0;
+
 
     //flywheel control
     public static volatile double TOLERANCE = 100;

@@ -128,6 +128,10 @@ public class AutoFromTextFile extends LinearOpMode {
                     actionList.add(autoActions.redThirdIntakeAction());
                     telemetry.addLine("RED.THIRD.INTAKE");
                     break;
+                case "BLUE.THIRD.INTAKE":
+                    actionList.add(autoActions.blueThirdIntakeAction());
+                    telemetry.addLine("BLUE.THIRD.INTAKE");
+                    break;
                 case "RED.GATE.INTAKE":
                     actionList.add(autoActions.redGateIntakeAction());
                     telemetry.addLine("RED.GATE.INTAKE");
@@ -135,6 +139,10 @@ public class AutoFromTextFile extends LinearOpMode {
                 case "RED.LOAD.INTAKE":
                     actionList.add(autoActions.redLoadingZoneIntakeAction());
                     telemetry.addLine("RED.LOAD.INTAKE");
+                    break;
+                case "BLUE.LOAD.INTAKE":
+                    actionList.add(autoActions.blueLoadingZoneIntakeAction());
+                    telemetry.addLine("BLUE.LOAD.INTAKE");
                     break;
                 case "UPDATE.POSE":
                     actionList.add(autoActions.updatePoseFromVisionAction(false));
