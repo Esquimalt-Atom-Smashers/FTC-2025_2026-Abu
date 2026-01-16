@@ -329,8 +329,4 @@ public class AutoActions {
     public Action updatePoseFromVisionAction(boolean forceReset) {
         return new UpdatePoseFromVisionAction(forceReset);
     }
-
-
-
-
 }

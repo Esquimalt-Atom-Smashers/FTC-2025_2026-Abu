@@ -33,6 +33,7 @@ public class RobotContainer {
     public final IntakeTransferSubsystem intake;
     public final VisionSubsystem vision;
     public final ReturnToBaseSubsystem returnToBase;
+    public final LEDSubsystem ledSubsystem;
 
     private OpMode opMode;
     private Pose2d robotPose;
@@ -40,6 +41,7 @@ public class RobotContainer {
     public Pose2d goalPos;
     private ElapsedTime telemetryTimer;
     private boolean isAuto = false;
+    private boolean firstRun = true;
     private ElapsedTime autoTimer;
     /**
      * Represents the alliance color.
@@ -66,6 +68,7 @@ public class RobotContainer {
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
         vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
         returnToBase = new ReturnToBaseSubsystem();
+        ledSubsystem = new LEDSubsystem(opMode, alliance);
         shooter.shutDownSubsystem();
 
         telemetryTimer = new ElapsedTime();
@@ -84,6 +87,10 @@ public class RobotContainer {
      * This method should be lightweight and safe to run every cycle.
      */
     public void runRobot() {
+        if (firstRun) {
+            firstRun = false;
+            ledSubsystem.normalLight();
+        }
         drivebase.periodic();
         shooter.periodic();
         intake.periodic();
@@ -117,6 +124,7 @@ public class RobotContainer {
         shooter.shutDownSubsystem();
         intake.shutDownSubsystem();
         vision.shutDownSubsystem();
+        ledSubsystem.shutDownSubsystem();
     }
 
     /**
@@ -169,5 +177,14 @@ public class RobotContainer {
 
     public void drive(double drive, double strafe, double turn) {
         drivebase.driveFieldCentric(drive, strafe, turn);
+        ledSubsystem.normalLight();
+    }
+
+    public void aimbotAssistedDrive(double drive, double strafe, double turn) {
+        if (drivebase.aimbotAssistedDrive(drive, strafe, turn)) {
+            ledSubsystem.aimedLight();
+        } else {
+            ledSubsystem.aimingLight();
+        }
     }
 }

@@ -107,7 +107,7 @@ public class DriveSubsystem implements SubsystemBase {
                 ));
     }
 
-    public void aimbotAssistedDrive(double drive, double strafe, double turn) {
+    public boolean aimbotAssistedDrive(double drive, double strafe, double turn) {
         double goalPosX = goalPos.position.x;
         double goalPosY = goalPos.position.y;
         currentPose = getPose();
@@ -127,9 +127,6 @@ public class DriveSubsystem implements SubsystemBase {
             if (Math.toDegrees(targetHeading) >= 180) { targetHeading -= Math.toRadians(360);}
         }
 
-//        driveSubsystem.opMode.telemetry.addData("current heading", Math.toDegrees(driveSubsystem.getCurrentPos().heading.toDouble()));
-//        driveSubsystem.opMode.telemetry.addData("heading error",driveSubsystem.getCurrentPos().heading.toDouble() - targetHeading);
-
         double turnError = AngleUnit.normalizeDegrees(Math.toDegrees(targetHeading - currentPose.heading.toDouble()));
         double turnSuggested;
         turnSuggested = turnController.calculate(0.0, turnError) + Math.signum(turnError) * PARAMS.MIN_TURN_POWER;
@@ -144,6 +141,7 @@ public class DriveSubsystem implements SubsystemBase {
         }
         aimbotLine = "goal target heading: " + Math.toDegrees(targetHeading) + "\nturn power: " + turn + "\nis with in Tolerance :" + turnError;
         driveFieldCentric(drive, strafe, turn);
+        return Math.abs(turnError) <= PARAMS.ANGULAR_TOLERANCE;
     }
 
     public void switchFieldCentric() {
