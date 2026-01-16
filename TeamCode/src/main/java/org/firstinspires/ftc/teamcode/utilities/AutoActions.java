@@ -30,8 +30,27 @@ public class AutoActions {
         intakeTransferSubsystem = robotContainer.intake;
         visionSubsystem = robotContainer.vision;
     }
-
-    public class BlueFarShootAction implements Action{
+    /** IMPORTANT: Action arrangement rules:
+     * Red Far Shoot -> Red Close Shoot
+     * Blue Far Shoot -> Blue Close Shoot
+     *
+     * Red Intake Actions 1st -> 2nd -> 3rd -> Gate -> Load
+     * Blue Intake Actions 1st -> 2nd -> 3rd -> Gate -> Load
+     *
+     * Shoot Artifact Action
+     * Go to Pose Action
+     * Update Pose from Vision Action
+     *
+     * How to add an action:
+     * 1, create class:
+     *      public class ___ implements Action //upper case at start
+     *          public ___() //constructor
+     *          public boolean run() //return false when completed
+     * 2, add function:
+     *      public Action ___() {return new___()} //lower case at start
+    */
+    //    =================================RED SHOOTING ACTIONS==========================================
+    public class RedFarShootAction implements Action{
         public Action path;
         public boolean firstRun = true;
 
@@ -39,19 +58,14 @@ public class AutoActions {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                    strafeToLinearHeading(new Vector2d(BLUE_FAR_SHOOT_X, BLUE_FAR_SHOOT_Y), Math.toRadians(BLUE_FAR_SHOOT_HEADING)).build();
+                        strafeToLinearHeading(new Vector2d(RED_FAR_SHOOT_X, RED_FAR_SHOOT_Y), Math.toRadians(RED_FAR_SHOOT_HEADING)).build();
                 firstRun = false;
             }
             return path.run(telemetryPacket);
         }
     }
-
-    public Action blueFarShootAction() {
-        return new BlueFarShootAction();
-    }
-
-    public Action redCloseShootAction() {
-        return new RedCloseShootAction();
+    public Action redFarShootAction() {
+        return new RedFarShootAction();
     }
 
     public class RedCloseShootAction implements Action{
@@ -68,8 +82,11 @@ public class AutoActions {
             return path.run(telemetryPacket);
         }
     }
-
-    public class RedFarShootAction implements Action{
+    public Action redCloseShootAction() {
+        return new RedCloseShootAction();
+    }
+    //    =================================BLUE SHOOTING ACTIONS==========================================
+    public class BlueFarShootAction implements Action{
         public Action path;
         public boolean firstRun = true;
 
@@ -77,17 +94,17 @@ public class AutoActions {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                        strafeToLinearHeading(new Vector2d(RED_FAR_SHOOT_X, RED_FAR_SHOOT_Y), Math.toRadians(RED_FAR_SHOOT_HEADING)).build();
+                        strafeToLinearHeading(new Vector2d(BLUE_FAR_SHOOT_X, BLUE_FAR_SHOOT_Y), Math.toRadians(BLUE_FAR_SHOOT_HEADING)).build();
                 firstRun = false;
             }
             return path.run(telemetryPacket);
         }
     }
-
-    public Action redFarShootAction() {
-        return new RedFarShootAction();
+    public Action blueFarShootAction() {
+        return new BlueFarShootAction();
     }
 
+    //    =================================RED INTAKE ACTIONS==========================================
     public class RedFirstIntakeAction implements Action{
         public Action path;
         public boolean firstRun = true;
@@ -104,7 +121,6 @@ public class AutoActions {
             return path.run(telemetryPacket);
         }
     }
-
     public Action redFirstIntakeAction() {
         return new RedFirstIntakeAction();
     }
@@ -125,7 +141,6 @@ public class AutoActions {
             return path.run(telemetryPacket);
         }
     }
-
     public Action redSecondIntakeAction() {
         return new RedSecondIntakeAction();
     }
@@ -146,7 +161,6 @@ public class AutoActions {
             return path.run(telemetryPacket);
         }
     }
-
     public Action redThirdIntakeAction() {
         return new RedThirdIntakeAction();
     }
@@ -168,7 +182,6 @@ public class AutoActions {
             return path.run(telemetryPacket);
         }
     }
-
     public Action redGateIntakeAction() {
         return new RedGateIntakeAction();
     }
@@ -193,35 +206,48 @@ public class AutoActions {
         return new RedLoadingZoneIntakeAction();
     }
 
-
-    public Action goToPoseAction(double x, double y, double headingDegree) {
-        return new GoToPoseAction(x, y, headingDegree);
-    }
-
-    public class GoToPoseAction implements Action{
+    //    =================================BLUE INTAKE ACTIONS==========================================
+    public class BlueThirdIntakeAction implements Action{
         public Action path;
         public boolean firstRun = true;
-        public double x;
-        public double y;
-        public double headingDegree;
 
-        public GoToPoseAction(double x, double y, double headingDegree) {
-            this.x = x;
-            this.y = y;
-            this.headingDegree = headingDegree;
-        }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
-                        .strafeToLinearHeading(new Vector2d(x, y), Math.toRadians(headingDegree))
+                        .strafeToLinearHeading(new Vector2d(BLUE_THIRD_INTAKE_P1_X, BLUE_THIRD_INTAKE_P1_Y), Math.toRadians(BLUE_THIRD_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(BLUE_THIRD_INTAKE_P2_X, BLUE_THIRD_INTAKE_P2_Y), Math.toRadians(BLUE_THIRD_INTAKE_P2_HEADING))
                         .build();
                 firstRun = false;
             }
             return path.run(telemetryPacket);
         }
     }
+    public Action blueThirdIntakeAction() {
+        return new BlueThirdIntakeAction();
+    }
 
+    public class BlueLoadingZoneIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(BLUE_LOAD_INTAKE_P1_X, BLUE_LOAD_INTAKE_P1_Y), Math.toRadians(BLUE_LOAD_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(BLUE_LOAD_INTAKE_P2_X, BLUE_LOAD_INTAKE_P2_Y), Math.toRadians(BLUE_LOAD_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+    public Action blueLoadingZoneIntakeAction() {
+        return new BlueLoadingZoneIntakeAction();
+    }
+
+    //    =================================MISCELLANEOUS ACTIONS==========================================
     public class ShootArtifactAction implements Action {
         public double targetVelocity;
         public ShooterSubsystem.FlywheelSetting flywheelSetting;
@@ -253,27 +279,34 @@ public class AutoActions {
             }
         }
     }
+    public ShootArtifactAction shootArtifactAction(double targetRPM, double seconds) {return new ShootArtifactAction(targetRPM, seconds);}
 
-    public class BlueThirdIntakeAction implements Action{
+    public class GoToPoseAction implements Action{
         public Action path;
         public boolean firstRun = true;
+        public double x;
+        public double y;
+        public double headingDegree;
 
+        public GoToPoseAction(double x, double y, double headingDegree) {
+            this.x = x;
+            this.y = y;
+            this.headingDegree = headingDegree;
+        }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
-                        .strafeToLinearHeading(new Vector2d(BLUE_THIRD_INTAKE_P1_X, BLUE_THIRD_INTAKE_P1_Y), Math.toRadians(BLUE_THIRD_INTAKE_P1_HEADING))
-                        .strafeToLinearHeading(new Vector2d(BLUE_THIRD_INTAKE_P2_X, BLUE_THIRD_INTAKE_P2_Y), Math.toRadians(BLUE_THIRD_INTAKE_P2_HEADING))
+                        .strafeToLinearHeading(new Vector2d(x, y), Math.toRadians(headingDegree))
                         .build();
                 firstRun = false;
             }
             return path.run(telemetryPacket);
         }
     }
-
-    public Action blueThirdIntakeAction() {return new BlueThirdIntakeAction();}
-
-    public ShootArtifactAction shootArtifactAction(double targetRPM, double seconds) {return new ShootArtifactAction(targetRPM, seconds);}
+    public Action goToPoseAction(double x, double y, double headingDegree) {
+        return new GoToPoseAction(x, y, headingDegree);
+    }
 
     public class UpdatePoseFromVisionAction implements Action {
         public boolean forceReset;
@@ -293,29 +326,11 @@ public class AutoActions {
             return updateSuccessful && failedTimes < 5;
         }
     }
-
-
-    public class BlueLoadingZoneIntakeAction implements Action{
-        public Action path;
-        public boolean firstRun = true;
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (firstRun) {
-                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
-                        .strafeToLinearHeading(new Vector2d(BLUE_LOAD_INTAKE_P1_X, BLUE_LOAD_INTAKE_P1_Y), Math.toRadians(BLUE_LOAD_INTAKE_P1_HEADING))
-                        .strafeToLinearHeading(new Vector2d(BLUE_LOAD_INTAKE_P2_X, BLUE_LOAD_INTAKE_P2_Y), Math.toRadians(BLUE_LOAD_INTAKE_P2_HEADING))
-                        .build();
-                firstRun = false;
-            }
-            return path.run(telemetryPacket);
-        }
+    public Action updatePoseFromVisionAction(boolean forceReset) {
+        return new UpdatePoseFromVisionAction(forceReset);
     }
-    public Action updatePoseFromVisionAction(boolean forceReset) {return new UpdatePoseFromVisionAction(forceReset);}
 
-    public Action blueLoadingZoneIntakeAction() {
-        return new BlueLoadingZoneIntakeAction();
-    }
+
 
 
 }
