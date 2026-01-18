@@ -104,6 +104,24 @@ public class AutoActions {
         return new BlueFarShootAction();
     }
 
+    public class BlueCloseShootAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
+                        strafeToLinearHeading(new Vector2d(BLUE_CLOSE_SHOOT_X, BLUE_CLOSE_SHOOT_Y), Math.toRadians(BLUE_CLOSE_SHOOT_HEADING)).build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+    public Action blueCloseShootAction() {
+        return new BlueCloseShootAction();
+    }
+
     //    =================================RED INTAKE ACTIONS==========================================
     public class RedFirstIntakeAction implements Action{
         public Action path;
@@ -206,7 +224,50 @@ public class AutoActions {
         return new RedLoadingZoneIntakeAction();
     }
 
+
+
     //    =================================BLUE INTAKE ACTIONS==========================================
+
+    public class BlueFirstIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(BLUE_FIRST_INTAKE_P1_X, BLUE_FIRST_INTAKE_P1_Y), Math.toRadians(BLUE_FIRST_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(BLUE_FIRST_INTAKE_P2_X, BLUE_FIRST_INTAKE_P2_Y), Math.toRadians(BLUE_FIRST_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+    public Action blueFirstIntakeAction() {
+        return new AutoActions.BlueFirstIntakeAction();
+        }
+
+    public class BlueSecondIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(BLUE_SECOND_INTAKE_P1_X, BLUE_SECOND_INTAKE_P1_Y), Math.toRadians(BLUE_SECOND_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(BLUE_SECOND_INTAKE_P2_X, BLUE_SECOND_INTAKE_P2_Y), Math.toRadians(BLUE_SECOND_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+    public Action blueSecondIntakeAction() {
+        return new BlueSecondIntakeAction();
+    }
+
     public class BlueThirdIntakeAction implements Action{
         public Action path;
         public boolean firstRun = true;
@@ -245,6 +306,27 @@ public class AutoActions {
     }
     public Action blueLoadingZoneIntakeAction() {
         return new BlueLoadingZoneIntakeAction();
+    }
+
+    public class BlueGateIntakeAction implements Action{
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(BLUE_GATE_INTAKE_P1_X, BLUE_GATE_INTAKE_P1_Y), Math.toRadians(BLUE_GATE_INTAKE_P1_HEADING))
+                        .stopAndAdd(new SleepAction(GATE_INTAKE_DELAY_SECOND))
+                        .strafeToLinearHeading(new Vector2d(BLUE_GATE_INTAKE_P2_X, BLUE_GATE_INTAKE_P2_Y), Math.toRadians(BLUE_GATE_INTAKE_P2_HEADING))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+    public Action blueGateIntakeAction() {
+        return new BlueGateIntakeAction();
     }
 
     //    =================================MISCELLANEOUS ACTIONS==========================================
@@ -307,7 +389,6 @@ public class AutoActions {
     public Action goToPoseAction(double x, double y, double headingDegree) {
         return new GoToPoseAction(x, y, headingDegree);
     }
-
     public class UpdatePoseFromVisionAction implements Action {
         public boolean forceReset;
         public int failedTimes;

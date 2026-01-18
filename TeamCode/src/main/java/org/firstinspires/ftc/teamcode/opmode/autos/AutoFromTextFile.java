@@ -111,11 +111,11 @@ public class AutoFromTextFile extends LinearOpMode {
                     actionList.add(autoActions.shootArtifactAction(FAR_SHOOT_RPM, SHOOTING_SECONDS));
                     telemetry.addLine("BLUE.FAR.SHOOT");
                     break;
-//                case "BLUE.CLOSE.SHOOT":
-//                    actionList.add(autoActions.blueFarShootAction());
-//                    actionList.add(autoActions.shootArtifactAction(CLOSE_SHOOT_RPM, SHOOTING_SECONDS));
-//                    telemetry.addLine("RED.CLOSE.SHOOT");
-//                    break;
+                case "BLUE.CLOSE.SHOOT":
+                    actionList.add(autoActions.blueCloseShootAction());
+                    actionList.add(autoActions.shootArtifactAction(CLOSE_SHOOT_RPM, SHOOTING_SECONDS));
+                    telemetry.addLine("BLUE.CLOSE.SHOOT");
+                    break;
                 case "RED.FIRST.INTAKE":
                     actionList.add(autoActions.redFirstIntakeAction());
                     telemetry.addLine("RED.FIRST.INTAKE");
@@ -136,17 +136,21 @@ public class AutoFromTextFile extends LinearOpMode {
                     actionList.add(autoActions.redLoadingZoneIntakeAction());
                     telemetry.addLine("RED.LOAD.INTAKE");
                     break;
-//                case "BLUE.FIRST.INTAKE":
-//                    actionList.add(autoActions.blueFirstIntakeAction());
-//                    telemetry.addLine("BLUE.FIRST.INTAKE");
-//                    break;
-//                case "BLUE.SECOND.INTAKE":
-//                    actionList.add(autoActions.redSecondIntakeAction());
-//                    telemetry.addLine("RED.SECOND.INTAKE");
-//                    break;
+                case "BLUE.FIRST.INTAKE":
+                    actionList.add(autoActions.blueFirstIntakeAction());
+                    telemetry.addLine("BLUE.FIRST.INTAKE");
+                    break;
+                case "BLUE.SECOND.INTAKE":
+                    actionList.add(autoActions.blueSecondIntakeAction());
+                    telemetry.addLine("BLUE.SECOND.INTAKE");
+                    break;
                 case "BLUE.THIRD.INTAKE":
                     actionList.add(autoActions.blueThirdIntakeAction());
                     telemetry.addLine("BLUE.THIRD.INTAKE");
+                    break;
+                case "BLUE.GATE.INTAKE":
+                    actionList.add(autoActions.blueGateIntakeAction());
+                    telemetry.addLine("BLUE.GATE.INTAKE");
                     break;
                 case "BLUE.LOAD.INTAKE":
                     actionList.add(autoActions.blueLoadingZoneIntakeAction());
