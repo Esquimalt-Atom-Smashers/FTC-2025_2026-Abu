@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.utilities.Property.*;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -65,14 +67,14 @@ public class ShooterSubsystem implements SubsystemBase{
 
     private final TreeMap<Double, FlywheelSetting> MATCHING_MAP= new TreeMap<>();
     {
-        MATCHING_MAP.put(30.0 , new FlywheelSetting(3300, 20));
-        MATCHING_MAP.put(45.0, new FlywheelSetting(3050, 25));
-        MATCHING_MAP.put(60.0, new FlywheelSetting(3100, 30));
-        MATCHING_MAP.put(75.0, new FlywheelSetting(3100, 30));
-        MATCHING_MAP.put(90.0, new FlywheelSetting(3150, 30));
-        MATCHING_MAP.put(105.0, new FlywheelSetting(3350, 30));
-        MATCHING_MAP.put(120.0, new FlywheelSetting(3550, 30));
-        MATCHING_MAP.put(130.0, new FlywheelSetting(3600, 30));
+        MATCHING_MAP.put(30.0 , new FlywheelSetting(THIRTY_INCH_RPM, 20));
+        MATCHING_MAP.put(45.0, new FlywheelSetting(FORTY_FIVE_INCH_RPM, 25));
+        MATCHING_MAP.put(60.0, new FlywheelSetting(SIXTY_INCH_RPM, 30));
+        MATCHING_MAP.put(75.0, new FlywheelSetting(SEVENTY_FIVE_INCH_RPM, 30));
+        MATCHING_MAP.put(90.0, new FlywheelSetting(NINETY_INCH_RPM, 30));
+        MATCHING_MAP.put(105.0, new FlywheelSetting(ONE_HUNDRED_FIVE_INCH_RPM, 30));
+        MATCHING_MAP.put(120.0, new FlywheelSetting(ONE_HUNDRED_TWENTY_INCH_RPM, 30));
+        MATCHING_MAP.put(130.0, new FlywheelSetting(ONE_HUNDRED_THIRTY_INCH_RPM, 30));
     }
 
     public enum ShooterState{

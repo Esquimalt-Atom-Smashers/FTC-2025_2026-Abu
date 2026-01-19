@@ -44,7 +44,7 @@ public class DriveSubsystem implements SubsystemBase {
     public DriveSubsystemState currentState;
 
     public static class Params {
-        public double P = 0.08;
+        public double P = 0.03;
         public double I = 0.0;
         public double D = 0.0;
         public double MIN_TURN_POWER = 0.07;
@@ -131,16 +131,16 @@ public class DriveSubsystem implements SubsystemBase {
         double turnSuggested;
         turnSuggested = turnController.calculate(0.0, turnError) + Math.signum(turnError) * PARAMS.MIN_TURN_POWER;
 
-        if (turnSuggested >= 0) {
-            turn = Range.clip(turn, -PARAMS.MIN_TURN_POWER, turnSuggested);
-        } else {
-            turn = Range.clip(turn, turnSuggested, PARAMS.MIN_TURN_POWER);
-        }
-        if (Math.abs(turnError) <= PARAMS.ANGULAR_TOLERANCE) {
-            turn = 0.0;
-        }
-        aimbotLine = "goal target heading: " + Math.toDegrees(targetHeading) + "\nturn power: " + turn + "\nis with in Tolerance :" + turnError;
-        driveFieldCentric(drive, strafe, turn);
+//        if (turnSuggested >= 0) {
+//            turn = Range.clip(turn, -PARAMS.MIN_TURN_POWER, turnSuggested);
+//        } else {
+//            turn = Range.clip(turn, turnSuggested, PARAMS.MIN_TURN_POWER);
+//        }
+//        if (Math.abs(turnError) <= PARAMS.ANGULAR_TOLERANCE) {
+//            turn = 0.0;
+//        }
+        aimbotLine = "goal target heading: " + Math.toDegrees(targetHeading) + "\nturn power: " + turnSuggested + "\nis with in Tolerance :" + turnError;
+        driveFieldCentric(drive, strafe, turnSuggested);
         return Math.abs(turnError) <= PARAMS.ANGULAR_TOLERANCE;
     }
 

@@ -19,7 +19,7 @@ public class Property {
     public static volatile double BLUE_GOAL_Y = -65;
     public static volatile double BLUE_GOAL_HEADING = 0;
 
-    // AUTO POSITION
+    // AUTO STARTING POSITION
     public static volatile double RED_FAR_X = 65;
     public static volatile double RED_FAR_Y = 16;
     public static volatile double RED_FAR_HEADING = 180;
@@ -36,9 +36,7 @@ public class Property {
     public static volatile double BLUE_CLOSE_Y = -54;
     public static volatile double BLUE_CLOSE_HEADING = 143.65;
 
-    public static volatile double FAR_SHOOT_RPM = 3375;
-    public static volatile double CLOSE_SHOOT_RPM = 3100;
-
+//    RED SHOOTING POSITIONS
     public static volatile double RED_FAR_SHOOT_X = 55;
     public static volatile double RED_FAR_SHOOT_Y = 17;
     public static volatile double RED_FAR_SHOOT_HEADING = 74;
@@ -47,6 +45,7 @@ public class Property {
     public static volatile double RED_CLOSE_SHOOT_Y = 24;
     public static volatile double RED_CLOSE_SHOOT_HEADING = 40;
 
+//    BLUE SHOOTING POSITIONS
     public static volatile double BLUE_FAR_SHOOT_X = 55;
     public static volatile double BLUE_FAR_SHOOT_Y = -17;
     public static volatile double BLUE_FAR_SHOOT_HEADING = 110;
@@ -55,6 +54,7 @@ public class Property {
     public static volatile double BLUE_CLOSE_SHOOT_Y = -24;
     public static volatile double BLUE_CLOSE_SHOOT_HEADING = 130;
 
+//    RED INTAKE POSITIONS
     public static volatile double RED_FIRST_INTAKE_P1_X = -18;
     public static volatile double RED_FIRST_INTAKE_P1_Y = 40;
     public static volatile double RED_FIRST_INTAKE_P1_HEADING = 90;
@@ -97,6 +97,7 @@ public class Property {
     public static volatile double RED_LOAD_INTAKE_P2_Y = 65;
     public static volatile double RED_LOAD_INTAKE_P2_HEADING = 0;
 
+//    BLUE INTAKE POSITIONS
     public static volatile double BLUE_FIRST_INTAKE_P1_X = 18;
     public static volatile double BLUE_FIRST_INTAKE_P1_Y = -40;
     public static volatile double BLUE_FIRST_INTAKE_P1_HEADING = 270;
@@ -137,12 +138,24 @@ public class Property {
     public static volatile double BLUE_GATE_INTAKE_P2_Y = -63;
     public static volatile double BLUE_GATE_INTAKE_P2_HEADING = 290;
 
-    //flywheel control
+    //FLYWHEEL CONTROL
+    public static volatile double FAR_SHOOT_RPM = 3375;
+    public static volatile double CLOSE_SHOOT_RPM = 3100;
+
     public static volatile double TOLERANCE = 100;
     public static volatile double kV = 0.000215;
     public static volatile double P = 0.005;
 
     public static volatile double SHOOTING_SECONDS = 5.0;
+
+    public static volatile double THIRTY_INCH_RPM = 3300;
+    public static volatile double FORTY_FIVE_INCH_RPM = 3050;
+    public static volatile double SIXTY_INCH_RPM = 3100;
+    public static volatile double SEVENTY_FIVE_INCH_RPM = 3100;
+    public static volatile double NINETY_INCH_RPM = 3150;
+    public static volatile double ONE_HUNDRED_FIVE_INCH_RPM = 3350;
+    public static volatile double ONE_HUNDRED_TWENTY_INCH_RPM = 3550;
+    public static volatile double ONE_HUNDRED_THIRTY_INCH_RPM = 3600;
 
     public static void reset() {
         Field[] fields = Property.class.getDeclaredFields();

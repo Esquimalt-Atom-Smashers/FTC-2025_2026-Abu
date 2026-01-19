@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 @TeleOp(name = "Kenny Red TeleOp", group = "AAA")
 public class RedTeleOp extends LinearOpMode {
     RobotContainer robotContainer;
-    Pose2d startingPose = new Pose2d(0, 0, Math.toRadians(90));
+    Pose2d startingPose = new Pose2d(0, 12, Math.toRadians(90));
     RobotContainer.Alliance alliance = RobotContainer.Alliance.RED;
     double targetRpm;
     ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
