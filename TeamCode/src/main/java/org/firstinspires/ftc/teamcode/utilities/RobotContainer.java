@@ -12,11 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.*;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem.BallColour;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem.Direction;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem.DriveSubsystemState;
-
-import java.util.ArrayList;
 
 
 /**
@@ -145,7 +141,7 @@ public class RobotContainer {
         Pose2d drivePose = getPose();
         vision.updateCurrentPose(drivePose);
         vision.periodic();
-        Pose2d visionPose = vision.getLimelightPos();
+        Pose2d visionPose = vision.getLimelightPosMT2();
         if (visionPose != null) {
             if ((Math.abs(visionPose.position.x - drivePose.position.x) <= POSITIONAL_TOLARANCE && Math.abs(visionPose.position.y - drivePose.position.y) <= POSITIONAL_TOLARANCE) && !forceReset) {
                 drivebase.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive

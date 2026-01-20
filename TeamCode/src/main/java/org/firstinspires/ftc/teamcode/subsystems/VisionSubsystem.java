@@ -57,7 +57,8 @@ public class VisionSubsystem implements SubsystemBase{
     private OpMode opMode;
     private VisionState currentState;
 
-    private Pose3D botPose;
+    private Pose3D botPoseMT2;
+    private Pose3D botPoseMT1;
     private double ty = 0.0;
     private int tagId = 0;
     private Pose2d pose2d;
@@ -96,10 +97,21 @@ public class VisionSubsystem implements SubsystemBase{
      * Returns the robot's position estimated by the Limelight.
      ** @return The estimated pose from vision
      */
-    public Pose2d getLimelightPos() {
+    public Pose2d getLimelightPosMT1() {
         limelight3A.updateRobotOrientation(alliance == Alliance.RED? Math.toDegrees(pose2d.heading.toDouble()) + PARAMS.redHeadingOffset : Math.toDegrees(pose2d.heading.toDouble()) + PARAMS.blueHeadingOffset);
-        if (botPose == null) return null;
-        Pose2d returningPose = new Pose2d(botPose.getPosition().x * METER_TO_INCH, botPose.getPosition().y * METER_TO_INCH, botPose.getOrientation().getYaw(AngleUnit.RADIANS));
+        if (botPoseMT1 == null) return null;
+        Pose2d returningPose = new Pose2d(botPoseMT1.getPosition().x * METER_TO_INCH, botPoseMT1.getPosition().y * METER_TO_INCH, botPoseMT1.getOrientation().getYaw(AngleUnit.RADIANS));
+        return returningPose;
+    }
+
+    /**
+     * Returns the robot's position estimated by the Limelight in MT2.
+     ** @return The estimated pose from vision
+     */
+    public Pose2d getLimelightPosMT2() {
+        limelight3A.updateRobotOrientation(alliance == Alliance.RED? Math.toDegrees(pose2d.heading.toDouble()) + PARAMS.redHeadingOffset : Math.toDegrees(pose2d.heading.toDouble()) + PARAMS.blueHeadingOffset);
+        if (botPoseMT2 == null) return null;
+        Pose2d returningPose = new Pose2d(botPoseMT2.getPosition().x * METER_TO_INCH, botPoseMT2.getPosition().y * METER_TO_INCH, botPoseMT2.getOrientation().getYaw(AngleUnit.RADIANS));
         return returningPose;
     }
 
@@ -133,7 +145,8 @@ public class VisionSubsystem implements SubsystemBase{
             LLResult result = limelight3A.getLatestResult();
             if (result.isValid()) {
                 ty = result.getTy();
-                botPose = result.getBotpose_MT2();
+                botPoseMT2 = result.getBotpose_MT2();
+                botPoseMT1 = result.getBotpose();
                 List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
                 for (LLResultTypes.FiducialResult fr : fiducialResults) {
                     if (fr.getFiducialId() == 21 || fr.getFiducialId() == 22 || fr.getFiducialId() == 33){
@@ -143,14 +156,16 @@ public class VisionSubsystem implements SubsystemBase{
                 LLGotData = true;
             } else {
                 ty = 0.0;
-                botPose = null;
+                botPoseMT1 = null;
+                botPoseMT2 = null;
                 tagId = 0;
                 LLGotData = false;
             }
         } else {
             pauseSubsystem();
             ty = 0.0;
-            botPose = null;
+            botPoseMT1 = null;
+            botPoseMT2 = null;
             tagId = 0;
             LLGotData = false;
         }
@@ -169,8 +184,12 @@ public class VisionSubsystem implements SubsystemBase{
     public void addSubsystemTelemetry() {
         if (isTelemetryEnabled) {
             opMode.telemetry.addData("LL data", LLGotData);
-            Pose2d llPose = getLimelightPos();
-            if (getLimelightPos() != null) {
+            Pose2d llPoseMT1 = getLimelightPosMT1();
+            if (getLimelightPosMT1() != null) {
+                opMode.telemetry.addData("LL PoseMT1", "X: %.2f, Y: %.2f, H: %.2f", llPoseMT1.position.x, llPoseMT1.position.y, Math.toDegrees(llPoseMT1.heading.toDouble()));
+            }
+            Pose2d llPose = getLimelightPosMT2();
+            if (getLimelightPosMT2() != null) {
                 opMode.telemetry.addData("LL Pose", "X: %.2f, Y: %.2f, H: %.2f", llPose.position.x, llPose.position.y, Math.toDegrees(llPose.heading.toDouble()));
             }
         }
