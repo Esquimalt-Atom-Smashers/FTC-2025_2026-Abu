@@ -44,7 +44,7 @@ public class DriveSubsystem implements SubsystemBase {
     public DriveSubsystemState currentState;
 
     public static class Params {
-        public double P = 0.03;
+        public double P = 0.03 ;
         public double I = 0.0;
         public double D = 0.0;
         public double MIN_TURN_POWER = 0.07;
@@ -217,6 +217,7 @@ public class DriveSubsystem implements SubsystemBase {
     /** shall be ran every loop*/
     @Override
     public void periodic() {
+        getPose();
         if (currentState == DriveSubsystemState.DISABLED) {
             shutDownSubsystem();
         }

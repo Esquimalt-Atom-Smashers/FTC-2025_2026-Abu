@@ -14,7 +14,7 @@ public class RobotPositionViewer extends LinearOpMode {
             telemetry.addData("x", RobotPositionHolder.getX());
             telemetry.addData("y", RobotPositionHolder.getY());
             telemetry.addData("heading", RobotPositionHolder.getHeading());
-
+            telemetry.update();
             if (gamepad1.a) {
                 RobotPositionHolder.clear();
             }

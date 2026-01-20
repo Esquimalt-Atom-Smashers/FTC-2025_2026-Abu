@@ -5,12 +5,12 @@ public final class PropertyDefaults {
     public static volatile double TELEMETRY_UPDATE_TIME = 1.0;
 
     // GOAL POSITIONS
-    public static volatile double RED_GOAL_X = -60;
-    public static volatile double RED_GOAL_Y = 65;
+    public static volatile double RED_GOAL_X = -72;
+    public static volatile double RED_GOAL_Y = 55;
     public static volatile double RED_GOAL_HEADING = 0;
 
-    public static volatile double BLUE_GOAL_X = -60;
-    public static volatile double BLUE_GOAL_Y = -65;
+    public static volatile double BLUE_GOAL_X = -72;
+    public static volatile double BLUE_GOAL_Y = -55;
     public static volatile double BLUE_GOAL_HEADING = 0;
 
     // AUTO STARTING POSITION
@@ -30,8 +30,7 @@ public final class PropertyDefaults {
     public static volatile double BLUE_CLOSE_Y = -54;
     public static volatile double BLUE_CLOSE_HEADING = 143.65;
 
-//    RED SHOOTING POSITIONS
-
+    //    RED SHOOTING POSITIONS
     public static volatile double RED_FAR_SHOOT_X = 55;
     public static volatile double RED_FAR_SHOOT_Y = 17;
     public static volatile double RED_FAR_SHOOT_HEADING = 74;
@@ -93,11 +92,11 @@ public final class PropertyDefaults {
     public static volatile double RED_LOAD_INTAKE_P2_HEADING = 0;
 
     //    BLUE INTAKE POSITIONS
-    public static volatile double BLUE_FIRST_INTAKE_P1_X = 18;
+    public static volatile double BLUE_FIRST_INTAKE_P1_X = -12;
     public static volatile double BLUE_FIRST_INTAKE_P1_Y = -40;
     public static volatile double BLUE_FIRST_INTAKE_P1_HEADING = 270;
 
-    public static volatile double BLUE_FIRST_INTAKE_P2_X = 18;
+    public static volatile double BLUE_FIRST_INTAKE_P2_X = -12;
     public static volatile double BLUE_FIRST_INTAKE_P2_Y = -60;
     public static volatile double BLUE_FIRST_INTAKE_P2_HEADING = 270;
 
@@ -134,8 +133,8 @@ public final class PropertyDefaults {
     public static volatile double BLUE_GATE_INTAKE_P2_HEADING = 290;
 
     //FLYWHEEL CONTROL
-    public static volatile double FAR_SHOOT_RPM = 3375;
-    public static volatile double CLOSE_SHOOT_RPM = 3100;
+    public static volatile double FAR_SHOOT_RPM = 3450;
+    public static volatile double CLOSE_SHOOT_RPM = 3050;
 
     public static volatile double TOLERANCE = 100;
     public static volatile double kV = 0.000215;
@@ -149,7 +148,6 @@ public final class PropertyDefaults {
     public static volatile double SEVENTY_FIVE_INCH_RPM = 3100;
     public static volatile double NINETY_INCH_RPM = 3150;
     public static volatile double ONE_HUNDRED_FIVE_INCH_RPM = 3350;
-    public static volatile double ONE_HUNDRED_TWENTY_INCH_RPM = 3550;
-    public static volatile double ONE_HUNDRED_THIRTY_INCH_RPM = 3600;
-
+    public static volatile double ONE_HUNDRED_TWENTY_INCH_RPM = 3350;
+    public static volatile double ONE_HUNDRED_THIRTY_INCH_RPM = 3400;
 }
