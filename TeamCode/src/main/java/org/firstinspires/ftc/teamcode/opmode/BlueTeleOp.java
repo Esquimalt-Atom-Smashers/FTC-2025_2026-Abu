@@ -47,6 +47,7 @@ public class BlueTeleOp extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             boolean forceReset = false;
+            boolean isLLReseting = false;
             //drive control
             double drive = InputUtility.deadZoneJoyStick(-gamepad1.left_stick_y);
             double strafe = InputUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
@@ -98,8 +99,9 @@ public class BlueTeleOp extends LinearOpMode {
             }
             if (gamepad1.x) {
                 robotContainer.updatePoseFromVision(forceReset);
+                isLLReseting = true;
             }
-            robotContainer.addOpModeTelemetry("isManualRPM: " + isManualRPMControl);
+            robotContainer.addOpModeTelemetry("isManualRPM: " + isManualRPMControl +"\nisReseting Manual: " + isLLReseting);
             robotContainer.runRobot();
         }
         robotContainer.shutDownRobot();

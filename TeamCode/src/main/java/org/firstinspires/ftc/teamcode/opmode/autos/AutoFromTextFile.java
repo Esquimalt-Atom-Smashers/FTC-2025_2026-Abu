@@ -198,7 +198,8 @@ public class AutoFromTextFile extends LinearOpMode {
         try {
             Actions.runBlocking(
                     new ParallelAction(actionSequence,
-                            new InstantAction(robotContainer::runRobot)
+                            new InstantAction(robotContainer::runRobot),
+                            new InstantAction(robotContainer::updatePositionHolderAuto)
                     )
             );
         } finally {
