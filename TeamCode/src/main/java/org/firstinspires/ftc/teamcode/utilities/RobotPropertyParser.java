@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
-import java.util.Scanner;
 
 public class RobotPropertyParser {
 
@@ -23,7 +22,30 @@ public class RobotPropertyParser {
     private static File autoSequenceTxt;
     public static final String FILE_LOCATION = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode";
     public static final String PROPERTIES_FILE_NAME = "robot_properties.txt";
-    public static final String AUTO_SEQUENCE1_FILE_NAME = "ActiveAuto.txt";
+    public static final String CUSTOMIZABLE_AUTO_FILE_NAME = "ActiveAuto.txt";
+    public static final String RED_FAR_AUTO_FILE_NAME = "RedFarAuto.txt";
+    public static final String RED_CLOSE_AUTO_FILE_NAME = "RedCloseAuto.txt";
+    public static final String BLUE_FAR_AUTO_FILE_NAME = "BlueFarAuto.txt";
+    public static final String BLUE_CLOSE_AUTO_FILE_NAME = "BlueCloseAuto.txt";
+
+    public enum AUTO {
+        CUSTOMIZABLE_AUTO(CUSTOMIZABLE_AUTO_FILE_NAME),
+        RED_FAR_AUTO(RED_FAR_AUTO_FILE_NAME),
+        RED_CLOSE_AUTO(RED_CLOSE_AUTO_FILE_NAME),
+        BLUE_FAR_AUTO(BLUE_FAR_AUTO_FILE_NAME),
+        BLUE_CLOSE_AUTO(BLUE_CLOSE_AUTO_FILE_NAME);
+
+        private final String fileName;
+
+        AUTO(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+    }
+
 
     public static void loadProperties() {
         try {
@@ -35,7 +57,7 @@ public class RobotPropertyParser {
     }
 
     public static void loadAutoSequence1() {
-        autoSequenceTxt = new File(FILE_LOCATION + "/" + AUTO_SEQUENCE1_FILE_NAME);
+        autoSequenceTxt = new File(FILE_LOCATION + "/" + CUSTOMIZABLE_AUTO_FILE_NAME);
     }
 
     /**
@@ -115,11 +137,11 @@ public class RobotPropertyParser {
     // =========================
     // AUTO LOADING
     // =========================
-    public static ArrayList<String> loadAuto() {
+    public static ArrayList<String> loadAuto(AUTO auto) {
         // Load base config first
         loadTeleOp();
         // Then override with auto config
-        return loadFile(FILE_LOCATION + "/" + AUTO_SEQUENCE1_FILE_NAME, true);
+        return loadFile(FILE_LOCATION + "/" + auto.fileName, true);
 
     }
 

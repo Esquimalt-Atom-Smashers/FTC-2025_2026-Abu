@@ -24,8 +24,8 @@ import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Custom Auto")
-public class AutoFromTextFile extends LinearOpMode {
+@Autonomous(name = "Red Close Auto")
+public class RedCloseAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d startingPos;
@@ -34,7 +34,7 @@ public class AutoFromTextFile extends LinearOpMode {
         SequentialAction actionSequence;
 
         //get the actions from the ActiveAutoSequence & property form Txt file
-        ArrayList<String> actions = RobotPropertyParser.loadAuto(RobotPropertyParser.AUTO.CUSTOMIZABLE_AUTO);
+        ArrayList<String> actions = RobotPropertyParser.loadAuto(RobotPropertyParser.AUTO.RED_CLOSE_AUTO);
         //Print auto title
         telemetry.addLine("Title: " + actions.get(0));
         actions.remove(0);

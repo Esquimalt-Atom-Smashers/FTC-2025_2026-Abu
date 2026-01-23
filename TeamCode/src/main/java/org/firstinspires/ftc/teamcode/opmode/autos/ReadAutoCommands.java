@@ -1,22 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmode.autos;
 
-import static org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser.AUTO_SEQUENCE1_FILE_NAME;
-import static org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser.FILE_LOCATION;
-import static org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser.PROPERTIES_FILE_NAME;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.utilities.Property;
 import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Properties;
 
-@Autonomous(name = "Experimental: ReadAutoCommands")
+@Autonomous(name = "ReadAutoCommands")
 public class ReadAutoCommands extends LinearOpMode {
 
     /**
@@ -33,7 +26,7 @@ public class ReadAutoCommands extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         while (opModeInInit()) {
-            ArrayList<String> actionLines = RobotPropertyParser.loadAuto();
+            ArrayList<String> actionLines = RobotPropertyParser.loadAuto(RobotPropertyParser.AUTO.CUSTOMIZABLE_AUTO);
             Field[] fields = Property.class.getDeclaredFields();
 
             for (Field field : fields) {
