@@ -403,8 +403,10 @@ public class AutoActions {
             boolean updateSuccessful = robotContainer.updatePoseFromVision(forceReset);
             if (!updateSuccessful) {
                 failedTimes ++;
+                return failedTimes < 5;
+            } else {
+                return false;
             }
-            return updateSuccessful && failedTimes < 5;
         }
     }
     public Action updatePoseFromVisionAction(boolean forceReset) {

@@ -9,6 +9,10 @@ import java.lang.reflect.Modifier;
 public class Property {
     //GENERAL SETTINGS
     public static volatile double TELEMETRY_UPDATE_TIME = 1.0;
+    public static volatile double TELEOP_DEFAULT_STARTING_POS_X = 0;
+    public static volatile double TELEOP_DEFAULT_STARTING_POS_Y = 0;
+    public static volatile double TELEOP_DEFAULT_STARTING_POS_HEADING = 0;
+
 
     // GOAL POSITIONS
     public static volatile double RED_GOAL_X = -72;

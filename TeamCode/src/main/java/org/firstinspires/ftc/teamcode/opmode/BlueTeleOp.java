@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 @TeleOp(name = "Kenny Blue TeleOp", group = "AAA")
 public class BlueTeleOp extends LinearOpMode {
     RobotContainer robotContainer;
-    Pose2d startingPose = new Pose2d(0, - 12, Math.toRadians(270));
+    Pose2d startingPose = new Pose2d(Property.TELEOP_DEFAULT_STARTING_POS_X, Property.TELEOP_DEFAULT_STARTING_POS_Y, Math.toRadians(Property.TELEOP_DEFAULT_STARTING_POS_HEADING));
     RobotContainer.Alliance alliance = RobotContainer.Alliance.BLUE;
     double targetRpm;
     ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
@@ -40,8 +40,8 @@ public class BlueTeleOp extends LinearOpMode {
                 ShooterSubsystem.ShooterState.MANUAL,
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.TRACKING_GOAL);
+        robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(270));
         if (RobotPositionHolder.hasData()) {
-            robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(270));
             RobotPositionHolder.markReceived();
         }
         waitForStart();
