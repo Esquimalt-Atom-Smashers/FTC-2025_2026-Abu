@@ -33,6 +33,10 @@ public class ShooterSubsystem implements SubsystemBase{
         public double P = Property.P;
         public double I = 0;
         public double D = 0;
+        public double turretP = 0.0;
+        public double turretI = 0.0;
+        public double turretD = 0.0;
+        public double turretKS = 0.0;
     }
     public static Params PARAMS = new Params();
     private OpMode opMode;
@@ -88,6 +92,21 @@ public class ShooterSubsystem implements SubsystemBase{
      * Shooter motors, hood servos, and sensors
      * should be initialized here later.
      */
+
+    // turret setting
+    private DcMotorEx turretMotor;
+    private final String TURRET_MOTOR_NAME = "turretMotor";
+    private final DcMotorSimple.Direction TURRET_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    private static final double TICKS_PER_REV = 8192;   // example: through-bore encoder
+    private static final double GEAR_RATIO = 1.0;       // turret gear ratio
+    private static final double TICKS_PER_DEGREE =
+            (TICKS_PER_REV * GEAR_RATIO) / 360.0;
+
+    // Soft limits (degrees)
+    private static final double MIN_ANGLE = -180;
+    private static final double MAX_ANGLE = 180;
+    private double targetAngleDegree = 0;
+    private PIDController turrentPIDController;
     public ShooterSubsystem(OpMode opMode, RobotContainer.Alliance alliance, ShooterState state, Pose2d pose2d) {
         this.opMode = opMode;
         this.alliance = alliance;
@@ -105,6 +124,14 @@ public class ShooterSubsystem implements SubsystemBase{
         currentState = state;
         setPose2d(pose2d);
         setFlywheelMotorPower(0);
+
+        turretMotor = opMode.hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
+        turretMotor.setDirection(TURRET_MOTOR_DIRECTION);
+        turretMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        turrentPIDController = new PIDController(PARAMS.turretP, PARAMS.turretI, PARAMS.turretD);
     }
 
     public double getFlywheelPower() {
@@ -196,6 +223,34 @@ public class ShooterSubsystem implements SubsystemBase{
                 lower.hoodAngle + ((higher.hoodAngle - lower.hoodAngle) * percentageDistance));
 
     }
+//===============================turret==================================
+    public void setTurretMotorPower(double turretMotorPower) {
+        turretMotor.setPower(turretMotorPower);
+    }
+
+    public void setTargetAngle(double angleDeg) {
+        targetAngleDegree = Range.clip(angleDeg, MIN_ANGLE, MAX_ANGLE);
+    }
+
+    public double getCurrentAngle() {
+        return ticksToDegrees(turretMotor.getCurrentPosition());
+    }
+
+    private double ticksToDegrees(int ticks) {
+        return ticks / TICKS_PER_DEGREE;
+    }
+
+    private int degreesToTicks(double degrees) {
+        return (int) (degrees * TICKS_PER_DEGREE);
+    }
+
+    public double turretPIDF() {
+        return Range.clip(turrentPIDController.calculate(getCurrentAngle(), targetAngleDegree) + PARAMS.turretKS, -1, 1);
+    }
+
+    public void updateTurret() {
+        setTurretMotorPower(turretPIDF());
+    }
 //--------------------Common functions across subsystems--------------------
     /**
      * Runs every loop
@@ -205,8 +260,10 @@ public class ShooterSubsystem implements SubsystemBase{
             shutDownSubsystem();
         } else if (currentState == ShooterState.AUTO) {
             shoot(alliance, pose2d);
+            updateTurret();
         } else {
             shoot(targetSetting);
+            updateTurret();
         }
     }
 
@@ -238,6 +295,7 @@ public class ShooterSubsystem implements SubsystemBase{
      */
     public void shutDownSubsystem() {
         setFlywheelMotorPower(0);
+        setTurretMotorPower(0);
     }
 
     public ShooterState getState() {
