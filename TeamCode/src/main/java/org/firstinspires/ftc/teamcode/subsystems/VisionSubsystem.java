@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,7 +60,9 @@ public class VisionSubsystem implements SubsystemBase{
 
     private Pose3D botPoseMT2;
     private Pose3D botPoseMT1;
-    private double ty = 0.0;
+    private double ty = -9999.9999;
+    private double tx = -9999.9999;
+    private double ta = -9999.9999;
     private int tagId = 0;
     private Pose2d pose2d;
     private boolean LLGotData = false;
@@ -91,6 +94,16 @@ public class VisionSubsystem implements SubsystemBase{
     public void updateCurrentPose(Pose2d pose2d) {
         this.pose2d = pose2d;
         limelight3A.updateRobotOrientation(Math.toDegrees(pose2d.heading.toDouble()));
+    }
+
+    public double getTy() {
+        return ty;
+    }
+    public double getTx() {
+        return tx;
+    }
+    public double getTa() {
+        return ta;
     }
 
     /**
@@ -145,6 +158,8 @@ public class VisionSubsystem implements SubsystemBase{
             LLResult result = limelight3A.getLatestResult();
             if (result.isValid()) {
                 ty = result.getTy();
+                tx = result.getTx();
+                ta = result.getTa();
                 botPoseMT2 = result.getBotpose_MT2();
                 botPoseMT1 = result.getBotpose();
                 List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
@@ -155,7 +170,9 @@ public class VisionSubsystem implements SubsystemBase{
                 }
                 LLGotData = true;
             } else {
-                ty = 0.0;
+                ty = 9999.9999;
+                tx = 9999.9999;
+                ta = 9999.9999;
                 botPoseMT1 = null;
                 botPoseMT2 = null;
                 tagId = 0;
@@ -163,7 +180,9 @@ public class VisionSubsystem implements SubsystemBase{
             }
         } else {
             pauseSubsystem();
-            ty = 0.0;
+            ty = 9999.9999;
+            tx = 9999.9999;
+            ta = 9999.9999;
             botPoseMT1 = null;
             botPoseMT2 = null;
             tagId = 0;

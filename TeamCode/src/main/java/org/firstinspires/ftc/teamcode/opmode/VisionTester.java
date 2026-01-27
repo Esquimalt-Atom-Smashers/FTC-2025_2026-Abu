@@ -29,6 +29,9 @@ public class VisionTester extends LinearOpMode {
             Pose2d poseMT1 = visionSubsystem.getLimelightPosMT1();
             Pose2d visionPos = visionSubsystem.getLimelightPosMT2();
             if (visionPos != null) {
+                telemetry.addData("ty", visionSubsystem.getTy());
+                telemetry.addData("tx", visionSubsystem.getTx());
+                telemetry.addData("ta", visionSubsystem.getTa());
                 telemetry.addLine("MT1");
                 telemetry.addData("x", poseMT1.position.x);
                 telemetry.addData("y", poseMT1.position.y);
