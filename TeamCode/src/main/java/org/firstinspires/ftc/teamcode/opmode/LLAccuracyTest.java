@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -24,7 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 @Config
-@Autonomous(name = "RobotContainer only test", group = "AAA")
+@TeleOp(name = "LLAccuracyTest", group = "AAA")
 public class LLAccuracyTest extends LinearOpMode {
     RobotContainer robotContainer;
     Pose2d startingPose = new Pose2d(0, 12, Math.toRadians(90));
@@ -32,6 +33,7 @@ public class LLAccuracyTest extends LinearOpMode {
     double targetRpm;
     ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
     boolean isManualRPMControl = true;
+    ElapsedTime aHoldTimer = new ElapsedTime();
     boolean lastA = false;
 
     @Override
@@ -57,31 +59,39 @@ public class LLAccuracyTest extends LinearOpMode {
             Pose2d poseMT1 = robotContainer.vision.getLimelightPosMT1();
             Pose2d visionPos = robotContainer.vision.getLimelightPosMT2();
             if (visionPos != null) {
+                String timestamp = new java.text.SimpleDateFormat("HH:mm:ss.SSS").format(new java.util.Date());
+
                 robotContainer.addOpModeTelemetry(
-                        "ty: " + robotContainer.vision.getTy() +
-                                "\ntx: " + robotContainer.vision.getTx() +
-                                "\nta: " + robotContainer.vision.getTa() +
-
-                                "\n\nMT1" +
-                                "\nx: " + poseMT1.position.x +
-                                "\ny: " + poseMT1.position.y +
-                                "\nheading: " + Math.toDegrees(poseMT1.heading.toDouble()) +
-
-                                "\n\nMT2" +
-                                "\nx: " + visionPos.position.x +
-                                "\ny: " + visionPos.position.y +
-                                "\nheading: " + Math.toDegrees(visionPos.heading.toDouble())
+                        timestamp + ", " +
+                                robotContainer.vision.getTy() + ", " +
+                                robotContainer.vision.getTx() + ", " +
+                                robotContainer.vision.getTa() + ", " +
+                                robotContainer.vision.getBotPoseAvgDist() + ", " +
+                                poseMT1.position.x + ", " +
+                                poseMT1.position.y + ", " +
+                                Math.toDegrees(poseMT1.heading.toDouble()) + ", " +
+                                visionPos.position.x + ", " +
+                                visionPos.position.y + ", " +
+                                Math.toDegrees(visionPos.heading.toDouble())
                 );
             } else {
                 robotContainer.addOpModeTelemetry("no LL data");
             }
             boolean aPressed = gamepad1.a;
-
-            if (aPressed && !lastA && visionPos != null) {
-                saveLineToFile(buildVisionLogLine(poseMT1, visionPos));
+            if (aPressed && visionPos != null) {
+                // First press (edge)
+                if (!lastA) {
+                    saveLineToFile(buildVisionLogLine(poseMT1, visionPos));
+                    aHoldTimer.reset();
+                }
+                // Held down: repeat every 0.5 seconds
+                else if (aHoldTimer.seconds() >= 0.5) {
+                    saveLineToFile(buildVisionLogLine(poseMT1, visionPos));
+                    aHoldTimer.reset();
+                }
             }
-
             lastA = aPressed;
+
 
             robotContainer.runRobot();
 
@@ -93,18 +103,20 @@ public class LLAccuracyTest extends LinearOpMode {
     }
 
     private String buildVisionLogLine(Pose2d poseMT1, Pose2d visionPos) {
+        String timestamp = new java.text.SimpleDateFormat("HH:mm:ss.SSS").format(new java.util.Date());
+
         return
-                "ty=" + robotContainer.vision.getTy() + ", " +
-                        "tx=" + robotContainer.vision.getTx() + ", " +
-                        "ta=" + robotContainer.vision.getTa() + ", " +
-
-                        "MT1[x=" + poseMT1.position.x +
-                        ", y=" + poseMT1.position.y +
-                        ", h=" + Math.toDegrees(poseMT1.heading.toDouble()) + "], " +
-
-                        "MT2[x=" + visionPos.position.x +
-                        ", y=" + visionPos.position.y +
-                        ", h=" + Math.toDegrees(visionPos.heading.toDouble()) + "]";
+                timestamp + ", " +
+                        robotContainer.vision.getTy() + ", " +
+                        robotContainer.vision.getTx() + ", " +
+                        robotContainer.vision.getTa() + ", " +
+                        robotContainer.vision.getBotPoseAvgDist() + ", " +
+                        poseMT1.position.x + ", " +
+                        poseMT1.position.y + ", " +
+                        Math.toDegrees(poseMT1.heading.toDouble()) + ", " +
+                        visionPos.position.x + ", " +
+                        visionPos.position.y + ", " +
+                        Math.toDegrees(visionPos.heading.toDouble());
     }
     private void saveLineToFile(String line) {
         try {

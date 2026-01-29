@@ -41,7 +41,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     private final String FLYWHEEL_MOTOR_NAME = "flywheelMotor";
     private final String SECOND_FLYWHEEL_MOTOR_NAME = "secondFlywheelMotor";
     private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
-    private final DcMotorSimple.Direction SECOND_FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    private final DcMotorSimple.Direction SECOND_FLYWHEEL_DIRECTION = DcMotorSimple.Direction.REVERSE;
     public final double RPM_TOLERANCE = Property.TOLERANCE;
 
     private final double TICKS_PER_ROTATION = 28;
@@ -118,13 +118,13 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         setPose2d(pose2d);
         setFlywheelMotorPower(0);
 
-        turretMotor = opMode.hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
-        turretMotor.setDirection(TURRET_MOTOR_DIRECTION);
-        turretMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        turrentPIDController = new PIDController(PARAMS.turretP, PARAMS.turretI, PARAMS.turretD);
+//        turretMotor = opMode.hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
+//        turretMotor.setDirection(TURRET_MOTOR_DIRECTION);
+//        turretMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//
+//        turrentPIDController = new PIDController(PARAMS.turretP, PARAMS.turretI, PARAMS.turretD);
     }
 
     public double getFlywheelPower() {

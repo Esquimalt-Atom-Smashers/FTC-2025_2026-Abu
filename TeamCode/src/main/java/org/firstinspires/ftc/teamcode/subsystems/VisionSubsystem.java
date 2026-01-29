@@ -63,6 +63,7 @@ public class VisionSubsystem implements SubsystemBase{
     private double ty = -9999.9999;
     private double tx = -9999.9999;
     private double ta = -9999.9999;
+    private double botPoseAvgDist = -9999.9999;
     private int tagId = 0;
     private Pose2d pose2d;
     private boolean LLGotData = false;
@@ -104,6 +105,9 @@ public class VisionSubsystem implements SubsystemBase{
     }
     public double getTa() {
         return ta;
+    }
+    public double getBotPoseAvgDist() {
+        return botPoseAvgDist;
     }
 
     /**
@@ -160,6 +164,7 @@ public class VisionSubsystem implements SubsystemBase{
                 ty = result.getTy();
                 tx = result.getTx();
                 ta = result.getTa();
+                botPoseAvgDist = result.getBotposeAvgArea();
                 botPoseMT2 = result.getBotpose_MT2();
                 botPoseMT1 = result.getBotpose();
                 List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
@@ -173,6 +178,7 @@ public class VisionSubsystem implements SubsystemBase{
                 ty = 9999.9999;
                 tx = 9999.9999;
                 ta = 9999.9999;
+                botPoseAvgDist = 9999.9999;
                 botPoseMT1 = null;
                 botPoseMT2 = null;
                 tagId = 0;
@@ -183,6 +189,7 @@ public class VisionSubsystem implements SubsystemBase{
             ty = 9999.9999;
             tx = 9999.9999;
             ta = 9999.9999;
+            botPoseAvgDist = 9999.9999;
             botPoseMT1 = null;
             botPoseMT2 = null;
             tagId = 0;

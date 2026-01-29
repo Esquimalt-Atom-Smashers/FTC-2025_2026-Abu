@@ -20,11 +20,16 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 @TeleOp
 @Config
 public class TwoMotorFlywheelTuner extends OpMode {
+    public DcMotor intakeMotor;
+    public DcMotor feedMotor;
     public static class Params {
         public double stayTime = 10.0;
         public double accelerateTime = 0.0;
         public double maxRPM = 4000;
         public double minRPM = 3000;
+        public double intakePower = 1;
+        public double feedPower = 1;
+        public double notFeedPower = 0;
     }
 
     public static Params PARAMS = new Params();
@@ -55,6 +60,13 @@ public class TwoMotorFlywheelTuner extends OpMode {
     @Override
     public void init() {
 //        intakeFeedSubsystem = new IntakeTransferSubsystem(this, IntakeTransferSubsystem.IntakeTransferState.INTAKING);
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        feedMotor = hardwareMap.get(DcMotor.class, "feedMotor");
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        feedMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        feedMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         flywheelSubsystem = new org.firstinspires.ftc.teamcode.opmode.TwoMotorShooterSubsystem(this, RobotContainer.Alliance.RED, org.firstinspires.ftc.teamcode.opmode.TwoMotorShooterSubsystem.ShooterState.MANUAL, new Pose2d(0, 0, 0));
         timer = new ElapsedTime();
         state = MotionProfilingStates.ACCLEARATING;
@@ -64,11 +76,12 @@ public class TwoMotorFlywheelTuner extends OpMode {
 
     @Override
     public void loop() {
-//        if (gamepad1.a) {
-//            intakeFeedSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
-//        } else {
-//            intakeFeedSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
-//        }
+        if (gamepad1.a) {
+            feedMotor.setPower(PARAMS.feedPower);
+        } else {
+            feedMotor.setPower(PARAMS.notFeedPower);
+        }
+        intakeMotor.setPower(PARAMS.intakePower);
 
         double targetRPM = motionProfiling();
         flywheelSubsystem.shoot(new org.firstinspires.ftc.teamcode.opmode.TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, 0));
