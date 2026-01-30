@@ -71,6 +71,11 @@ public class TwoMotorFlywheelTuner extends OpMode {
 
     @Override
     public void loop() {
+        if (gamepad1.dpad_left) {
+            flywheelSubsystem.setTurretAngleOnBot(flywheelSubsystem.getTurretHeading() + 1);
+        } else if (gamepad1.dpad_right) {
+            flywheelSubsystem.setFlywheelMotorPower(flywheelSubsystem.getTurretHeading() - 1);
+        }
         if (gamepad1.a) {
             feedMotor.setPower(PARAMS.feedPower);
         } else {

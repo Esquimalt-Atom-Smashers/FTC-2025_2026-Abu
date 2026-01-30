@@ -127,6 +127,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         turretServo = opMode.hardwareMap.get(CRServo.class, TURRET_SERVO_NAME);
         turretEncoder = opMode.hardwareMap.get(AnalogInput.class, TURRET_ENCODER_NAME);
         turretServoManager = new RTPAxon(turretServo, turretEncoder, FORWARD);
+        turretServoManager.setPidCoeffs(PARAMS.turretP, PARAMS.turretI, PARAMS.D);
     }
 
     public double getFlywheelPower() {
