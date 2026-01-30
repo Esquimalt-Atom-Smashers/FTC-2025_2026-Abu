@@ -4,17 +4,12 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
-import org.firstinspires.ftc.teamcode.utilities.Property;
+import org.firstinspires.ftc.teamcode.subsystems.TwoMotorShooterSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 
 @TeleOp
@@ -34,7 +29,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
 
     public static Params PARAMS = new Params();
 
-    private org.firstinspires.ftc.teamcode.opmode.TwoMotorShooterSubsystem flywheelSubsystem;
+    private TwoMotorShooterSubsystem flywheelSubsystem;
 //    private IntakeTransferSubsystem intakeFeedSubsystem;
 
     private enum MotionProfilingStates {
@@ -67,7 +62,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         feedMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        flywheelSubsystem = new org.firstinspires.ftc.teamcode.opmode.TwoMotorShooterSubsystem(this, RobotContainer.Alliance.RED, org.firstinspires.ftc.teamcode.opmode.TwoMotorShooterSubsystem.ShooterState.MANUAL, new Pose2d(0, 0, 0));
+        flywheelSubsystem = new TwoMotorShooterSubsystem(this, RobotContainer.Alliance.RED, TwoMotorShooterSubsystem.ShooterState.MANUAL, new Pose2d(0, 0, 0));
         timer = new ElapsedTime();
         state = MotionProfilingStates.ACCLEARATING;
         telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -84,7 +79,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
         intakeMotor.setPower(PARAMS.intakePower);
 
         double targetRPM = motionProfiling();
-        flywheelSubsystem.shoot(new org.firstinspires.ftc.teamcode.opmode.TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, 0));
+        flywheelSubsystem.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, 0));
 //        intakeFeedSubsystem.periodic();
         telemetry.addData("targetRPM", targetRPM);
         telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());

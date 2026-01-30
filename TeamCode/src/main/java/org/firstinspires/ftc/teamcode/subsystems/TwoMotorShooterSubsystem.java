@@ -1,15 +1,19 @@
-package org.firstinspires.ftc.teamcode.opmode;
+package org.firstinspires.ftc.teamcode.subsystems;
+
+import static org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon.Direction.FORWARD;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
+import org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon;
 import org.firstinspires.ftc.teamcode.utilities.Property;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 
@@ -87,19 +91,21 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
      */
 
     // turret setting
-    private DcMotorEx turretMotor;
-    private final String TURRET_MOTOR_NAME = "turretMotor";
-    private final DcMotorSimple.Direction TURRET_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-    private static final double TICKS_PER_REV = 8192;   // example: through-bore encoder
-    private static final double GEAR_RATIO = 1.0;       // turret gear ratio
-    private static final double TICKS_PER_DEGREE =
-            (TICKS_PER_REV * GEAR_RATIO) / 360.0;
+    private CRServo turretServo;
+    private final String TURRET_SERVO_NAME = "turretServo";
+    private final RTPAxon.Direction TURRET_SERVO_DIRECTION = FORWARD;
+    private AnalogInput turretEncoder;
+    private final String TURRET_ENCODER_NAME = "turretEncoder";
+    private RTPAxon turretServoManager;
+
+    private static double DEGREE_PER_ROTATION = -1;
 
     // Soft limits (degrees)
-    private static final double MIN_ANGLE = -180;
-    private static final double MAX_ANGLE = 180;
+    private static final double MIN_ANGLE_ON_BOT = -180;
+    private static final double MAX_ANGLE_ON_BOT = 180;
     private double targetAngleDegree = 0;
-    private PIDController turrentPIDController;
+    private double startingDegree = 0;
+
     public TwoMotorShooterSubsystem(OpMode opMode, RobotContainer.Alliance alliance, ShooterState state, Pose2d pose2d) {
         this.opMode = opMode;
         this.alliance = alliance;
@@ -118,13 +124,9 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         setPose2d(pose2d);
         setFlywheelMotorPower(0);
 
-//        turretMotor = opMode.hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
-//        turretMotor.setDirection(TURRET_MOTOR_DIRECTION);
-//        turretMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-//        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//
-//        turrentPIDController = new PIDController(PARAMS.turretP, PARAMS.turretI, PARAMS.turretD);
+        turretServo = opMode.hardwareMap.get(CRServo.class, TURRET_SERVO_NAME);
+        turretEncoder = opMode.hardwareMap.get(AnalogInput.class, TURRET_ENCODER_NAME);
+        turretServoManager = new RTPAxon(turretServo, turretEncoder, FORWARD);
     }
 
     public double getFlywheelPower() {
@@ -217,32 +219,26 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
 
     }
     //===============================turret==================================
-    public void setTurretMotorPower(double turretMotorPower) {
-        turretMotor.setPower(turretMotorPower);
-    }
-
     public void setTargetAngle(double angleDeg) {
-        targetAngleDegree = Range.clip(angleDeg, MIN_ANGLE, MAX_ANGLE);
+        targetAngleDegree = Range.clip(angleDeg, MIN_ANGLE_ON_BOT, MAX_ANGLE_ON_BOT);
     }
-
-    public double getCurrentAngle() {
-        return ticksToDegrees(turretMotor.getCurrentPosition());
+    public double getTurretHeading() {
+        return Math.toDegrees(pose2d.heading.toDouble()) + rotationToDegrees(turretServoManager.getTotalRotation());
     }
-
-    private double ticksToDegrees(int ticks) {
-        return ticks / TICKS_PER_DEGREE;
+    public double getCurrentAngleOnBot() {
+        return rotationToDegrees(turretServoManager.getTotalRotation()) + startingDegree;
     }
-
-    private int degreesToTicks(double degrees) {
-        return (int) (degrees * TICKS_PER_DEGREE);
+    private double rotationToDegrees(double rotation) {
+        return rotation / DEGREE_PER_ROTATION;
     }
-
-    public double turretPIDF() {
-        return Range.clip(turrentPIDController.calculate(getCurrentAngle(), targetAngleDegree) + PARAMS.turretKS, -1, 1);
+    private double degreesToRotation(double degrees) {
+        return degrees * DEGREE_PER_ROTATION;
     }
-
+    public void setTurretAngleOnBot(double degrees) {
+        turretServoManager.setTargetRotation(degreesToRotation(degrees));
+    }
     public void updateTurret() {
-        setTurretMotorPower(turretPIDF());
+        turretServoManager.update();
     }
 //--------------------Common functions across subsystems--------------------
     /**
@@ -288,7 +284,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
      */
     public void shutDownSubsystem() {
         setFlywheelMotorPower(0);
-        setTurretMotorPower(0);
+        turretServoManager.setPower(0);
     }
 
     public ShooterState getState() {
