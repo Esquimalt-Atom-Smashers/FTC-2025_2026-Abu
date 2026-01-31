@@ -362,35 +362,34 @@ public class RTPAxon {
             waitForStart();
 
             while (!isStopRequested()) {
-                gamepads.copyStates();
                 servo.update();
 
                 // Manual controls for target and PID tuning
-                if (gamepads.isPressed(-1, "dpad_up")) {
+                if (gamepad1.dpad_up) {
                     servo.changeTargetRotation(15);
                 }
-                if (gamepads.isPressed(-1, "dpad_down")) {
+                if (gamepad1.dpad_down) {
                     servo.changeTargetRotation(-15);
                 }
-                if (gamepads.isPressed(-1, "cross")) {
+                if (gamepad1.a) {
                     servo.setTargetRotation(0);
                 }
 
-                if (gamepads.isPressed(-1, "triangle")) {
+                if (gamepad1.y) {
                     servo.setKP(servo.getKP() + 0.001);
                 }
-                if (gamepads.isPressed(-1, "square")) {
+                if (gamepad1.x) {
                     servo.setKP(Math.max(0, servo.getKP() - 0.001));
                 }
 
-                if (gamepads.isPressed(-1, "right_bumper")) {
+                if (gamepad1.right_bumper) {
                     servo.setKI(servo.getKI() + 0.0001);
                 }
-                if (gamepads.isPressed(-1, "left_bumper")) {
+                if (gamepad1.left_bumper) {
                     servo.setKI(Math.max(0, servo.getKI() - 0.0001));
                 }
 
-                if (gamepads.isPressed(-1, "touchpad")) {
+                if (gamepad1.back) {
                     servo.setKP(0.015);
                     servo.setKI(0.0005);
                     servo.setKD(0.0025);

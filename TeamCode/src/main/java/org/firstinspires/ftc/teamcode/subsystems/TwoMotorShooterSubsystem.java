@@ -270,6 +270,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     public void addSubsystemTelemetry() {
         if (isTelemetryEnabled) {
             opMode.telemetry.addData("RPM", "Target: %.2f, Current : %.2f", targetSetting.rpm, getFlywheelRPM());
+            opMode.telemetry.addData("turretAngleOnbot", getCurrentAngleOnBot());
         }
     }
 
