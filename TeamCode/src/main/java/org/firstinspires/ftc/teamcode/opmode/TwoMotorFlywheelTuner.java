@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.TwoMotorShooterSubsystem;
@@ -32,6 +33,15 @@ public class TwoMotorFlywheelTuner extends OpMode {
     private TwoMotorShooterSubsystem flywheelSubsystem;
 //    private IntakeTransferSubsystem intakeFeedSubsystem;
 
+    private Servo hoodServo;
+
+    // Hood tuning constants
+    private static final double HOOD_MIN = 0.0;
+    private static final double HOOD_MAX = 1.0;
+    private static final double HOOD_STEP = 0.01;
+
+    private double hoodPosition = 0.5; // start mid-position
+
     private enum MotionProfilingStates {
         ACCLEARATING(PARAMS.maxRPM),
         CONSTANT(PARAMS.minRPM),
@@ -52,11 +62,14 @@ public class TwoMotorFlywheelTuner extends OpMode {
     private ElapsedTime timer;
     private ElapsedTime loopTimer;
 
+
     @Override
     public void init() {
 //        intakeFeedSubsystem = new IntakeTransferSubsystem(this, IntakeTransferSubsystem.IntakeTransferState.INTAKING);
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         feedMotor = hardwareMap.get(DcMotor.class, "feedMotor");
+        hoodServo = hardwareMap.get(Servo.class, "hoodServo"); // port 0
+        hoodServo.setPosition(hoodPosition);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         feedMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -71,25 +84,49 @@ public class TwoMotorFlywheelTuner extends OpMode {
 
     @Override
     public void loop() {
+
+        // Turret control
         if (gamepad1.dpad_left) {
-            flywheelSubsystem.setTurretAngleOnBot(flywheelSubsystem.getTurretHeading() + 1);
+            flywheelSubsystem.setTurretAngleOnBot(
+                    flywheelSubsystem.getTurretHeading() + 1
+            );
         } else if (gamepad1.dpad_right) {
-            flywheelSubsystem.setFlywheelMotorPower(flywheelSubsystem.getTurretHeading() - 1);
+            flywheelSubsystem.setTurretAngleOnBot(
+                    flywheelSubsystem.getTurretHeading() - 1
+            );
         }
+
+        // Feed control
         if (gamepad1.a) {
             feedMotor.setPower(PARAMS.feedPower);
         } else {
             feedMotor.setPower(PARAMS.notFeedPower);
         }
+
         intakeMotor.setPower(PARAMS.intakePower);
 
+        // Hood control (PORT 0)
+        if (gamepad1.left_bumper) {
+            hoodPosition += HOOD_STEP;
+        } else if (gamepad1.right_bumper) {
+            hoodPosition -= HOOD_STEP;
+        }
+
+        hoodPosition = Math.max(HOOD_MIN, Math.min(HOOD_MAX, hoodPosition));
+        hoodServo.setPosition(hoodPosition);
+
+        // Shooter control
         double targetRPM = motionProfiling();
-        flywheelSubsystem.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, 0));
-//        intakeFeedSubsystem.periodic();
+        flywheelSubsystem.shoot(
+                new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, 0)
+        );
+
+        // Telemetry
         telemetry.addData("targetRPM", targetRPM);
         telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
-        telemetry.addData("output power", (flywheelSubsystem.getFlywheelPower() * -10000));
-        telemetry.addData("latency time", loopTimer.milliseconds());
+        telemetry.addData("hood position", hoodPosition);
+        telemetry.addData("latency (ms)", loopTimer.milliseconds());
+
         loopTimer.reset();
         telemetry.update();
     }
