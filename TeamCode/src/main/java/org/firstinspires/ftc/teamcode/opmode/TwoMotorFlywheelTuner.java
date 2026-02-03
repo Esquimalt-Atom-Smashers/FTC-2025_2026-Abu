@@ -90,13 +90,9 @@ public class TwoMotorFlywheelTuner extends OpMode {
 
         // Turret control
         if (gamepad1.dpad_left) {
-            flywheelSubsystem.setTurretAngleOnBot(
-                    flywheelSubsystem.getTurretHeading() + 1
-            );
+            turretSubsystem.lockRobotFrame(turretSubsystem.getTurretAngleOnBot() + 1);
         } else if (gamepad1.dpad_right) {
-            flywheelSubsystem.setTurretAngleOnBot(
-                    flywheelSubsystem.getTurretHeading() - 1
-            );
+            turretSubsystem.lockRobotFrame(turretSubsystem.getTurretAngleOnBot() - 1);
         }
 
         // Feed control
@@ -123,11 +119,13 @@ public class TwoMotorFlywheelTuner extends OpMode {
         flywheelSubsystem.shoot(
                 new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, 0)
         );
+        turretSubsystem.periodic();
 
         // Telemetry
         telemetry.addData("targetRPM", targetRPM);
         telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
         telemetry.addData("hood position", hoodPosition);
+        turretSubsystem.addSubsystemTelemetry();
         telemetry.addData("latency (ms)", loopTimer.milliseconds());
 
         loopTimer.reset();

@@ -90,22 +90,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
      * should be initialized here later.
      */
 
-    // turret setting
-    private CRServo turretServo;
-    private final String TURRET_SERVO_NAME = "turretServo";
-    private final RTPAxon.Direction TURRET_SERVO_DIRECTION = FORWARD;
-    private AnalogInput turretEncoder;
-    private final String TURRET_ENCODER_NAME = "turretEncoder";
-    private RTPAxon turretServoManager;
-
-    private static double DEGREE_PER_ROTATION = -1;
-
-    // Soft limits (degrees)
-    private static final double MIN_ANGLE_ON_BOT = -180;
-    private static final double MAX_ANGLE_ON_BOT = 180;
-    private double targetAngleDegree = 0;
-    private double startingDegree = 0;
-
     public TwoMotorShooterSubsystem(OpMode opMode, RobotContainer.Alliance alliance, ShooterState state, Pose2d pose2d) {
         this.opMode = opMode;
         this.alliance = alliance;
@@ -123,11 +107,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         currentState = state;
         setPose2d(pose2d);
         setFlywheelMotorPower(0);
-
-        turretServo = opMode.hardwareMap.get(CRServo.class, TURRET_SERVO_NAME);
-        turretEncoder = opMode.hardwareMap.get(AnalogInput.class, TURRET_ENCODER_NAME);
-        turretServoManager = new RTPAxon(turretServo, turretEncoder, FORWARD);
-        turretServoManager.setPidCoeffs(PARAMS.turretP, PARAMS.turretI, PARAMS.D);
     }
 
     public double getFlywheelPower() {
@@ -219,28 +198,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
                 lower.hoodAngle + ((higher.hoodAngle - lower.hoodAngle) * percentageDistance));
 
     }
-    //===============================turret==================================
-    public void setTargetAngle(double angleDeg) {
-        targetAngleDegree = Range.clip(angleDeg, MIN_ANGLE_ON_BOT, MAX_ANGLE_ON_BOT);
-    }
-    public double getTurretHeading() {
-        return Math.toDegrees(pose2d.heading.toDouble()) + rotationToDegrees(turretServoManager.getTotalRotation());
-    }
-    public double getCurrentAngleOnBot() {
-        return rotationToDegrees(turretServoManager.getTotalRotation()) + startingDegree;
-    }
-    private double rotationToDegrees(double rotation) {
-        return rotation / DEGREE_PER_ROTATION;
-    }
-    private double degreesToRotation(double degrees) {
-        return degrees * DEGREE_PER_ROTATION;
-    }
-    public void setTurretAngleOnBot(double degrees) {
-        turretServoManager.setTargetRotation(degreesToRotation(degrees));
-    }
-    public void updateTurret() {
-        turretServoManager.update();
-    }
+
 //--------------------Common functions across subsystems--------------------
     /**
      * Runs every loop
@@ -250,10 +208,8 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
             shutDownSubsystem();
         } else if (currentState == ShooterState.AUTO) {
             shoot(alliance, pose2d);
-            updateTurret();
         } else {
             shoot(targetSetting);
-            updateTurret();
         }
     }
 
@@ -270,7 +226,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     public void addSubsystemTelemetry() {
         if (isTelemetryEnabled) {
             opMode.telemetry.addData("RPM", "Target: %.2f, Current : %.2f", targetSetting.rpm, getFlywheelRPM());
-            opMode.telemetry.addData("turretAngleOnbot", getCurrentAngleOnBot());
         }
     }
 
@@ -286,7 +241,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
      */
     public void shutDownSubsystem() {
         setFlywheelMotorPower(0);
-        turretServoManager.setPower(0);
     }
 
     public ShooterState getState() {

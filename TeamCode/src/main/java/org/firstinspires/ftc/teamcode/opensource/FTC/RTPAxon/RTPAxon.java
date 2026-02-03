@@ -19,8 +19,9 @@ public class RTPAxon {
         public double I = 0.0;
         public double D = 0.0;
         public double testSteps = 1;
+        public double DEAD_ZONE = 0.005;
     }
-    public static Params PARAMS = new Params();
+    public static Params PARAMS;
     // Encoder for servo position feedback
     private final AnalogInput servoEncoder;
     // Continuous rotation servo
@@ -75,6 +76,13 @@ public class RTPAxon {
     // Constructor with explicit direction
     public RTPAxon(CRServo servo, AnalogInput encoder, Direction direction) {
         this(servo, encoder);
+        this.direction = direction;
+        initialize();
+    }
+
+    public RTPAxon(CRServo turretServo, AnalogInput turretEncoder, Direction direction, Params turretParams) {
+        this(turretServo, turretEncoder);
+        PARAMS = turretParams;
         this.direction = direction;
         initialize();
     }
@@ -324,7 +332,7 @@ public class RTPAxon {
         double output = pTerm + iTerm + dTerm;
 
         // Deadzone for output
-        final double DEADZONE = 0.5;
+        final double DEADZONE = PARAMS.DEAD_ZONE;
         if (Math.abs(error) > DEADZONE) {
             double power = Math.min(maxPower, Math.abs(output)) * Math.signum(output);
             setPower(power);

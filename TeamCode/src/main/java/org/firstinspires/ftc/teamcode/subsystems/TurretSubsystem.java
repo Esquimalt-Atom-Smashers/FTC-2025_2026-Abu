@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -8,17 +9,25 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
-
+@Config
 public class TurretSubsystem implements SubsystemBase{
     private final OpMode opMode;
     private final RobotContainer.Alliance alliance;
     private final Pose2d goalPos;
+    private boolean isTelemetryEnabled = true;
     // ================= CONFIG =================
+    public RTPAxon.Params TURRET_PARAMS = new RTPAxon.Params(){
+        public double P = 0.0;
+        public double I = 0.0;
+        public double D = 0.0;
+        public double testSteps = 1;
+        public double DEAD_ZONE = 0.005;
+    };
     private static final double MIN_ANGLE_ON_BOT = -180.0;
     private static final double MAX_ANGLE_ON_BOT =  180.0;
 
     // Encoder calibration
-    private static final double DEGREE_PER_ROTATION = -1.0; // YOU must calibrate this
+    private static final double DEGREE_PER_ROTATION = 180; // YOU must calibrate this
     private static final double ENCODER_ZERO_OFFSET_DEG = 0.0; // absolute encoder zero align
 
     // Feedforward gain for rotation compensation
@@ -31,14 +40,14 @@ public class TurretSubsystem implements SubsystemBase{
     private RTPAxon.Direction direction = RTPAxon.Direction.FORWARD;
 
     // ================= STATE =================
-    private Pose2d robotPose = new Pose2d(0,0,0);
+    private Pose2d robotPose;
     private double robotHeadingRate = 0.0; // rad/s
 
     // ================= Subsystem State =================
     public enum TurretState {
         IDLE,
         ROBOT_FRAME_LOCK,   // angle on robot
-        FIELD_POINT_LOCK    // lock to field coordinate
+        GOAL_LOCK    // lock to field coordinate
     }
 
     private TurretState currentState = TurretState.IDLE;
@@ -54,7 +63,7 @@ public class TurretSubsystem implements SubsystemBase{
         this.alliance = alliance;
         turretServo = opMode.hardwareMap.get(CRServo.class, "turretServo");
         turretEncoder = opMode.hardwareMap.get(AnalogInput.class, "turretEncoder");
-        turretServoManager = new RTPAxon(turretServo, turretEncoder, direction);
+        turretServoManager = new RTPAxon(turretServo, turretEncoder, direction, TURRET_PARAMS);
         this.currentState = turretState;
         robotPose = pose2d;
         this.goalPos = goalPos;
@@ -80,43 +89,13 @@ public class TurretSubsystem implements SubsystemBase{
 
     // 2) Field-point lock
     public void lockFieldPoint(double x, double y){
-        currentState = TurretState.FIELD_POINT_LOCK;
+        currentState = TurretState.GOAL_LOCK;
         targetX = x;
         targetY = y;
     }
 
     public void idle(){
         currentState = TurretState.IDLE;
-    }
-
-    // ================= CORE LOOP =================
-    public void update(){
-
-        if(currentState == TurretState.IDLE){
-            turretServoManager.setPower(0);
-            return;
-        }
-
-        double targetDeg;
-
-        switch(currentState){
-
-            case ROBOT_FRAME_LOCK:
-                targetDeg = targetRobotFrameDeg;
-                break;
-
-            case FIELD_POINT_LOCK:
-                targetDeg = computeFieldPointAngle();
-                break;
-
-            default:
-                return;
-        }
-
-        // Apply feedforward compensation
-        applyCompensatedControl(targetDeg);
-
-        turretServoManager.update();
     }
 
     // ================= CONTROL =================
@@ -181,7 +160,24 @@ public class TurretSubsystem implements SubsystemBase{
      */
     @Override
     public void periodic() {
-
+        if(currentState == TurretState.IDLE){
+            turretServoManager.setPower(0);
+            return;
+        }
+        double targetDeg;
+        switch(currentState){
+            case ROBOT_FRAME_LOCK:
+                targetDeg = targetRobotFrameDeg;
+                break;
+            case GOAL_LOCK:
+                targetDeg = computeFieldPointAngle();
+                break;
+            default:
+                return;
+        }
+        // Apply feedforward compensation
+        applyCompensatedControl(targetDeg);
+        turretServoManager.update();
     }
 
     /**
@@ -191,12 +187,15 @@ public class TurretSubsystem implements SubsystemBase{
      */
     @Override
     public void enableSubsystemTelemetry(boolean enabled) {
-
+        isTelemetryEnabled = enabled;
     }
 
     @Override
     public void addSubsystemTelemetry() {
-
+        if (isTelemetryEnabled) {
+            opMode.telemetry.addData("Current TA On Bot", getTurretAngleOnBot());
+            opMode.telemetry.addData("Target TA On Bot", targetRobotFrameDeg);
+        }
     }
 
     /**
@@ -204,7 +203,6 @@ public class TurretSubsystem implements SubsystemBase{
      */
     @Override
     public void resetSubsystem() {
-
     }
 
     /**
@@ -212,7 +210,7 @@ public class TurretSubsystem implements SubsystemBase{
      */
     @Override
     public void shutDownSubsystem() {
-
+        idle();
     }
 
     /**
@@ -222,7 +220,7 @@ public class TurretSubsystem implements SubsystemBase{
      */
     @Override
     public Enum<?> getState() {
-        return null;
+        return currentState;
     }
     public void setCurrentState(TurretState turretState) {currentState = turretState;}
 
