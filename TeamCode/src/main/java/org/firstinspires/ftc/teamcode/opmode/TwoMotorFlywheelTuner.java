@@ -27,6 +27,8 @@ public class TwoMotorFlywheelTuner extends OpMode {
         public double intakePower = 1;
         public double feedPower = 1;
         public double notFeedPower = 0;
+        //max servo number 0.93
+        //min servo num 0.27
     }
 
     public static Params PARAMS = new Params();
@@ -72,7 +74,6 @@ public class TwoMotorFlywheelTuner extends OpMode {
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         feedMotor = hardwareMap.get(DcMotor.class, "feedMotor");
         hoodServo = hardwareMap.get(Servo.class, "hoodServo"); // port 0
-        hoodServo.setPosition(hoodPosition);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         feedMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -87,7 +88,6 @@ public class TwoMotorFlywheelTuner extends OpMode {
 
     @Override
     public void loop() {
-
         // Turret control
         if (gamepad1.dpad_left) {
             turretSubsystem.lockRobotFrame(turretSubsystem.getTurretAngleOnBot() + 1);

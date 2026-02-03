@@ -44,8 +44,8 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     private DcMotorEx secondFlywheelMotor;
     private final String FLYWHEEL_MOTOR_NAME = "flywheelMotor";
     private final String SECOND_FLYWHEEL_MOTOR_NAME = "secondFlywheelMotor";
-    private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
-    private final DcMotorSimple.Direction SECOND_FLYWHEEL_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    private final DcMotorSimple.Direction SECOND_FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
     public final double RPM_TOLERANCE = Property.TOLERANCE;
 
     private final double TICKS_PER_ROTATION = 28;
