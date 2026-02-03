@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TwoMotorShooterSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 
@@ -30,6 +31,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
     public static Params PARAMS = new Params();
 
     private TwoMotorShooterSubsystem flywheelSubsystem;
+    private TurretSubsystem turretSubsystem;
 //    private IntakeTransferSubsystem intakeFeedSubsystem;
 
     private enum MotionProfilingStates {
@@ -55,6 +57,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
     @Override
     public void init() {
 //        intakeFeedSubsystem = new IntakeTransferSubsystem(this, IntakeTransferSubsystem.IntakeTransferState.INTAKING);
+        turretSubsystem = new TurretSubsystem(this, RobotContainer.Alliance.RED, TurretSubsystem.TurretState.ROBOT_FRAME_LOCK, new Pose2d(0,0,0), new Pose2d(0,0,0));
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         feedMotor = hardwareMap.get(DcMotor.class, "feedMotor");
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

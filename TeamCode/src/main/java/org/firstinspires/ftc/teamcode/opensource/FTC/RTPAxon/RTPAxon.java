@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon;
 import android.annotation.SuppressLint;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,8 +12,15 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.opensource.FTC.GamepadWrapper.GamepadPair;
-
+@Config
 public class RTPAxon {
+    public static class Params{
+        public double P = 0.0;
+        public double I = 0.0;
+        public double D = 0.0;
+        public double testSteps = 1;
+    }
+    public static Params PARAMS = new Params();
     // Encoder for servo position feedback
     private final AnalogInput servoEncoder;
     // Continuous rotation servo
@@ -97,9 +105,9 @@ public class RTPAxon {
         homeAngle = previousAngle;
 
         // Default PID coefficients
-        kP = 0.015; 
-        kI = 0.0005; 
-        kD = 0.0025;
+        kP = PARAMS.P;
+        kI = PARAMS.I;
+        kD = PARAMS.D;
         integralSum = 0.0;
         lastError = 0.0;
         maxIntegralSum = 100.0;
@@ -358,6 +366,8 @@ public class RTPAxon {
             AnalogInput encoder = hardwareMap.get(AnalogInput.class, "turretEncoder");
             GamepadPair gamepads = new GamepadPair(gamepad1, gamepad2);
             RTPAxon servo = new RTPAxon(crservo, encoder);
+            boolean prevUp = false;
+            boolean prevDown = false;
 
             waitForStart();
 
@@ -365,12 +375,15 @@ public class RTPAxon {
                 servo.update();
 
                 // Manual controls for target and PID tuning
-                if (gamepad1.dpad_up) {
-                    servo.changeTargetRotation(15);
+                if (gamepad1.dpad_up && !prevUp) {
+                    servo.changeTargetRotation(PARAMS.testSteps);
                 }
-                if (gamepad1.dpad_down) {
-                    servo.changeTargetRotation(-15);
+                if (gamepad1.dpad_down && !prevDown) {
+                    servo.changeTargetRotation(-PARAMS.testSteps);
                 }
+
+                prevUp = gamepad1.dpad_up;
+                prevDown = gamepad1.dpad_down;
                 if (gamepad1.a) {
                     servo.setTargetRotation(0);
                 }
