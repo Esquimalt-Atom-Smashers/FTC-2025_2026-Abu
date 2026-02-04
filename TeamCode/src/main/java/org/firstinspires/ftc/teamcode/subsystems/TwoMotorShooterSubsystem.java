@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon;
@@ -47,6 +48,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.REVERSE;
     private final DcMotorSimple.Direction SECOND_FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
     public final double RPM_TOLERANCE = Property.TOLERANCE;
+    private Servo hoodAngleServo;
 
     private final double TICKS_PER_ROTATION = 28;
     private FlywheelSetting targetSetting = new FlywheelSetting(0,0);
@@ -68,7 +70,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
 
     private final TreeMap<Double, FlywheelSetting> MATCHING_MAP= new TreeMap<>();
     {
-        MATCHING_MAP.put(30.0 , new FlywheelSetting(3300, 20));
+        MATCHING_MAP.put(30.0 , new FlywheelSetting(3300, 0.5));
         MATCHING_MAP.put(45.0, new FlywheelSetting(3050, 25));
         MATCHING_MAP.put(60.0, new FlywheelSetting(3100, 30));
         MATCHING_MAP.put(75.0, new FlywheelSetting(3100, 30));
@@ -154,6 +156,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         double feedforward = flywheelFeedForward(targetVelocity);
         double pid = flywheelCustomPID(targetVelocity);
 
+        hoodAngleServo.setPosition(targetSetting.hoodAngle);
         setFlywheelMotorPower(feedforward + pid);
     }
 
