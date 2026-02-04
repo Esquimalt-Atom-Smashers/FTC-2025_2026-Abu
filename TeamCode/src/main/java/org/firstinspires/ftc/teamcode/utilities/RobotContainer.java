@@ -27,6 +27,7 @@ public class RobotContainer {
     public DriveSubsystem drivebase = null;
     public final ShooterSubsystem shooter;
     public final IntakeTransferSubsystem intake;
+    public final TurretSubsystem turretSubsystem;
     public final VisionSubsystem vision;
     public final ReturnToBaseSubsystem returnToBase;
     public final LEDSubsystem ledSubsystem;
@@ -55,12 +56,13 @@ public class RobotContainer {
      *
      * All subsystems are created and managed here.
      */
-    public RobotContainer(OpMode opMode, Pose2d robotPose, Alliance alliance, DriveSubsystemState driveState, ShooterSubsystem.ShooterState shooterState, IntakeTransferSubsystem.IntakeTransferState intakeTransferState, VisionSubsystem.VisionState visionState) {
+    public RobotContainer(OpMode opMode, Pose2d robotPose, Alliance alliance, DriveSubsystemState driveState, ShooterSubsystem.ShooterState shooterState, TurretSubsystem.TurretState turretState,IntakeTransferSubsystem.IntakeTransferState intakeTransferState, VisionSubsystem.VisionState visionState) {
         goalPos = alliance == RobotContainer.Alliance.RED? new Pose2d(RED_GOAL_X, RED_GOAL_Y, Math.toRadians(RED_GOAL_HEADING)): new Pose2d(BLUE_GOAL_X, BLUE_GOAL_Y, Math.toRadians(BLUE_GOAL_HEADING));
 
         this.opMode = opMode;
         drivebase = new DriveSubsystem(opMode, alliance, driveState, robotPose, goalPos);
         shooter = new ShooterSubsystem(opMode, alliance, shooterState, robotPose, goalPos);
+        turretSubsystem = new TurretSubsystem(opMode, alliance, turretState, robotPose, goalPos);
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
         vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
         returnToBase = new ReturnToBaseSubsystem();
@@ -89,6 +91,8 @@ public class RobotContainer {
         }
         drivebase.periodic();
         shooter.periodic();
+        turretSubsystem.updateRobotPose(robotPose);
+        turretSubsystem.periodic();
         intake.periodic();
         vision.updateCurrentPose(drivebase.getPose());
         vision.periodic();
@@ -97,8 +101,9 @@ public class RobotContainer {
             opMode.telemetry.clearAll();
             drivebase.addSubsystemTelemetry();
             shooter.addSubsystemTelemetry();
+            turretSubsystem.addSubsystemTelemetry();
             intake.addSubsystemTelemetry();
-            vision.addSubsystemTelemetry();;
+            vision.addSubsystemTelemetry();
             opMode.telemetry.addLine(opModeTelemetry);
             opMode.telemetry.update();
             telemetryTimer.reset();

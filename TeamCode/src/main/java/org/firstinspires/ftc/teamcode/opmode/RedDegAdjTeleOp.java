@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.InputUtility;
 import org.firstinspires.ftc.teamcode.utilities.Property;
@@ -25,7 +26,6 @@ public class RedDegAdjTeleOp extends LinearOpMode {
     RobotContainer.Alliance alliance = RobotContainer.Alliance.RED;
     double targetRpm;
     ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
-    boolean isManualRPMControl = true;
     boolean isLeftDpadPressed = false;
     boolean isRightDpadPressed = false;  
     @Override
@@ -39,7 +39,8 @@ public class RedDegAdjTeleOp extends LinearOpMode {
                 startingPose,
                 alliance,
                 DriveSubsystem.DriveSubsystemState.TELEOP_DRIVING,
-                ShooterSubsystem.ShooterState.MANUAL,
+                ShooterSubsystem.ShooterState.DISABLED,
+                TurretSubsystem.TurretState.GOAL_LOCK,
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.TRACKING_GOAL);
         robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(90));
@@ -75,19 +76,9 @@ public class RedDegAdjTeleOp extends LinearOpMode {
 
             //flywheel control
             if (gamepad1.triangle) {
-                isManualRPMControl = false;
                 forceReset = true;
             } else if (gamepad1.square) {
-                isManualRPMControl = true;
                 forceReset = false;
-            }
-
-            if (isManualRPMControl) {
-                if (gamepad1.dpad_up) {
-                    targetRpm = Property.FAR_SHOOT_RPM;
-                } else if (gamepad1.dpad_down) {
-                    targetRpm = Property.CLOSE_SHOOT_RPM;
-                }
             }
 
             if (!gamepad1.dpad_left && isLeftDpadPressed) {
@@ -101,17 +92,14 @@ public class RedDegAdjTeleOp extends LinearOpMode {
             } else if (gamepad1.dpad_right && !isRightDpadPressed) {
                 isRightDpadPressed = true;
             }
-            robotContainer.shoot(targetRpm, isManualRPMControl);
-            if (gamepad1.left_trigger >= 0.3) {
-                robotContainer.aimbotAssistedDrive(drive, strafe, turn);
-            } else {
-                robotContainer.drive(drive, strafe, turn);
-            }
+            robotContainer.shoot(targetRpm, false);
+            robotContainer.drive(drive, strafe, turn);
+
             if (gamepad1.x) {
                 robotContainer.updatePoseFromVision(forceReset);
                 isLLReseting = true;
             }
-            robotContainer.addOpModeTelemetry("isManualRPM: " + isManualRPMControl +"\nisReseting Manual: " + isLLReseting);
+            robotContainer.addOpModeTelemetry("is Reseting Manual: " + isLLReseting);
             robotContainer.runRobot();
         }
         robotContainer.shutDownRobot();

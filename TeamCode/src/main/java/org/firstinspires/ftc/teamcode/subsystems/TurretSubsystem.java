@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon;
-import org.firstinspires.ftc.teamcode.utilities.Property;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 @Config
 public class TurretSubsystem implements SubsystemBase{
@@ -18,7 +17,8 @@ public class TurretSubsystem implements SubsystemBase{
         public double turretD = 0.0;
         public double testSteps = 1;
         public double DEAD_ZONE = 0.005;
-        public double DEGREE_PER_ROTATION = (double) 1;
+        public double SERVO_TO_TURRET_GEAR_RATIO = 2;
+        public double kHeadingComp = 1;
         public double MIN_ANGLE_ON_BOT = -340.0;
         public double MAX_ANGLE_ON_BOT = 250.0;
     }
@@ -27,6 +27,7 @@ public class TurretSubsystem implements SubsystemBase{
     private final OpMode opMode;
     private final RobotContainer.Alliance alliance;
     private final Pose2d goalPos;
+    private String aimbotLine;
     private boolean isTelemetryEnabled = true;
     // ================= CONFIG =================
 // in Turret subsystem
@@ -40,11 +41,11 @@ public class TurretSubsystem implements SubsystemBase{
     }
 
     // Encoder calibration
-    private static final double DEGREE_PER_ROTATION = PARAMS.DEGREE_PER_ROTATION; // YOU must calibrate this
+    private static double SERVO_TO_TURRET_GEAR_RATIO = PARAMS.SERVO_TO_TURRET_GEAR_RATIO; // YOU must calibrate this
     private static final double ENCODER_ZERO_OFFSET_DEG = 0.0; // absolute encoder zero align
 
     // Feedforward gain for rotation compensation
-    private double kHeadingComp = 1.0; // tune if drivetrain model is bad
+    private double kHeadingComp = PARAMS.kHeadingComp; // tune if drivetrain model is bad
 
     // ================= HARDWARE =================
     private RTPAxon turretServoManager;// closed-loop controller
@@ -54,7 +55,7 @@ public class TurretSubsystem implements SubsystemBase{
 
     // ================= STATE =================
     private Pose2d robotPose;
-    private double robotHeadingRate = 0.0; // rad/s
+    private double lastFieldAngle = Double.NaN;
 
     // ================= Subsystem State =================
     public enum TurretState {
@@ -63,14 +64,10 @@ public class TurretSubsystem implements SubsystemBase{
         GOAL_LOCK    // lock to field coordinate
     }
 
-    private TurretState currentState = TurretState.IDLE;
+    private TurretState currentState;
 
     // Targets
     private double targetRobotFrameDeg = 0.0;
-    private double targetX = 0.0;
-    private double targetY = 0.0;
-
-
     public TurretSubsystem(OpMode opMode, RobotContainer.Alliance alliance, TurretState turretState, Pose2d pose2d, Pose2d goalPos) {
         this.opMode = opMode;
         this.alliance = alliance;
@@ -87,24 +84,17 @@ public class TurretSubsystem implements SubsystemBase{
     public void updateRobotPose(Pose2d pose){
         this.robotPose = pose;
     }
-
-    public void updateHeadingRate(double radPerSec){
-        this.robotHeadingRate = radPerSec;
-    }
-
     // ================= MODE SETTERS =================
 
     // 1) Robot-frame angle lock
-    public void lockRobotFrame(double angleDeg){
+    public void lockRobotFrame(double angleDeg) {
         currentState = TurretState.ROBOT_FRAME_LOCK;
-        targetRobotFrameDeg = ( 3 * clipAndNormalize(angleDeg));
+        targetRobotFrameDeg = findBestAngle(angleDeg);
     }
 
-    // 2) Field-point lock
-    public void lockFieldPoint(double x, double y){
+        // 2) Field-point lock
+    public void lockFieldPoint(){
         currentState = TurretState.GOAL_LOCK;
-        targetX = x;
-        targetY = y;
     }
 
     public void idle(){
@@ -112,32 +102,65 @@ public class TurretSubsystem implements SubsystemBase{
     }
 
     // ================= CONTROL =================
-
-    private void applyCompensatedControl(double targetRobotFrameDeg){
+    private void applyRobotFrameControl(double targetRobotFrameDeg){
         // --- Position target ---
-        turretServoManager.setTargetRotation(targetRobotFrameDeg + -kHeadingComp * Math.toDegrees(robotHeadingRate));
+        turretServoManager.setTargetRotation(targetRobotFrameDeg * SERVO_TO_TURRET_GEAR_RATIO);
     }
 
     // ================= GEOMETRY =================
 
     private double computeFieldPointAngle(){
-        double dx = targetX - robotPose.position.x;
-        double dy = targetY - robotPose.position.y;
-
+        double dx = goalPos.position.x - robotPose.position.x;
+        double dy = goalPos.position.y - robotPose.position.y;
         // Field frame angle
         double fieldAngle = Math.atan2(dy, dx);
-
+        double lastLoopFieldAngle = lastFieldAngle;
+        lastFieldAngle = fieldAngle;
         // Convert to robot frame
         double robotFrameAngle = fieldAngle - robotPose.heading.toDouble();
+        aimbotLine = "goal target heading: " + Math.toDegrees(fieldAngle);
+        if (Double.isNaN(lastLoopFieldAngle)) {
+            return findBestAngle(Math.toDegrees(robotFrameAngle));
+        } else {
+            return findBestAngle(Math.toDegrees(robotFrameAngle + (fieldAngle - lastLoopFieldAngle) * -kHeadingComp));
+        }
+    }
 
-        return clipAndNormalize(Math.toDegrees(robotFrameAngle));
+    private double findBestAngle(double angleDeg) {
+        double current = getTurretAngleOnBot(); // continuous, not normalized
+        double base = angleDeg; // desired robot-frame angle in degrees
+
+        double best = Double.NaN;
+        double bestError = Double.POSITIVE_INFINITY;
+
+        // search multiple wraps (enough to cover limits)
+        for (int k = -2; k <= 2; k++) {
+            double candidate = base + k * 360.0;
+
+            // respect hard limits
+            if (candidate < PARAMS.MIN_ANGLE_ON_BOT || candidate > PARAMS.MAX_ANGLE_ON_BOT) {
+                continue;
+            }
+
+            double error = Math.abs(candidate - current);
+            if (error < bestError) {
+                bestError = error;
+                best = candidate;
+            }
+        }
+
+        // if nothing valid found, clamp to nearest limit
+        if (Double.isNaN(best)) {
+            best = Range.clip(base, PARAMS.MIN_ANGLE_ON_BOT, PARAMS.MAX_ANGLE_ON_BOT);
+        }
+        return best;
     }
 
     // ================= SENSORS =================
 
     public double getTurretAngleOnBot(){
         // absolute encoder -> degrees on robot
-        double rot = turretServoManager.getTotalRotation();
+        double rot = turretServoManager.getTotalRotation() / SERVO_TO_TURRET_GEAR_RATIO;
         return rot + ENCODER_ZERO_OFFSET_DEG;
     }
 
@@ -154,7 +177,9 @@ public class TurretSubsystem implements SubsystemBase{
     }
 
     // ================= TUNING =================
-
+    public double setTargetRobotFrameDeg () {
+        return targetRobotFrameDeg;
+    }
     public void setHeadingCompGain(double k){
         this.kHeadingComp = k;
     }
@@ -171,16 +196,16 @@ public class TurretSubsystem implements SubsystemBase{
         double targetDeg;
         switch(currentState){
             case ROBOT_FRAME_LOCK:
-                targetDeg = targetRobotFrameDeg;
+                applyRobotFrameControl(targetRobotFrameDeg);
                 break;
             case GOAL_LOCK:
                 targetDeg = computeFieldPointAngle();
+                lastFieldAngle = targetDeg;
+                applyRobotFrameControl(targetDeg);
                 break;
             default:
                 return;
         }
-        // Apply feedforward compensation
-        applyCompensatedControl(targetDeg);
         turretServoManager.update();
     }
 
@@ -199,6 +224,7 @@ public class TurretSubsystem implements SubsystemBase{
         if (isTelemetryEnabled) {
             opMode.telemetry.addData("Current TA On Bot", getTurretAngleOnBot());
             opMode.telemetry.addData("Target TA On Bot", targetRobotFrameDeg);
+            opMode.telemetry.addLine(aimbotLine);
             opMode.telemetry.addLine(turretServoManager.log());
         }
     }
