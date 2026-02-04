@@ -70,6 +70,7 @@ public class RTPAxon {
         this.servo = servo;
         servoEncoder = encoder;
         direction = Direction.FORWARD;
+        PARAMS = new Params();
         initialize();
     }
 

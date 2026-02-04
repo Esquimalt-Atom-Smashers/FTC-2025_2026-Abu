@@ -19,6 +19,8 @@ public class TurretSubsystem implements SubsystemBase{
         public double testSteps = 1;
         public double DEAD_ZONE = 0.005;
         public double DEGREE_PER_ROTATION = (double) 1;
+        public double MIN_ANGLE_ON_BOT = -340.0;
+        public double MAX_ANGLE_ON_BOT = 250.0;
     }
     public static Params PARAMS = new Params();
 
@@ -36,9 +38,6 @@ public class TurretSubsystem implements SubsystemBase{
         TURRET_PARAMS.testSteps = PARAMS.testSteps;
         TURRET_PARAMS.DEAD_ZONE = PARAMS.DEAD_ZONE;
     }
-
-    private static final double MIN_ANGLE_ON_BOT = -340.0;
-    private static final double MAX_ANGLE_ON_BOT =  250.0;
 
     // Encoder calibration
     private static final double DEGREE_PER_ROTATION = PARAMS.DEGREE_PER_ROTATION; // YOU must calibrate this
@@ -98,7 +97,7 @@ public class TurretSubsystem implements SubsystemBase{
     // 1) Robot-frame angle lock
     public void lockRobotFrame(double angleDeg){
         currentState = TurretState.ROBOT_FRAME_LOCK;
-        targetRobotFrameDeg = 2*(clipAndNormalize(angleDeg));
+        targetRobotFrameDeg = ( 3 * clipAndNormalize(angleDeg));
     }
 
     // 2) Field-point lock
@@ -145,7 +144,7 @@ public class TurretSubsystem implements SubsystemBase{
     // ================= UTIL =================
     private double clipAndNormalize(double deg){
         deg = normalizeDeg(deg);
-        return Range.clip(deg, MIN_ANGLE_ON_BOT, MAX_ANGLE_ON_BOT);
+        return Range.clip(deg, PARAMS.MIN_ANGLE_ON_BOT, PARAMS.MAX_ANGLE_ON_BOT);
     }
 
     private double normalizeDeg(double deg){
