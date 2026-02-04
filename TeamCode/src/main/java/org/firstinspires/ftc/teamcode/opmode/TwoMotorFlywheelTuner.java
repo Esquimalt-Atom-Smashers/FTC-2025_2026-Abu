@@ -27,6 +27,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
         public double intakePower = 1;
         public double feedPower = 1;
         public double notFeedPower = 0;
+        public double testSteps = 1;
         //max servo number 0.93
         //min servo num 0.27
     }
@@ -65,7 +66,9 @@ public class TwoMotorFlywheelTuner extends OpMode {
     private MotionProfilingStates pastState;
     private ElapsedTime timer;
     private ElapsedTime loopTimer;
-
+    public double targetDegree;
+    boolean prevUp = false;
+    boolean prevDown = false;
 
     @Override
     public void init() {
@@ -88,11 +91,19 @@ public class TwoMotorFlywheelTuner extends OpMode {
 
     @Override
     public void loop() {
-        // Turret control
-        if (gamepad1.dpad_left) {
-            turretSubsystem.lockRobotFrame(turretSubsystem.getTurretAngleOnBot() + 1);
-        } else if (gamepad1.dpad_right) {
-            turretSubsystem.lockRobotFrame(turretSubsystem.getTurretAngleOnBot() - 1);
+        // Manual controls for target and PID tuning
+        if (gamepad1.x && !prevUp) {
+            turretSubsystem.lockRobotFrame(turretSubsystem.getTurretAngleOnBot() + PARAMS.testSteps);
+        }
+        if (gamepad1.b && !prevDown) {
+            turretSubsystem.lockRobotFrame(turretSubsystem.getTurretAngleOnBot() - PARAMS.testSteps);
+        }
+        prevUp = gamepad1.x;
+        prevDown = gamepad1.b;
+        if (gamepad1.dpad_up) {
+            turretSubsystem.lockRobotFrame(400);
+        } else if (gamepad1.dpad_down) {
+            turretSubsystem.lockRobotFrame(-90);
         }
 
         // Feed control

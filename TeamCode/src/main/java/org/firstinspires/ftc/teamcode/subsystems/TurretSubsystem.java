@@ -8,26 +8,40 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon;
+import org.firstinspires.ftc.teamcode.utilities.Property;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 @Config
 public class TurretSubsystem implements SubsystemBase{
+    public static class Params {
+        public double turretP = 0.01;
+        public double turretI = 0.0;
+        public double turretD = 0.0;
+        public double testSteps = 1;
+        public double DEAD_ZONE = 0.005;
+        public double DEGREE_PER_ROTATION = (double) 1;
+    }
+    public static Params PARAMS = new Params();
+
     private final OpMode opMode;
     private final RobotContainer.Alliance alliance;
     private final Pose2d goalPos;
     private boolean isTelemetryEnabled = true;
     // ================= CONFIG =================
-    public RTPAxon.Params TURRET_PARAMS = new RTPAxon.Params(){
-        public double P = 0.0;
-        public double I = 0.0;
-        public double D = 0.0;
-        public double testSteps = 1;
-        public double DEAD_ZONE = 0.005;
-    };
-    private static final double MIN_ANGLE_ON_BOT = -180.0;
-    private static final double MAX_ANGLE_ON_BOT =  180.0;
+// in Turret subsystem
+    public RTPAxon.Params TURRET_PARAMS = new RTPAxon.Params();
+    {
+        TURRET_PARAMS.P = PARAMS.turretP;
+        TURRET_PARAMS.I = PARAMS.turretI;
+        TURRET_PARAMS.D = PARAMS.turretD;
+        TURRET_PARAMS.testSteps = PARAMS.testSteps;
+        TURRET_PARAMS.DEAD_ZONE = PARAMS.DEAD_ZONE;
+    }
+
+    private static final double MIN_ANGLE_ON_BOT = -340.0;
+    private static final double MAX_ANGLE_ON_BOT =  250.0;
 
     // Encoder calibration
-    private static final double DEGREE_PER_ROTATION = 180; // YOU must calibrate this
+    private static final double DEGREE_PER_ROTATION = PARAMS.DEGREE_PER_ROTATION; // YOU must calibrate this
     private static final double ENCODER_ZERO_OFFSET_DEG = 0.0; // absolute encoder zero align
 
     // Feedforward gain for rotation compensation
@@ -84,7 +98,7 @@ public class TurretSubsystem implements SubsystemBase{
     // 1) Robot-frame angle lock
     public void lockRobotFrame(double angleDeg){
         currentState = TurretState.ROBOT_FRAME_LOCK;
-        targetRobotFrameDeg = clipAndNormalize(angleDeg);
+        targetRobotFrameDeg = 2*(clipAndNormalize(angleDeg));
     }
 
     // 2) Field-point lock
@@ -102,7 +116,7 @@ public class TurretSubsystem implements SubsystemBase{
 
     private void applyCompensatedControl(double targetRobotFrameDeg){
         // --- Position target ---
-        turretServoManager.setTargetRotation(degToRot(targetRobotFrameDeg + -kHeadingComp * Math.toDegrees(robotHeadingRate)));
+        turretServoManager.setTargetRotation(targetRobotFrameDeg + -kHeadingComp * Math.toDegrees(robotHeadingRate));
     }
 
     // ================= GEOMETRY =================
@@ -125,19 +139,10 @@ public class TurretSubsystem implements SubsystemBase{
     public double getTurretAngleOnBot(){
         // absolute encoder -> degrees on robot
         double rot = turretServoManager.getTotalRotation();
-        return rotToDeg(rot) + ENCODER_ZERO_OFFSET_DEG;
+        return rot + ENCODER_ZERO_OFFSET_DEG;
     }
 
     // ================= UTIL =================
-
-    private double rotToDeg(double rot){
-        return rot / DEGREE_PER_ROTATION;
-    }
-
-    private double degToRot(double deg){
-        return deg * DEGREE_PER_ROTATION;
-    }
-
     private double clipAndNormalize(double deg){
         deg = normalizeDeg(deg);
         return Range.clip(deg, MIN_ANGLE_ON_BOT, MAX_ANGLE_ON_BOT);
@@ -195,6 +200,7 @@ public class TurretSubsystem implements SubsystemBase{
         if (isTelemetryEnabled) {
             opMode.telemetry.addData("Current TA On Bot", getTurretAngleOnBot());
             opMode.telemetry.addData("Target TA On Bot", targetRobotFrameDeg);
+            opMode.telemetry.addLine(turretServoManager.log());
         }
     }
 

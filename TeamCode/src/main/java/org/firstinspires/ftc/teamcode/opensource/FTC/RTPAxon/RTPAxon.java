@@ -21,7 +21,7 @@ public class RTPAxon {
         public double testSteps = 1;
         public double DEAD_ZONE = 0.005;
     }
-    public static Params PARAMS;
+    public static Params PARAMS = new Params();
     // Encoder for servo position feedback
     private final AnalogInput servoEncoder;
     // Continuous rotation servo
