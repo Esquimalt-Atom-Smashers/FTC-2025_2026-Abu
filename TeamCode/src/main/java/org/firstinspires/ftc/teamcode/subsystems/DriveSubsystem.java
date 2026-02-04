@@ -217,7 +217,7 @@ public class DriveSubsystem implements SubsystemBase {
     /** shall be ran every loop*/
     @Override
     public void periodic() {
-        getPose();
+        currentPose = getPose();
         if (currentState == DriveSubsystemState.DISABLED) {
             shutDownSubsystem();
         }
@@ -238,7 +238,6 @@ public class DriveSubsystem implements SubsystemBase {
             Pose2d pose = getPose();
             opMode.telemetry.addData("Pose", "X: %.2f, Y: %.2f, H: %.2f", pose.position.x, pose.position.y, Math.toDegrees(pose.heading.toDouble()));
             opMode.telemetry.addData("FC Heading", getFieldCentricHeading());
-            opMode.telemetry.addLine(aimbotLine);
         }
     }
 

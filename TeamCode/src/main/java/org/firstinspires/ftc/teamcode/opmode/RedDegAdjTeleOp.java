@@ -1,16 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.TwoMotorShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.InputUtility;
 import org.firstinspires.ftc.teamcode.utilities.Property;
@@ -22,15 +20,16 @@ import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 @TeleOp(name = "Kenny Red deg adjust TeleOp", group = "AAA")
 public class RedDegAdjTeleOp extends LinearOpMode {
     RobotContainer robotContainer;
-    Pose2d startingPose = new Pose2d(Property.TELEOP_DEFAULT_STARTING_POS_X, Property.TELEOP_DEFAULT_STARTING_POS_Y, Math.toRadians(Property.TELEOP_DEFAULT_STARTING_POS_HEADING));
+    Pose2d startingPose;
     RobotContainer.Alliance alliance = RobotContainer.Alliance.RED;
     double targetRpm;
-    ShooterSubsystem.FlywheelSetting flywheelSetting = new ShooterSubsystem.FlywheelSetting(targetRpm, 0);
+    TwoMotorShooterSubsystem.FlywheelSetting flywheelSetting = new TwoMotorShooterSubsystem.FlywheelSetting(targetRpm, 0);
     boolean isLeftDpadPressed = false;
     boolean isRightDpadPressed = false;  
     @Override
     public void runOpMode() throws InterruptedException {
         RobotPropertyParser.loadTeleOp();
+        startingPose = new Pose2d(Property.TELEOP_DEFAULT_STARTING_POS_X, Property.TELEOP_DEFAULT_STARTING_POS_Y, Math.toRadians(Property.TELEOP_DEFAULT_STARTING_POS_HEADING));
         targetRpm = Property.CLOSE_SHOOT_RPM;
         if (RobotPositionHolder.hasData()) {
             startingPose = new Pose2d(RobotPositionHolder.getX(), RobotPositionHolder.getY(), RobotPositionHolder.getHeading());
@@ -39,7 +38,7 @@ public class RedDegAdjTeleOp extends LinearOpMode {
                 startingPose,
                 alliance,
                 DriveSubsystem.DriveSubsystemState.TELEOP_DRIVING,
-                ShooterSubsystem.ShooterState.DISABLED,
+                TwoMotorShooterSubsystem.ShooterState.DISABLED,
                 TurretSubsystem.TurretState.GOAL_LOCK,
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.TRACKING_GOAL);
@@ -92,7 +91,7 @@ public class RedDegAdjTeleOp extends LinearOpMode {
             } else if (gamepad1.dpad_right && !isRightDpadPressed) {
                 isRightDpadPressed = true;
             }
-            robotContainer.shoot(targetRpm, false);
+            robotContainer.shoot();
             robotContainer.drive(drive, strafe, turn);
 
             if (gamepad1.x) {

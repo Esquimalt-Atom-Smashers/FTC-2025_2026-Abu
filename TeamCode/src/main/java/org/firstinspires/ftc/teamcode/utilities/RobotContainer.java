@@ -24,13 +24,13 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem.DriveSubsystemSt
 public class RobotContainer {
 
     // Subsystems
-    public DriveSubsystem drivebase = null;
-    public final ShooterSubsystem shooter;
+    public DriveSubsystem drivebase;
+    public final TwoMotorShooterSubsystem shooter;
     public final IntakeTransferSubsystem intake;
     public final TurretSubsystem turretSubsystem;
-    public final VisionSubsystem vision;
+//    public final VisionSubsystem vision;
     public final ReturnToBaseSubsystem returnToBase;
-    public final LEDSubsystem ledSubsystem;
+//    public final LEDSubsystem ledSubsystem;
 
     private OpMode opMode;
     private Pose2d robotPose;
@@ -56,21 +56,22 @@ public class RobotContainer {
      *
      * All subsystems are created and managed here.
      */
-    public RobotContainer(OpMode opMode, Pose2d robotPose, Alliance alliance, DriveSubsystemState driveState, ShooterSubsystem.ShooterState shooterState, TurretSubsystem.TurretState turretState,IntakeTransferSubsystem.IntakeTransferState intakeTransferState, VisionSubsystem.VisionState visionState) {
+    public RobotContainer(OpMode opMode, Pose2d robotPose, Alliance alliance, DriveSubsystemState driveState, TwoMotorShooterSubsystem.ShooterState shooterState, TurretSubsystem.TurretState turretState,IntakeTransferSubsystem.IntakeTransferState intakeTransferState, VisionSubsystem.VisionState visionState) {
         goalPos = alliance == RobotContainer.Alliance.RED? new Pose2d(RED_GOAL_X, RED_GOAL_Y, Math.toRadians(RED_GOAL_HEADING)): new Pose2d(BLUE_GOAL_X, BLUE_GOAL_Y, Math.toRadians(BLUE_GOAL_HEADING));
 
         this.opMode = opMode;
         drivebase = new DriveSubsystem(opMode, alliance, driveState, robotPose, goalPos);
-        shooter = new ShooterSubsystem(opMode, alliance, shooterState, robotPose, goalPos);
+        shooter = new TwoMotorShooterSubsystem(opMode, alliance, shooterState, robotPose);
         turretSubsystem = new TurretSubsystem(opMode, alliance, turretState, robotPose, goalPos);
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
-        vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
+//        vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
         returnToBase = new ReturnToBaseSubsystem();
-        ledSubsystem = new LEDSubsystem(opMode, alliance);
+//        ledSubsystem = new LEDSubsystem(opMode, alliance);
         shooter.shutDownSubsystem();
 
         telemetryTimer = new ElapsedTime();
         this.alliance = alliance;
+        this.robotPose = robotPose;
 
         if (driveState == DriveSubsystemState.AUTO) {
             isAuto = true;
@@ -87,15 +88,16 @@ public class RobotContainer {
     public void runRobot() {
         if (firstRun) {
             firstRun = false;
-            ledSubsystem.normalLight();
+//            ledSubsystem.normalLight();
         }
+        robotPose = drivebase.getPose();
         drivebase.periodic();
         shooter.periodic();
-        turretSubsystem.updateRobotPose(robotPose);
+        turretSubsystem.updateRobotPose(robotPose, drivebase.getMecanumDrive().localizer.update());
         turretSubsystem.periodic();
         intake.periodic();
-        vision.updateCurrentPose(drivebase.getPose());
-        vision.periodic();
+//        vision.updateCurrentPose(drivebase.getPose());
+//        vision.periodic();
         // TODO: Update subsystems if needed
         if (telemetryTimer.seconds() >= Property.TELEMETRY_UPDATE_TIME) {
             opMode.telemetry.clearAll();
@@ -103,7 +105,7 @@ public class RobotContainer {
             shooter.addSubsystemTelemetry();
             turretSubsystem.addSubsystemTelemetry();
             intake.addSubsystemTelemetry();
-            vision.addSubsystemTelemetry();
+//            vision.addSubsystemTelemetry();
             opMode.telemetry.addLine(opModeTelemetry);
             opMode.telemetry.update();
             telemetryTimer.reset();
@@ -124,8 +126,8 @@ public class RobotContainer {
         drivebase.shutDownSubsystem();
         shooter.shutDownSubsystem();
         intake.shutDownSubsystem();
-        vision.shutDownSubsystem();
-        ledSubsystem.shutDownSubsystem();
+//        vision.shutDownSubsystem();
+//        ledSubsystem.shutDownSubsystem();
     }
 
     /**
@@ -144,15 +146,15 @@ public class RobotContainer {
      */
     public boolean updatePoseFromVision(boolean forceReset) {
         Pose2d drivePose = getPose();
-        vision.updateCurrentPose(drivePose);
-        vision.periodic();
-        Pose2d visionPose = vision.getLimelightPosMT2();
-        if (visionPose != null) {
-            if ((Math.abs(visionPose.position.x - drivePose.position.x) <= POSITIONAL_TOLARANCE && Math.abs(visionPose.position.y - drivePose.position.y) <= POSITIONAL_TOLARANCE) || !forceReset) {
-                drivebase.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
-                return true;
-            }
-        }
+//        vision.updateCurrentPose(drivePose);
+//        vision.periodic();
+//        Pose2d visionPose = vision.getLimelightPosMT2();
+//        if (visionPose != null) {
+//            if ((Math.abs(visionPose.position.x - drivePose.position.x) <= POSITIONAL_TOLARANCE && Math.abs(visionPose.position.y - drivePose.position.y) <= POSITIONAL_TOLARANCE) || !forceReset) {
+//                drivebase.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
+//                return true;
+//            }
+//        }
         //did not update pose
         return false;
     }
@@ -167,25 +169,21 @@ public class RobotContainer {
     }
 
     /**High-level shooting command.*/
-    public void shoot(double manualTargetRPM, boolean isManualRPMControl) {
-        if (isManualRPMControl) {
-            shooter.shoot(new ShooterSubsystem.FlywheelSetting(manualTargetRPM, 0));
-        } else {
-            ShooterSubsystem.FlywheelSetting flywheelSetting = shooter.distanceToFlywheelSetting(drivebase.getDistanceToGoal());
-            shooter.shoot(flywheelSetting);
-        }
+    public void shoot() {
+        TwoMotorShooterSubsystem.FlywheelSetting flywheelSetting = shooter.distanceToFlywheelSetting(drivebase.getDistanceToGoal());
+        shooter.shoot(flywheelSetting);
     }
 
     public void drive(double drive, double strafe, double turn) {
         drivebase.driveFieldCentric(drive, strafe, turn);
-        ledSubsystem.normalLight();
+//        ledSubsystem.normalLight();
     }
 
     public void aimbotAssistedDrive(double drive, double strafe, double turn) {
         if (drivebase.aimbotAssistedDrive(drive, strafe, turn)) {
-            ledSubsystem.aimedLight();
+//            ledSubsystem.aimedLight();
         } else {
-            ledSubsystem.aimingLight();
+//            ledSubsystem.aimingLight();
         }
     }
 }

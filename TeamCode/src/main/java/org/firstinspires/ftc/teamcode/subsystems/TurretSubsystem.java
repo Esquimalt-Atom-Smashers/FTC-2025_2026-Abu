@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -18,7 +19,8 @@ public class TurretSubsystem implements SubsystemBase{
         public double testSteps = 1;
         public double DEAD_ZONE = 0.005;
         public double SERVO_TO_TURRET_GEAR_RATIO = 2;
-        public double kHeadingComp = 1;
+        public double kRobotMovementComp = 0;
+        public double kRobotRotationComp = 0;
         public double MIN_ANGLE_ON_BOT = -340.0;
         public double MAX_ANGLE_ON_BOT = 250.0;
     }
@@ -45,7 +47,8 @@ public class TurretSubsystem implements SubsystemBase{
     private static final double ENCODER_ZERO_OFFSET_DEG = 0.0; // absolute encoder zero align
 
     // Feedforward gain for rotation compensation
-    private double kHeadingComp = PARAMS.kHeadingComp; // tune if drivetrain model is bad
+    private double kRobotMovementComp = PARAMS.kRobotMovementComp; // tune if drivetrain model is bad
+    private double kRobotRotationComp = PARAMS.kRobotRotationComp;
 
     // ================= HARDWARE =================
     private RTPAxon turretServoManager;// closed-loop controller
@@ -55,6 +58,7 @@ public class TurretSubsystem implements SubsystemBase{
 
     // ================= STATE =================
     private Pose2d robotPose;
+    private PoseVelocity2d robotVelocity;
     private double lastFieldAngle = Double.NaN;
 
     // ================= Subsystem State =================
@@ -81,8 +85,9 @@ public class TurretSubsystem implements SubsystemBase{
 
 
     // ================= INPUT UPDATES =================
-    public void updateRobotPose(Pose2d pose){
+    public void updateRobotPose(Pose2d pose, PoseVelocity2d velocity2d){
         this.robotPose = pose;
+        this.robotVelocity = velocity2d;
     }
     // ================= MODE SETTERS =================
 
@@ -122,7 +127,7 @@ public class TurretSubsystem implements SubsystemBase{
         if (Double.isNaN(lastLoopFieldAngle)) {
             return findBestAngle(Math.toDegrees(robotFrameAngle));
         } else {
-            return findBestAngle(Math.toDegrees(robotFrameAngle + (fieldAngle - lastLoopFieldAngle) * -kHeadingComp));
+            return findBestAngle(Math.toDegrees(robotFrameAngle + (fieldAngle - lastLoopFieldAngle) * -kRobotMovementComp + robotVelocity.angVel * -kRobotRotationComp));
         }
     }
 
@@ -181,7 +186,7 @@ public class TurretSubsystem implements SubsystemBase{
         return targetRobotFrameDeg;
     }
     public void setHeadingCompGain(double k){
-        this.kHeadingComp = k;
+        this.kRobotMovementComp = k;
     }
     //
     /**
@@ -193,15 +198,13 @@ public class TurretSubsystem implements SubsystemBase{
             turretServoManager.setPower(0);
             return;
         }
-        double targetDeg;
         switch(currentState){
             case ROBOT_FRAME_LOCK:
                 applyRobotFrameControl(targetRobotFrameDeg);
                 break;
             case GOAL_LOCK:
-                targetDeg = computeFieldPointAngle();
-                lastFieldAngle = targetDeg;
-                applyRobotFrameControl(targetDeg);
+                targetRobotFrameDeg = computeFieldPointAngle();
+                applyRobotFrameControl(targetRobotFrameDeg);
                 break;
             default:
                 return;
@@ -225,7 +228,8 @@ public class TurretSubsystem implements SubsystemBase{
             opMode.telemetry.addData("Current TA On Bot", getTurretAngleOnBot());
             opMode.telemetry.addData("Target TA On Bot", targetRobotFrameDeg);
             opMode.telemetry.addLine(aimbotLine);
-            opMode.telemetry.addLine(turretServoManager.log());
+            opMode.telemetry.addData("Turret Pose", "X: %.2f, Y: %.2f, H: %.2f", robotPose.position.x, robotPose.position.y, Math.toDegrees(robotPose.heading.toDouble()));
+//            opMode.telemetry.addLine(turretServoManager.log());
         }
     }
 
