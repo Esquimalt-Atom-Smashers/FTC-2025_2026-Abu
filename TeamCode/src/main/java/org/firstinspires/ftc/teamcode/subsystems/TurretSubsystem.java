@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon;
@@ -13,14 +14,14 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 @Config
 public class TurretSubsystem implements SubsystemBase{
     public static class Params {
-        public double turretP = 0.01;
+        public double turretP = 0.011;
         public double turretI = 0.0;
-        public double turretD = 0.0;
+        public double turretD = 0.000000005;
         public double testSteps = 1;
         public double DEAD_ZONE = 0.005;
         public double SERVO_TO_TURRET_GEAR_RATIO = 2;
         public double kRobotMovementComp = 0;
-        public double kRobotRotationComp = 0;
+        public double kRobotRotationComp = -1;
         public double MIN_ANGLE_ON_BOT = -340.0;
         public double MAX_ANGLE_ON_BOT = 250.0;
     }
@@ -29,6 +30,7 @@ public class TurretSubsystem implements SubsystemBase{
     private final OpMode opMode;
     private final RobotContainer.Alliance alliance;
     private final Pose2d goalPos;
+    private ElapsedTime loopTimer;
     private String aimbotLine;
     private boolean isTelemetryEnabled = true;
     // ================= CONFIG =================
@@ -81,6 +83,7 @@ public class TurretSubsystem implements SubsystemBase{
         this.currentState = turretState;
         robotPose = pose2d;
         this.goalPos = goalPos;
+        loopTimer = new ElapsedTime();
     }
 
 
@@ -204,6 +207,7 @@ public class TurretSubsystem implements SubsystemBase{
                 break;
             case GOAL_LOCK:
                 targetRobotFrameDeg = computeFieldPointAngle();
+                loopTimer.reset();
                 applyRobotFrameControl(targetRobotFrameDeg);
                 break;
             default:
@@ -228,7 +232,7 @@ public class TurretSubsystem implements SubsystemBase{
             opMode.telemetry.addData("Current TA On Bot", getTurretAngleOnBot());
             opMode.telemetry.addData("Target TA On Bot", targetRobotFrameDeg);
             opMode.telemetry.addLine(aimbotLine);
-            opMode.telemetry.addData("Turret Pose", "X: %.2f, Y: %.2f, H: %.2f", robotPose.position.x, robotPose.position.y, Math.toDegrees(robotPose.heading.toDouble()));
+            opMode.telemetry.addData("Turret velocity", Math.toDegrees(robotVelocity.angVel));
         }
     }
 

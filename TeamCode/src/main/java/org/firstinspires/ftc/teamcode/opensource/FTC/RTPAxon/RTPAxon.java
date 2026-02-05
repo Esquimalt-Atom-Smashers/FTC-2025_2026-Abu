@@ -250,7 +250,7 @@ public class RTPAxon {
     // Get current angle from encoder (in degrees)
     public double getCurrentAngle() {
         if (servoEncoder == null) return 0;
-        return (servoEncoder.getVoltage() / 3.3) * (direction.equals(Direction.REVERSE) ? -360 : 360);
+        return (servoEncoder.getVoltage() / 3.2 * (direction.equals(Direction.REVERSE) ? -360 : 360));
     }
 
     // Check if servo is at target (default tolerance)
