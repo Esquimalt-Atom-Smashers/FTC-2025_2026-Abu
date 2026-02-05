@@ -128,7 +128,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
         // Shooter control
         double targetRPM = motionProfiling();
         flywheelSubsystem.shoot(
-                new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, 0)
+                new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, hoodPosition)
         );
         turretSubsystem.periodic();
 
@@ -138,6 +138,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
         telemetry.addData("hood position", hoodPosition);
         turretSubsystem.addSubsystemTelemetry();
         telemetry.addData("latency (ms)", loopTimer.milliseconds());
+        turretSubsystem.addAxonLog();
 
         loopTimer.reset();
         telemetry.update();

@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -48,6 +49,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     private final DcMotorSimple.Direction FLYWHEEL_DIRECTION = DcMotorSimple.Direction.REVERSE;
     private final DcMotorSimple.Direction SECOND_FLYWHEEL_DIRECTION = DcMotorSimple.Direction.FORWARD;
     public final double RPM_TOLERANCE = Property.TOLERANCE;
+    private final String HOOD_SERVO_NAME = "hoodServo";
     private Servo hoodAngleServo;
 
     private final double TICKS_PER_ROTATION = 28;
@@ -56,6 +58,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     private PIDController flyWheelController;
     private double maxFlywheelPower = 1.0;
     private Pose2d pose2d;
+
 
     //distance to rpm matching table, we are not using hood angle rn
     public static class FlywheelSetting {
@@ -70,14 +73,14 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
 
     private final TreeMap<Double, FlywheelSetting> MATCHING_MAP= new TreeMap<>();
     {
-        MATCHING_MAP.put(30.0 , new FlywheelSetting(3300, 0.5));
-        MATCHING_MAP.put(45.0, new FlywheelSetting(3050, 25));
-        MATCHING_MAP.put(60.0, new FlywheelSetting(3100, 30));
-        MATCHING_MAP.put(75.0, new FlywheelSetting(3100, 30));
-        MATCHING_MAP.put(90.0, new FlywheelSetting(3150, 30));
-        MATCHING_MAP.put(105.0, new FlywheelSetting(3350, 30));
-        MATCHING_MAP.put(120.0, new FlywheelSetting(3550, 30));
-        MATCHING_MAP.put(130.0, new FlywheelSetting(3600, 30));
+        MATCHING_MAP.put(30.0 , new FlywheelSetting(2700, 1.0));
+        MATCHING_MAP.put(45.0, new FlywheelSetting(2800, 0.9));
+        MATCHING_MAP.put(60.0, new FlywheelSetting(2900, 0.8));
+        MATCHING_MAP.put(75.0, new FlywheelSetting(2950, 0.75));
+        MATCHING_MAP.put(90.0, new FlywheelSetting(3000, 0.70));
+        MATCHING_MAP.put(105.0, new FlywheelSetting(3100, 0.70));
+        MATCHING_MAP.put(120.0, new FlywheelSetting(3350, .70));
+        MATCHING_MAP.put(130.0, new FlywheelSetting(3500, .70));
     }
 
     public enum ShooterState{
@@ -109,6 +112,9 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         currentState = state;
         setPose2d(pose2d);
         setFlywheelMotorPower(0);
+
+        hoodAngleServo = opMode.hardwareMap.get(Servo.class, HOOD_SERVO_NAME);
+        hoodAngleServo.setDirection(Servo.Direction.FORWARD); // or REVERSE if needed
     }
 
     public double getFlywheelPower() {
@@ -160,20 +166,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         setFlywheelMotorPower(feedforward + pid);
     }
 
-    /**
-     * Shoots using preconfigured settings based on alliance color & increase feedforward.
-     */
-    public void shoot(RobotContainer.Alliance alliance, Pose2d robotPose) {
-//        Pose2d goalPos;
-//        if (alliance == RobotContainer.Alliance.RED) {
-//            goalPos = RobotContainer.RED_GOAL_POSE;
-//        } else {
-//            goalPos = RobotContainer.BLUE_GOAL_POSE;
-//        }
-//        double distance = Math.sqrt(Math.pow(robotPose.position.x - goalPos.position.x, 2) + Math.pow(robotPose.position.y - goalPos.position.y, 2));
-//        shoot(distanceToFlywheelSetting(distance));
-    }
-
     public void setTargetSetting (FlywheelSetting targetSetting) {
         this.targetSetting = targetSetting;
     }
@@ -209,8 +201,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     public void periodic() {
         if (currentState == ShooterState.DISABLED) {
             shutDownSubsystem();
-        } else if (currentState == ShooterState.AUTO) {
-            shoot(alliance, pose2d);
         } else {
             shoot(targetSetting);
         }
@@ -229,6 +219,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     public void addSubsystemTelemetry() {
         if (isTelemetryEnabled) {
             opMode.telemetry.addData("RPM", "Target: %.2f, Current : %.2f", targetSetting.rpm, getFlywheelRPM());
+            opMode.telemetry.addData("HoodAngle", hoodAngleServo.getPosition());
         }
     }
 

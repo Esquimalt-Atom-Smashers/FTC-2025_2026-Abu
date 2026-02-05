@@ -229,8 +229,11 @@ public class TurretSubsystem implements SubsystemBase{
             opMode.telemetry.addData("Target TA On Bot", targetRobotFrameDeg);
             opMode.telemetry.addLine(aimbotLine);
             opMode.telemetry.addData("Turret Pose", "X: %.2f, Y: %.2f, H: %.2f", robotPose.position.x, robotPose.position.y, Math.toDegrees(robotPose.heading.toDouble()));
-//            opMode.telemetry.addLine(turretServoManager.log());
         }
+    }
+
+    public void addAxonLog() {
+        opMode.telemetry.addLine(turretServoManager.log());
     }
 
     /**
