@@ -20,6 +20,7 @@ public class RTPAxon {
         public double D = 0.0;
         public double testSteps = 1;
         public double DEAD_ZONE = 0.005;
+        public double maxPower = 1.0;
     }
     public static Params PARAMS = new Params();
     ;
@@ -124,7 +125,7 @@ public class RTPAxon {
         pidTimer = new ElapsedTime();
         pidTimer.reset();
 
-        maxPower = 0.25;
+        maxPower = PARAMS.maxPower;
         cliffs = 0;
     }
     // endregion
@@ -242,9 +243,9 @@ public class RTPAxon {
     }
 
     // Set target rotation and reset PID
-    public void setTargetRotation(double target) {
+    public void setTargetRotation(double target, boolean isResettingPID) {
         targetRotation = target;
-        resetPID();
+        if (isResettingPID) resetPID();
     }
 
     // Get current angle from encoder (in degrees)
@@ -283,7 +284,7 @@ public class RTPAxon {
     }
 
     // Main update loop: updates rotation, computes PID, applies power
-    public synchronized void update() {
+    public synchronized void update(double feedForwardPower) {
         double currentAngle = getCurrentAngle();
         double angleDifference = currentAngle - previousAngle;
 
@@ -336,7 +337,7 @@ public class RTPAxon {
         // Deadzone for output
         final double DEADZONE = PARAMS.DEAD_ZONE;
         if (Math.abs(error) > DEADZONE) {
-            double power = Math.min(maxPower, Math.abs(output)) * Math.signum(output);
+            double power = Math.min(maxPower, Math.abs(output + feedForwardPower)) * Math.signum(output);
             setPower(power);
         } else {
             setPower(0);
@@ -382,7 +383,7 @@ public class RTPAxon {
             waitForStart();
 
             while (!isStopRequested()) {
-                servo.update();
+                servo.update(0);
 
                 // Manual controls for target and PID tuning
                 if (gamepad1.dpad_up && !prevUp) {
@@ -395,7 +396,7 @@ public class RTPAxon {
                 prevUp = gamepad1.dpad_up;
                 prevDown = gamepad1.dpad_down;
                 if (gamepad1.a) {
-                    servo.setTargetRotation(0);
+                    servo.setTargetRotation(0, false);
                 }
 
                 if (gamepad1.y) {

@@ -19,9 +19,12 @@ public class TurretSubsystem implements SubsystemBase{
         public double turretD = 0.000000005;
         public double testSteps = 1;
         public double DEAD_ZONE = 0.005;
+        public double maxPower = 1.0;
         public double SERVO_TO_TURRET_GEAR_RATIO = 2;
-        public double kRobotMovementComp = 0;
+        public double kLeadGainSeconds = 0;
         public double kRobotRotationComp = -1;
+        public double kCoilFFComp = 0.01;
+        public double START_ANGLE_COIL_FF_COMP = 90.0;
         public double MIN_ANGLE_ON_BOT = -340.0;
         public double MAX_ANGLE_ON_BOT = 250.0;
     }
@@ -42,6 +45,7 @@ public class TurretSubsystem implements SubsystemBase{
         TURRET_PARAMS.D = PARAMS.turretD;
         TURRET_PARAMS.testSteps = PARAMS.testSteps;
         TURRET_PARAMS.DEAD_ZONE = PARAMS.DEAD_ZONE;
+        TURRET_PARAMS.maxPower = PARAMS.maxPower;
     }
 
     // Encoder calibration
@@ -49,7 +53,7 @@ public class TurretSubsystem implements SubsystemBase{
     private static final double ENCODER_ZERO_OFFSET_DEG = 0.0; // absolute encoder zero align
 
     // Feedforward gain for rotation compensation
-    private double kRobotMovementComp = PARAMS.kRobotMovementComp; // tune if drivetrain model is bad
+    private double kLeadGainSeconds = PARAMS.kLeadGainSeconds; // tune if drivetrain model is bad
     private double kRobotRotationComp = PARAMS.kRobotRotationComp;
 
     // ================= HARDWARE =================
@@ -61,7 +65,7 @@ public class TurretSubsystem implements SubsystemBase{
     // ================= STATE =================
     private Pose2d robotPose;
     private PoseVelocity2d robotVelocity;
-    private double lastFieldAngle = Double.NaN;
+    private double lastFieldAngleStored = Double.NaN;
 
     // ================= Subsystem State =================
     public enum TurretState {
@@ -110,9 +114,15 @@ public class TurretSubsystem implements SubsystemBase{
     }
 
     // ================= CONTROL =================
-    private void applyRobotFrameControl(double targetRobotFrameDeg){
+    private void applyRobotFrameControl(double targetRobotFrameDeg, boolean isResettingPID) {
         // --- Position target ---
-        turretServoManager.setTargetRotation(targetRobotFrameDeg * SERVO_TO_TURRET_GEAR_RATIO);
+        turretServoManager.setTargetRotation(targetRobotFrameDeg * SERVO_TO_TURRET_GEAR_RATIO, isResettingPID);
+    }
+
+    private double getFeedForwardPower() {
+        double turnFeedforward = robotVelocity.angVel * loopTimer.seconds() * -kRobotRotationComp;
+        double wireCoilFeedforward = (robotPose.heading.toDouble() >= PARAMS.START_ANGLE_COIL_FF_COMP)? PARAMS.kCoilFFComp : 0;
+        return  turnFeedforward + wireCoilFeedforward;
     }
 
     // ================= GEOMETRY =================
@@ -120,21 +130,26 @@ public class TurretSubsystem implements SubsystemBase{
     private double computeFieldPointAngle(){
         double dx = goalPos.position.x - robotPose.position.x;
         double dy = goalPos.position.y - robotPose.position.y;
-        double d = Math.sqrt((dy * dy) + (dx * dx));
-        // Field frame angle
-        double fieldAngle = Math.atan2(dy, dx);
-        double lastLoopFieldAngle = lastFieldAngle;
-        lastFieldAngle = fieldAngle;
-        // Convert to robot frame
-        double robotFrameAngle = fieldAngle - robotPose.heading.toDouble();
-        aimbotLine = "goal target heading: " + Math.toDegrees(fieldAngle);
+//        double distance = Math.sqrt((dy * dy) + (dx * dx));
+        
+        // Field frame angle to target (rad)
+        double currentFieldAngle = Math.atan2(dy, dx);
+        double lastLoopFieldAngle = lastFieldAngleStored;
+        lastFieldAngleStored = currentFieldAngle;
+        double robotFrameAngle = currentFieldAngle - robotPose.heading.toDouble();
+
         if (Double.isNaN(lastLoopFieldAngle)) {
             return findBestAngle(Math.toDegrees(robotFrameAngle));
-        } else {
-            return findBestAngle(Math.toDegrees(robotFrameAngle
-                    + (fieldAngle - lastLoopFieldAngle) * (d / kRobotMovementComp)
-                    + robotVelocity.angVel * loopTimer.seconds() * -kRobotRotationComp));
         }
+        
+        //shoot on the move compensation
+        double leadAngle = ((currentFieldAngle - lastLoopFieldAngle) / loopTimer.seconds()) * kLeadGainSeconds;
+        double predictedFieldAngle = currentFieldAngle + leadAngle;
+        double robotFrame = predictedFieldAngle - robotPose.heading.toDouble();
+
+        //wire coil feedforward
+        aimbotLine = "goal target heading: " + Math.toDegrees(robotFrame);
+        return findBestAngle(Math.toDegrees(robotFrame));
     }
 
     private double findBestAngle(double angleDeg) {
@@ -192,7 +207,7 @@ public class TurretSubsystem implements SubsystemBase{
         return targetRobotFrameDeg;
     }
     public void setHeadingCompGain(double k){
-        this.kRobotMovementComp = k;
+        this.kLeadGainSeconds = k;
     }
     //
     /**
@@ -206,17 +221,18 @@ public class TurretSubsystem implements SubsystemBase{
         }
         switch(currentState){
             case ROBOT_FRAME_LOCK:
-                applyRobotFrameControl(targetRobotFrameDeg);
+                applyRobotFrameControl(targetRobotFrameDeg, false);
                 break;
             case GOAL_LOCK:
                 targetRobotFrameDeg = computeFieldPointAngle();
-                loopTimer.reset();
-                applyRobotFrameControl(targetRobotFrameDeg);
+                applyRobotFrameControl(targetRobotFrameDeg, false);
                 break;
             default:
                 return;
         }
-        turretServoManager.update();
+        double ffPower = getFeedForwardPower();
+        loopTimer.reset();
+        turretServoManager.update(ffPower);
     }
 
     /**
