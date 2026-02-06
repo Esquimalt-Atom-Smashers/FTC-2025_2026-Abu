@@ -33,10 +33,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         public double P = Property.P;
         public double I = 0;
         public double D = 0;
-        public double turretP = 0.0;
-        public double turretI = 0.0;
-        public double turretD = 0.0;
-        public double turretKS = 0.0;
     }
     public static Params PARAMS = new Params();
     private OpMode opMode;

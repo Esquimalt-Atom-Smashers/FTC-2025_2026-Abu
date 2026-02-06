@@ -120,6 +120,7 @@ public class TurretSubsystem implements SubsystemBase{
     private double computeFieldPointAngle(){
         double dx = goalPos.position.x - robotPose.position.x;
         double dy = goalPos.position.y - robotPose.position.y;
+        double d = Math.sqrt((dy * dy) + (dx * dx));
         // Field frame angle
         double fieldAngle = Math.atan2(dy, dx);
         double lastLoopFieldAngle = lastFieldAngle;
@@ -130,7 +131,9 @@ public class TurretSubsystem implements SubsystemBase{
         if (Double.isNaN(lastLoopFieldAngle)) {
             return findBestAngle(Math.toDegrees(robotFrameAngle));
         } else {
-            return findBestAngle(Math.toDegrees(robotFrameAngle + (fieldAngle - lastLoopFieldAngle) * -kRobotMovementComp + robotVelocity.angVel * -kRobotRotationComp));
+            return findBestAngle(Math.toDegrees(robotFrameAngle
+                    + (fieldAngle - lastLoopFieldAngle) * (d / kRobotMovementComp)
+                    + robotVelocity.angVel * loopTimer.seconds() * -kRobotRotationComp));
         }
     }
 
