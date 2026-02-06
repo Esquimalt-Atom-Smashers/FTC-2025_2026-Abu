@@ -25,7 +25,10 @@ public class RedDegAdjTeleOp extends LinearOpMode {
     double targetRpm;
     TwoMotorShooterSubsystem.FlywheelSetting flywheelSetting = new TwoMotorShooterSubsystem.FlywheelSetting(targetRpm, 0);
     boolean isLeftDpadPressed = false;
-    boolean isRightDpadPressed = false;  
+    boolean isRightDpadPressed = false;
+    boolean intakeToggle = false;
+    boolean prevLeftBumper = false;
+
     @Override
     public void runOpMode() throws InterruptedException {
         RobotPropertyParser.loadTeleOp();
@@ -64,13 +67,21 @@ public class RedDegAdjTeleOp extends LinearOpMode {
                 robotContainer.updatePoseFromVision(true);
             }
 
-            //shooting && intake control
+            // toggle logic
+            if (gamepad1.left_bumper && !prevLeftBumper) {
+                intakeToggle = !intakeToggle;
+            }
+            prevLeftBumper = gamepad1.left_bumper;
+
+            // shooting && intake control
             if (gamepad1.right_trigger >= 0.3) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
             } else if (gamepad1.right_bumper) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.EJECTING);
-            } else {
+            } else if (intakeToggle) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
+            } else {
+                robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.DISABLED);
             }
 
             //flywheel control

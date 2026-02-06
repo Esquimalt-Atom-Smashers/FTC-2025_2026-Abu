@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 @Config
 public class TurretSubsystem implements SubsystemBase{
     public static class Params {
-        public double turretP = 0.011;
+        public double turretP = 0.0075;
         public double turretI = 0.0;
         public double turretD = 0.000000005;
         public double testSteps = 1;
