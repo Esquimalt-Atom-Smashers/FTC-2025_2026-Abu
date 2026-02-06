@@ -145,12 +145,21 @@ public final class PropertyDefaults {
 
     public static volatile double SHOOTING_SECONDS = 5.0;
 
-    public static volatile double THIRTY_INCH_RPM = 3300;
-    public static volatile double FORTY_FIVE_INCH_RPM = 3050;
-    public static volatile double SIXTY_INCH_RPM = 3100;
-    public static volatile double SEVENTY_FIVE_INCH_RPM = 3100;
-    public static volatile double NINETY_INCH_RPM = 3150;
-    public static volatile double ONE_HUNDRED_FIVE_INCH_RPM = 3350;
+    public static volatile double THIRTY_INCH_RPM = 2700;
+    public static volatile double FORTY_FIVE_INCH_RPM = 2800;
+    public static volatile double SIXTY_INCH_RPM = 2900;
+    public static volatile double SEVENTY_FIVE_INCH_RPM = 2950;
+    public static volatile double NINETY_INCH_RPM = 3000;
+    public static volatile double ONE_HUNDRED_FIVE_INCH_RPM = 3100;
     public static volatile double ONE_HUNDRED_TWENTY_INCH_RPM = 3350;
-    public static volatile double ONE_HUNDRED_THIRTY_INCH_RPM = 3400;
+    public static volatile double ONE_HUNDRED_THIRTY_INCH_RPM = 3500;
+
+    public static volatile double THIRTY_INCH_HOOD_ANGLE = 1.0;
+    public static volatile double FORTY_FIVE_INCH_HOOD_ANGLE = 0.9;
+    public static volatile double SIXTY_INCH_HOOD_ANGLE = 0.8;
+    public static volatile double SEVENTY_FIVE_INCH_HOOD_ANGLE = 0.75;
+    public static volatile double NINETY_INCH_HOOD_ANGLE = 0.70;
+    public static volatile double ONE_HUNDRED_FIVE_INCH_HOOD_ANGLE = 0.70;
+    public static volatile double ONE_HUNDRED_TWENTY_INCH_HOOD_ANGLE = 0.70;
+    public static volatile double ONE_HUNDRED_THIRTY_INCH_HOOD_ANGLE = 0.70;
 }

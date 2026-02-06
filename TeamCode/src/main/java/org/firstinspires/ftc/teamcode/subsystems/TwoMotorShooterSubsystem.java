@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon.Direction.FORWARD;
+import static org.firstinspires.ftc.teamcode.utilities.Property.*;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -73,14 +74,14 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
 
     private final TreeMap<Double, FlywheelSetting> MATCHING_MAP= new TreeMap<>();
     {
-        MATCHING_MAP.put(30.0 , new FlywheelSetting(2700, 1.0));
-        MATCHING_MAP.put(45.0, new FlywheelSetting(2800, 0.9));
-        MATCHING_MAP.put(60.0, new FlywheelSetting(2900, 0.8));
-        MATCHING_MAP.put(75.0, new FlywheelSetting(2950, 0.75));
-        MATCHING_MAP.put(90.0, new FlywheelSetting(3000, 0.70));
-        MATCHING_MAP.put(105.0, new FlywheelSetting(3100, 0.70));
-        MATCHING_MAP.put(120.0, new FlywheelSetting(3350, .70));
-        MATCHING_MAP.put(130.0, new FlywheelSetting(3500, .70));
+        MATCHING_MAP.put(30.0 , new FlywheelSetting(Property.THIRTY_INCH_RPM, THIRTY_INCH_HOOD_ANGLE));
+        MATCHING_MAP.put(45.0, new FlywheelSetting(Property.FORTY_FIVE_INCH_RPM, FORTY_FIVE_INCH_HOOD_ANGLE));
+        MATCHING_MAP.put(60.0, new FlywheelSetting(Property.SIXTY_INCH_RPM, SIXTY_INCH_HOOD_ANGLE));
+        MATCHING_MAP.put(75.0, new FlywheelSetting(Property.SEVENTY_FIVE_INCH_RPM, SEVENTY_FIVE_INCH_HOOD_ANGLE));
+        MATCHING_MAP.put(90.0, new FlywheelSetting(Property.NINETY_INCH_RPM, NINETY_INCH_HOOD_ANGLE));
+        MATCHING_MAP.put(105.0, new FlywheelSetting(Property.ONE_HUNDRED_FIVE_INCH_RPM, ONE_HUNDRED_FIVE_INCH_HOOD_ANGLE));
+        MATCHING_MAP.put(120.0, new FlywheelSetting(Property.ONE_HUNDRED_TWENTY_INCH_RPM, ONE_HUNDRED_TWENTY_INCH_HOOD_ANGLE));
+        MATCHING_MAP.put(130.0, new FlywheelSetting(Property.ONE_HUNDRED_THIRTY_INCH_RPM, ONE_HUNDRED_THIRTY_INCH_HOOD_ANGLE));
     }
 
     public enum ShooterState{
