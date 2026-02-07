@@ -30,6 +30,8 @@ public class TwoMotorFlywheelTuner extends OpMode {
         public double feedPower = 1;
         public double notFeedPower = 0;
         public double testSteps = 1;
+        public double dPadUpDeg = 260;
+        public double dPadDownDeg = 100;
         //max servo number 0.93
         //min servo num 0.27
     }
@@ -103,9 +105,9 @@ public class TwoMotorFlywheelTuner extends OpMode {
         prevUp = gamepad1.x;
         prevDown = gamepad1.b;
         if (gamepad1.dpad_up) {
-            turretSubsystem.lockRobotFrame(400);
+            turretSubsystem.lockRobotFrame(PARAMS.dPadUpDeg);
         } else if (gamepad1.dpad_down) {
-            turretSubsystem.lockRobotFrame(-90);
+            turretSubsystem.lockRobotFrame(PARAMS.dPadDownDeg);
         }
 
         // Feed control
