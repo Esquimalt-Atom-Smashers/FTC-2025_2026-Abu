@@ -22,8 +22,9 @@ public class TurretSubsystem implements SubsystemBase{
         public double maxPower = 1.0;
         public double SERVO_TO_TURRET_GEAR_RATIO = 2;
         public double kLeadGainSeconds = 0;
-        public double kRobotRotationComp = 0;
-        public double kCoilFFComp = 0.095;
+        public double kVRobotRotation = 0;
+        public double kSCoilFFComp = 0.095;
+        public double kSTurretRing = 0.0;
         public double START_ANGLE_COIL_FF_COMP = 45.0;
         public double MIN_ANGLE_ON_BOT = -340.0;
         public double MAX_ANGLE_ON_BOT = 250.0;
@@ -54,7 +55,7 @@ public class TurretSubsystem implements SubsystemBase{
 
     // Feedforward gain for rotation compensation
     private double kLeadGainSeconds = PARAMS.kLeadGainSeconds; // tune if drivetrain model is bad
-    private double kRobotRotationComp = PARAMS.kRobotRotationComp;
+    private double kVRobotRotation = PARAMS.kVRobotRotation;
 
     // ================= HARDWARE =================
     private RTPAxon turretServoManager;// closed-loop controller
@@ -114,10 +115,11 @@ public class TurretSubsystem implements SubsystemBase{
     }
 
     // ================= CONTROL =================
-    private double getFeedForwardPower() {
-        double turnFeedforward = robotVelocity.angVel * loopTimer.seconds() * -kRobotRotationComp;
-        double wireCoilFeedforward = (getTurretAngleOnBot() >= PARAMS.START_ANGLE_COIL_FF_COMP)? PARAMS.kCoilFFComp : 0;
-        return  turnFeedforward + wireCoilFeedforward;
+    private double getFeedForwardPower(boolean isTurningRight) {
+        int turningDirection = isTurningRight? 1: -1;
+        double turnFeedforward = robotVelocity.angVel * -kVRobotRotation;
+        double wireCoilFeedforward = (getTurretAngleOnBot() >= PARAMS.START_ANGLE_COIL_FF_COMP)? PARAMS.kSCoilFFComp : 0;
+        return PARAMS.kSTurretRing * turningDirection + turnFeedforward + wireCoilFeedforward;
     }
 
     // ================= GEOMETRY =================
@@ -224,7 +226,7 @@ public class TurretSubsystem implements SubsystemBase{
             default:
                 return;
         }
-        double ffPower = getFeedForwardPower();
+        double ffPower = getFeedForwardPower((targetRobotFrameDeg - getTurretAngleOnBot()) >= 0);
         loopTimer.reset();
         turretServoManager.update(ffPower);
     }
