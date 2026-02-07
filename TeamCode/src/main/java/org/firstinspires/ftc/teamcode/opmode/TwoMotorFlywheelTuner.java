@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -130,6 +132,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
         flywheelSubsystem.shoot(
                 new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, hoodPosition)
         );
+        turretSubsystem.updateRobotPose(new Pose2d(0,0,0), new PoseVelocity2d(new Vector2d(0,0),0));
         turretSubsystem.periodic();
 
         // Telemetry

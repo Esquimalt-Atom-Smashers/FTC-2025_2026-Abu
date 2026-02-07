@@ -318,7 +318,7 @@ public class RTPAxon {
         integralSum = Math.max(-maxIntegralSum, Math.min(maxIntegralSum, integralSum));
 
         // Integral wind-down in deadzone
-        final double INTEGRAL_DEADZONE = 2.0;
+        final double INTEGRAL_DEADZONE = PARAMS.DEAD_ZONE + 2.0;
         if (Math.abs(error) < INTEGRAL_DEADZONE) {
             integralSum *= 0.95;
         }
@@ -337,7 +337,7 @@ public class RTPAxon {
         // Deadzone for output
         final double DEADZONE = PARAMS.DEAD_ZONE;
         if (Math.abs(error) > DEADZONE) {
-            double power = Math.min(maxPower, Math.abs(output + feedForwardPower)) * Math.signum(output);
+            double power = Math.min(maxPower, Math.abs(output) + feedForwardPower) * Math.signum(output);
             setPower(power);
         } else {
             setPower(0);
