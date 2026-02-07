@@ -115,7 +115,7 @@ public class TurretSubsystem implements SubsystemBase {
         double robotFrameAngle = currentTargetAngleFC - robotPose.heading.toDouble();
 
         if (Double.isNaN(lastLoopFieldAngle)) {
-            return angleToServoPos(Math.toDegrees(robotFrameAngle));
+            return Math.toDegrees(robotFrameAngle);
         }
 
         double leadAngle =
@@ -126,7 +126,7 @@ public class TurretSubsystem implements SubsystemBase {
         double robotFrame = predictedFieldAngle - robotPose.heading.toDouble();
 
         aimbotLine = "goal target heading: " + Math.toDegrees(robotFrame);
-        return angleToServoPos(Math.toDegrees(robotFrame));
+        return Math.toDegrees(robotFrame);
     }
 
 //    private double findBestTurretAngle(double robotCentricTargetAngle) {
