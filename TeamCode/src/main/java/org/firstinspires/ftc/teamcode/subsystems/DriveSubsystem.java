@@ -21,6 +21,73 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
  *
  * This class currently contains only structure and documentation.
  */
+//test code:
+//// joystick input
+//double joyX = gamepad1.left_stick_x;   // strafe
+//double joyY = -gamepad1.left_stick_y;  // forward
+//double joyW = gamepad1.right_stick_x;  // rotate
+//
+//// robot limits
+//double maxV = 2.0;        // m/s
+//double maxOmega = 4.0;    // rad/s
+//double maxAccel = 1.5;    // m/s^2
+//double maxAngAccel = 3.0; // rad/s^2
+//double dt = loopTimer.seconds();
+//
+//// target robot-frame velocities
+//double targetVx = joyX * maxV;
+//double targetVy = joyY * maxV;
+//double targetW  = joyW * maxOmega;
+//
+//// accel limit vx
+//double dvx = targetVx - currentVx;
+//double maxDvx = maxAccel * dt;
+//dvx = Math.max(-maxDvx, Math.min(maxDvx, dvx));
+//double limitedVx = currentVx + dvx;
+//
+//// accel limit vy
+//double dvy = targetVy - currentVy;
+//double maxDvy = maxAccel * dt;
+//dvy = Math.max(-maxDvy, Math.min(maxDvy, dvy));
+//double limitedVy = currentVy + dvy;
+//
+//// accel limit omega
+//double dw = targetW - currentW;
+//double maxDw = maxAngAccel * dt;
+//dw = Math.max(-maxDw, Math.min(maxDw, dw));
+//double limitedW = currentW + dw;
+//
+//// mecanum inverse kinematics
+//double L = robotLength;  // meters
+//double W = robotWidth;   // meters
+//double R = wheelRadius;  // meters
+//double k = (L + W);
+//
+//// wheel linear velocities (m/s)
+//double vFL = limitedVy + limitedVx - limitedW * k;
+//double vFR = limitedVy - limitedVx + limitedW * k;
+//double vBL = limitedVy - limitedVx - limitedW * k;
+//double vBR = limitedVy + limitedVx + limitedW * k;
+//
+//// normalize to power
+//double maxWheelVel = maxV + maxOmega * k; // rough bound
+//double pFL = vFL / maxWheelVel;
+//double pFR = vFR / maxWheelVel;
+//double pBL = vBL / maxWheelVel;
+//double pBR = vBR / maxWheelVel;
+//
+//// optional clamp
+//pFL = Math.max(-1, Math.min(1, pFL));
+//pFR = Math.max(-1, Math.min(1, pFR));
+//pBL = Math.max(-1, Math.min(1, pBL));
+//pBR = Math.max(-1, Math.min(1, pBR));
+//
+//// apply
+//frontLeft.setPower(pFL);
+//frontRight.setPower(pFR);
+//backLeft.setPower(pBL);
+//backRight.setPower(pBR);
+
 @Config
 public class DriveSubsystem implements SubsystemBase {
 
