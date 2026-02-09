@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmode.autos;
 
-import static org.firstinspires.ftc.teamcode.utilities.Property.*;
-
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,7 +17,6 @@ import org.firstinspires.ftc.teamcode.utilities.AutoActions;
 import org.firstinspires.ftc.teamcode.utilities.AutoCommandInterpreter;
 import org.firstinspires.ftc.teamcode.utilities.Property;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
-import org.firstinspires.ftc.teamcode.utilities.RobotContainer.*;
 import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 
 import java.util.ArrayList;
@@ -50,6 +45,7 @@ public class AutoFromTextFile extends LinearOpMode {
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.TRACKING_GOAL);
         AutoActions autoActions = new AutoActions(robotContainer);
+        interpreter.readAutoCommends(autoActions);
 
         //cycle through the actions to add them to the roadrunner action array
         actionList = interpreter.getActionList();

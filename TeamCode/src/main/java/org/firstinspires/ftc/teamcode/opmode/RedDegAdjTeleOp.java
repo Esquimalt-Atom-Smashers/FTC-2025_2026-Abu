@@ -2,9 +2,12 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
@@ -35,7 +38,8 @@ public class RedDegAdjTeleOp extends LinearOpMode {
         startingPose = new Pose2d(Property.TELEOP_DEFAULT_STARTING_POS_X, Property.TELEOP_DEFAULT_STARTING_POS_Y, Math.toRadians(Property.TELEOP_DEFAULT_STARTING_POS_HEADING));
         targetRpm = Property.CLOSE_SHOOT_RPM;
         if (RobotPositionHolder.hasData()) {
-            startingPose = new Pose2d(RobotPositionHolder.getX(), RobotPositionHolder.getY(), RobotPositionHolder.getHeading());
+            GoBildaPinpointDriver pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+            startingPose = new Pose2d(pinpoint.getPosX(DistanceUnit.INCH), pinpoint.getPosY(DistanceUnit.INCH), pinpoint.getHeading(AngleUnit.RADIANS));
         }
         robotContainer = new RobotContainer(this,
                 startingPose,
@@ -46,9 +50,6 @@ public class RedDegAdjTeleOp extends LinearOpMode {
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.TRACKING_GOAL);
         robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(90));
-        if (RobotPositionHolder.hasData()) {
-            RobotPositionHolder.markReceived();
-        }
         waitForStart();
         while (opModeIsActive()) {
             boolean forceReset = false;
