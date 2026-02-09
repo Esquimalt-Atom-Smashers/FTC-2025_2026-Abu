@@ -16,9 +16,6 @@ public class TurretSubsystem implements SubsystemBase {
     public static class Params {
         public double kLeadGainSeconds = 0;
         public double kVRobotRotation = 0;
-        public double kSCoilFFComp = 0.095;
-        public double kSTurretRing = 0.0;
-        public double START_ANGLE_COIL_FF_COMP = 45.0;
 
         public double SERVO_MIN_POS = 0.0;
         public double SERVO_MAX_POS = 1.0;
@@ -93,16 +90,6 @@ public class TurretSubsystem implements SubsystemBase {
         currentState = TurretState.IDLE;
     }
 
-    // ================= FEEDFORWARD (LOGIC RETAINED, NOT USED) =================
-    private double getFeedForwardPower(boolean isTurningRight) {
-        int turningDirection = isTurningRight ? 1 : -1;
-        double turnFeedforward = robotVelocity.angVel * -PARAMS.kVRobotRotation;
-        double wireCoilFeedforward =
-                (getTurretAngleOnBot() >= PARAMS.START_ANGLE_COIL_FF_COMP)
-                        ? PARAMS.kSCoilFFComp : 0;
-        return PARAMS.kSTurretRing * turningDirection + turnFeedforward + wireCoilFeedforward;
-    }
-
     // ================= GEOMETRY =================
     private double computeFieldPointAngle(){
         double dx = goalPos.position.x - robotPose.position.x;
@@ -118,9 +105,7 @@ public class TurretSubsystem implements SubsystemBase {
             return Math.toDegrees(robotFrameAngle);
         }
 
-        double leadAngle =
-                ((currentTargetAngleFC - lastLoopFieldAngle) / loopTimer.seconds())
-                        * PARAMS.kLeadGainSeconds;
+        double leadAngle = getPredictedTransRotation(Math.hypot(dy, dx));
 
         double predictedFieldAngle = currentTargetAngleFC + leadAngle;
         double robotFrame = predictedFieldAngle - robotPose.heading.toDouble();
@@ -128,6 +113,35 @@ public class TurretSubsystem implements SubsystemBase {
         aimbotLine = "goal target heading: " + Math.toDegrees(robotFrame);
         return Math.toDegrees(robotFrame);
     }
+
+    private double getPredictedTransRotation(double distance){
+
+        double dx = goalPos.position.x - robotPose.position.x;
+        double dy = goalPos.position.y - robotPose.position.y;
+
+        double fieldAngleNow = Math.atan2(dy, dx);
+
+        double lastFieldAngle = lastTargetAngleStoredFC;
+        lastTargetAngleStoredFC = fieldAngleNow;
+
+        if (Double.isNaN(lastFieldAngle)) {
+            return 0.0;
+        }
+
+        double dt = loopTimer.seconds();
+        if (dt <= 1e-4) dt = 1e-4;
+
+        // field-frame angular velocity caused by translation / pushing
+        double fieldAngleRate = (fieldAngleNow - lastFieldAngle) / dt;
+
+        // empirical projectile flight time
+        double flightTime = distance * PARAMS.kLeadGainSeconds;
+        double predictedRobotRotation = robotVelocity.angVel * flightTime * PARAMS.kVRobotRotation;
+
+        // predicted angular offset in FIELD frame
+        return (fieldAngleRate * flightTime) + predictedRobotRotation;
+    }
+
 
 //    private double findBestTurretAngle(double robotCentricTargetAngle) {
 //        double currentTurretAngle = getTurretAngleOnBot();
