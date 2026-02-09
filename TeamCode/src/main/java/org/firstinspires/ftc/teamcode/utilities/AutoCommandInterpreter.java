@@ -6,15 +6,12 @@ import static org.firstinspires.ftc.teamcode.utilities.Property.BLUE_CLOSE_Y;
 import static org.firstinspires.ftc.teamcode.utilities.Property.BLUE_FAR_HEADING;
 import static org.firstinspires.ftc.teamcode.utilities.Property.BLUE_FAR_X;
 import static org.firstinspires.ftc.teamcode.utilities.Property.BLUE_FAR_Y;
-import static org.firstinspires.ftc.teamcode.utilities.Property.CLOSE_SHOOT_RPM;
-import static org.firstinspires.ftc.teamcode.utilities.Property.FAR_SHOOT_RPM;
 import static org.firstinspires.ftc.teamcode.utilities.Property.RED_CLOSE_HEADING;
 import static org.firstinspires.ftc.teamcode.utilities.Property.RED_CLOSE_X;
 import static org.firstinspires.ftc.teamcode.utilities.Property.RED_CLOSE_Y;
 import static org.firstinspires.ftc.teamcode.utilities.Property.RED_FAR_HEADING;
 import static org.firstinspires.ftc.teamcode.utilities.Property.RED_FAR_X;
 import static org.firstinspires.ftc.teamcode.utilities.Property.RED_FAR_Y;
-import static org.firstinspires.ftc.teamcode.utilities.Property.SHOOTING_SECONDS;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -82,22 +79,18 @@ public class AutoCommandInterpreter {
             switch (action) {
                 case "RED.FAR.SHOOT":
                     actionList.add(autoActions.redFarShootAction());
-                    actionList.add(autoActions.shootArtifactAction(FAR_SHOOT_RPM, SHOOTING_SECONDS));
                     autoCommendTelemetry.add("RED.FAR.SHOOT");
                     break;
                 case "RED.CLOSE.SHOOT":
                     actionList.add(autoActions.redCloseShootAction());
-                    actionList.add(autoActions.shootArtifactAction(CLOSE_SHOOT_RPM, SHOOTING_SECONDS));
                     autoCommendTelemetry.add("RED.CLOSE.SHOOT");
                     break;
                 case "BLUE.FAR.SHOOT":
                     actionList.add(autoActions.blueFarShootAction());
-                    actionList.add(autoActions.shootArtifactAction(FAR_SHOOT_RPM, SHOOTING_SECONDS));
                     autoCommendTelemetry.add("BLUE.FAR.SHOOT");
                     break;
                 case "BLUE.CLOSE.SHOOT":
                     actionList.add(autoActions.blueCloseShootAction());
-                    actionList.add(autoActions.shootArtifactAction(CLOSE_SHOOT_RPM, SHOOTING_SECONDS));
                     autoCommendTelemetry.add("BLUE.CLOSE.SHOOT");
                     break;
                 case "RED.FIRST.INTAKE":
@@ -112,6 +105,9 @@ public class AutoCommandInterpreter {
                     actionList.add(autoActions.redThirdIntakeAction());
                     autoCommendTelemetry.add("RED.THIRD.INTAKE");
                     break;
+                case "RED.OPEN.GATE":
+                    actionList.add(autoActions.redOpenGateAction());
+                    autoCommendTelemetry.add("RED.OPEN.GATE");
                 case "RED.GATE.INTAKE":
                     actionList.add(autoActions.redGateIntakeAction());
                     autoCommendTelemetry.add("RED.GATE.INTAKE");
@@ -132,6 +128,9 @@ public class AutoCommandInterpreter {
                     actionList.add(autoActions.blueThirdIntakeAction());
                     autoCommendTelemetry.add("BLUE.THIRD.INTAKE");
                     break;
+                case "BLUE.OPEN.GATE":
+                    actionList.add(autoActions.blueOpenGateAction());
+                    autoCommendTelemetry.add("BLUE.OPEN.GATE");
                 case "BLUE.GATE.INTAKE":
                     actionList.add(autoActions.blueGateIntakeAction());
                     autoCommendTelemetry.add("BLUE.GATE.INTAKE");
