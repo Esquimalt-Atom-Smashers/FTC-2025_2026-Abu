@@ -277,6 +277,19 @@ public class DriveSubsystem implements SubsystemBase {
         return driveDistanceEstimate;
     }
 
+    public boolean isWithinTolerance(Pose2d targetPose, double positionalTolerance, double angularToleranceRad) {
+        Pose2d pose = getPose(); // use the return value
+
+        double dx = targetPose.position.x - pose.position.x;
+        double dy = targetPose.position.y - pose.position.y;
+        double distance = Math.hypot(dx, dy);
+
+        double dTheta = targetPose.heading.toDouble() - pose.heading.toDouble();
+        dTheta = Math.atan2(Math.sin(dTheta), Math.cos(dTheta)); // normalize to [-pi, pi]
+
+        return distance <= positionalTolerance && Math.abs(dTheta) <= angularToleranceRad;
+    }
+
     public MecanumDrive getMecanumDrive() {
         return mecanumDrive;
     }

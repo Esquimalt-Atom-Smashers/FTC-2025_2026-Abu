@@ -144,6 +144,8 @@ public final class PropertyDefaults {
     public static volatile double P = 0.005;
 
     public static volatile double SHOOTING_SECONDS = 5.0;
+    public static volatile double SHOOTING_POSITIONAL_TOLERANCE = 5.0;
+    public static volatile double SHOOTING_HEADING_TOLERANCE = 5.0;
 
     public static volatile double THIRTY_INCH_RPM = 2700;
     public static volatile double FORTY_FIVE_INCH_RPM = 2800;

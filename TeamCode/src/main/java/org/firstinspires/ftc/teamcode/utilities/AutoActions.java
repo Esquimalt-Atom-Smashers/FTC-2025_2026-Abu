@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -48,18 +49,45 @@ public class AutoActions {
      *      public Action ___() {return new___()} //lower case at start
     */
     //    =================================RED SHOOTING ACTIONS==========================================
-    public class RedFarShootAction implements Action{
+    public class ShootAction implements Action {
         public Action path;
+        public Action shootingAction;
         public boolean firstRun = true;
+        public boolean pathNotCompleted = true;
+        public boolean shootingNotCompleted = true;
+        public Vector2d position;
+        public double headingRad;
 
+        public ShootAction(Vector2d position, double headingDegree) {
+            this.position = position;
+            this.headingRad = Math.toRadians(headingDegree);
+        }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                        strafeToLinearHeading(new Vector2d(RED_FAR_SHOOT_X, RED_FAR_SHOOT_Y), Math.toRadians(RED_FAR_SHOOT_HEADING)).build();
+                        strafeToLinearHeading(position, headingRad).build();
+                shootingAction = shootArtifactAction(SHOOTING_SECONDS);
                 firstRun = false;
             }
-            return path.run(telemetryPacket);
+            if (pathNotCompleted) {
+                pathNotCompleted = path.run(telemetryPacket);
+            }
+            if (drivebase.isWithinTolerance(new Pose2d(position.x, position.y, headingRad), SHOOTING_POSITIONAL_TOLERANCE, Math.toRadians(SHOOTING_HEADING_TOLERANCE))) {
+                shootingNotCompleted = shootingAction.run(telemetryPacket);
+            }
+            return pathNotCompleted || shootingNotCompleted;
+        }
+    }
+    public class RedFarShootAction implements Action{
+        ShootAction shootingAction;
+        public RedFarShootAction() {
+            shootingAction = new ShootAction(new Vector2d(RED_FAR_SHOOT_X, RED_FAR_SHOOT_Y), RED_FAR_SHOOT_HEADING);
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            return shootingAction.run(telemetryPacket);
         }
     }
     public Action redFarShootAction() {
@@ -67,17 +95,14 @@ public class AutoActions {
     }
 
     public class RedCloseShootAction implements Action{
-        public Action path;
-        public boolean firstRun = true;
+        ShootAction shootingAction;
+        public RedCloseShootAction() {
+            shootingAction = new ShootAction(new Vector2d(RED_CLOSE_SHOOT_X, RED_CLOSE_SHOOT_Y), RED_CLOSE_SHOOT_HEADING);
+        }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (firstRun) {
-                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                        strafeToLinearHeading(new Vector2d(RED_CLOSE_SHOOT_X, RED_CLOSE_SHOOT_Y), Math.toRadians(RED_CLOSE_SHOOT_HEADING)).build();
-                firstRun = false;
-            }
-            return path.run(telemetryPacket);
+            return shootingAction.run(telemetryPacket);
         }
     }
     public Action redCloseShootAction() {
@@ -85,17 +110,14 @@ public class AutoActions {
     }
     //    =================================BLUE SHOOTING ACTIONS==========================================
     public class BlueFarShootAction implements Action{
-        public Action path;
-        public boolean firstRun = true;
+        ShootAction shootingAction;
+        public BlueFarShootAction() {
+            shootingAction = new ShootAction(new Vector2d(BLUE_FAR_SHOOT_X, BLUE_FAR_SHOOT_Y), BLUE_FAR_SHOOT_HEADING);
+        }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (firstRun) {
-                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                        strafeToLinearHeading(new Vector2d(BLUE_FAR_SHOOT_X, BLUE_FAR_SHOOT_Y), Math.toRadians(BLUE_FAR_SHOOT_HEADING)).build();
-                firstRun = false;
-            }
-            return path.run(telemetryPacket);
+            return shootingAction.run(telemetryPacket);
         }
     }
     public Action blueFarShootAction() {
@@ -103,17 +125,14 @@ public class AutoActions {
     }
 
     public class BlueCloseShootAction implements Action{
-        public Action path;
-        public boolean firstRun = true;
+        ShootAction shootingAction;
+        public BlueCloseShootAction() {
+            shootingAction = new ShootAction(new Vector2d(BLUE_CLOSE_SHOOT_X, BLUE_CLOSE_SHOOT_Y), BLUE_CLOSE_SHOOT_HEADING);
+        }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (firstRun) {
-                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                        strafeToLinearHeading(new Vector2d(BLUE_CLOSE_SHOOT_X, BLUE_CLOSE_SHOOT_Y), Math.toRadians(BLUE_CLOSE_SHOOT_HEADING)).build();
-                firstRun = false;
-            }
-            return path.run(telemetryPacket);
+            return shootingAction.run(telemetryPacket);
         }
     }
     public Action blueCloseShootAction() {
@@ -179,6 +198,26 @@ public class AutoActions {
     }
     public Action redThirdIntakeAction() {
         return new RedThirdIntakeAction();
+    }
+
+    public class RedOpenGateAction implements Action {
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(RED_GATE_INTAKE_P1_X, RED_GATE_INTAKE_P1_Y), Math.toRadians(RED_GATE_INTAKE_P1_HEADING))
+                        .stopAndAdd(new SleepAction(GATE_INTAKE_DELAY_SECOND))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+    public Action redOpenGateAction() {
+        return new RedOpenGateAction();
     }
 
     public class RedGateIntakeAction implements Action{
@@ -306,6 +345,25 @@ public class AutoActions {
         return new BlueLoadingZoneIntakeAction();
     }
 
+    public class BlueOpenGateAction implements Action {
+        public Action path;
+        public boolean firstRun = true;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstRun) {
+                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
+                        .strafeToLinearHeading(new Vector2d(RED_GATE_INTAKE_P1_X, RED_GATE_INTAKE_P1_Y), Math.toRadians(RED_GATE_INTAKE_P1_HEADING))
+                        .stopAndAdd(new SleepAction(GATE_INTAKE_DELAY_SECOND))
+                        .build();
+                firstRun = false;
+            }
+            return path.run(telemetryPacket);
+        }
+    }
+    public Action blueOpenGateAction() {
+        return new BlueOpenGateAction();
+    }
     public class BlueGateIntakeAction implements Action{
         public Action path;
         public boolean firstRun = true;
@@ -329,15 +387,11 @@ public class AutoActions {
 
     //    =================================MISCELLANEOUS ACTIONS==========================================
     public class ShootArtifactAction implements Action {
-        public double targetVelocity;
         public TwoMotorShooterSubsystem.FlywheelSetting flywheelSetting;
         public ElapsedTime shootTimer;
         public double seconds;
         public boolean firstLoop = true;
-        public ShootArtifactAction(double targetRPM, double seconds) {
-            flywheelSetting = new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, 0);
-            shooterSubsystem.setTargetSetting(flywheelSetting);
-
+        public ShootArtifactAction(double seconds) {
             this.seconds = seconds;
         }
 
@@ -346,10 +400,10 @@ public class AutoActions {
             if (firstLoop) {
                 shootTimer = new ElapsedTime();
                 firstLoop = false;
-                shooterSubsystem.setCurrentState(TwoMotorShooterSubsystem.ShooterState.MANUAL);
+                shooterSubsystem.setCurrentState(TwoMotorShooterSubsystem.ShooterState.AUTO);
                 intakeTransferSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
             }
-            shooterSubsystem.shoot(flywheelSetting);
+            robotContainer.shoot();
             if (shootTimer.seconds() >= seconds) {
                 intakeTransferSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
                 return false;
@@ -359,7 +413,7 @@ public class AutoActions {
             }
         }
     }
-    public ShootArtifactAction shootArtifactAction(double targetRPM, double seconds) {return new ShootArtifactAction(targetRPM, seconds);}
+    public ShootArtifactAction shootArtifactAction(double seconds) {return new ShootArtifactAction(seconds);}
 
     public class GoToPoseAction implements Action{
         public Action path;
