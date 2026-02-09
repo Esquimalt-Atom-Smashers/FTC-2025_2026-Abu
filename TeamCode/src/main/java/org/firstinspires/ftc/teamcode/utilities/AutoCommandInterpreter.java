@@ -26,8 +26,8 @@ public class AutoCommandInterpreter {
     private Pose2d startingPos;
     private RobotContainer.Alliance alliance;
     private String startingPositionTelemetry;
-    private ArrayList<Action> actionList;
-    private ArrayList<String> autoCommendTelemetry;
+    private ArrayList<Action> actionList = new ArrayList<>();
+    private ArrayList<String> autoCommendTelemetry = new ArrayList<>();
     public AutoCommandInterpreter(ArrayList<String> autoFileContent) {
         this.autoFileContent = autoFileContent;
     }

@@ -55,6 +55,7 @@ public class BlueCloseAuto extends LinearOpMode {
         }
         telemetry.update();
         waitForStart();
+        robotContainer.shoot();
         //once robot starts do the prescribed actions from the action list.
         actionSequence = new SequentialAction(actionList);
         try {
