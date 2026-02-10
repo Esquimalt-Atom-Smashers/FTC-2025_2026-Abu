@@ -14,8 +14,9 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 public class TurretSubsystem implements SubsystemBase {
 
     public static class Params {
-        public double kLeadGainSeconds = 0;
-        public double kVRobotRotation = 0;
+        public double kLeadGainSeconds = 1;
+        public double kVRobotRotation = -0.1;
+        public double kVFieldAngleChange = -1.0;
 
         public double SERVO_MIN_POS = 0.0;
         public double SERVO_MAX_POS = 1.0;
@@ -96,50 +97,41 @@ public class TurretSubsystem implements SubsystemBase {
         double dy = goalPos.position.y - robotPose.position.y;
 
         double currentTargetAngleFC = Math.atan2(dy, dx);
-        double lastLoopFieldAngle = lastTargetAngleStoredFC;
-        lastTargetAngleStoredFC = currentTargetAngleFC;
 
-        double robotFrameAngle = currentTargetAngleFC - robotPose.heading.toDouble();
-
-        if (Double.isNaN(lastLoopFieldAngle)) {
-            return Math.toDegrees(robotFrameAngle);
-        }
-
-        double leadAngle = getPredictedTransRotation(Math.hypot(dy, dx));
+        double leadAngle = getPredictedTransRotation();
 
         double predictedFieldAngle = currentTargetAngleFC + leadAngle;
         double robotFrame = predictedFieldAngle - robotPose.heading.toDouble();
 
-        aimbotLine = "goal target heading: " + Math.toDegrees(robotFrame);
         return Math.toDegrees(robotFrame);
     }
 
-    private double getPredictedTransRotation(double distance){
+    private double getPredictedTransRotation(){
 
         double dx = goalPos.position.x - robotPose.position.x;
         double dy = goalPos.position.y - robotPose.position.y;
 
         double fieldAngleNow = Math.atan2(dy, dx);
 
-        double lastFieldAngle = lastTargetAngleStoredFC;
-        lastTargetAngleStoredFC = fieldAngleNow;
-
-        if (Double.isNaN(lastFieldAngle)) {
+        if (Double.isNaN(lastTargetAngleStoredFC)) {
+            lastTargetAngleStoredFC = fieldAngleNow;
             return 0.0;
         }
 
         double dt = loopTimer.seconds();
-        if (dt <= 1e-4) dt = 1e-4;
+        if (dt < 1e-4) dt = 1e-4;
+        aimbotLine = "fieldAngle now: " + fieldAngleNow + "\nlast field angle: " + lastTargetAngleStoredFC;
+        double dTheta = fieldAngleNow - lastTargetAngleStoredFC; // wrap-safe
+        double fieldAngularVel = dTheta / dt; // rad/s
 
-        // field-frame angular velocity caused by translation / pushing
-        double fieldAngleRate = (fieldAngleNow - lastFieldAngle) / dt;
+        double predictedFieldAngle = fieldAngularVel * PARAMS.kLeadGainSeconds;
 
+        lastTargetAngleStoredFC = fieldAngleNow;
         // empirical projectile flight time
-        double flightTime = distance * PARAMS.kLeadGainSeconds;
-        double predictedRobotRotation = robotVelocity.angVel * flightTime * PARAMS.kVRobotRotation;
+        double predictedRobotRotation = robotVelocity.angVel * PARAMS.kLeadGainSeconds * PARAMS.kVRobotRotation;
 
         // predicted angular offset in FIELD frame
-        return (fieldAngleRate * flightTime) + predictedRobotRotation;
+        return predictedFieldAngle + predictedRobotRotation;
     }
 
 
