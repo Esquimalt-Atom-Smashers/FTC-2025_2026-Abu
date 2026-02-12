@@ -70,9 +70,7 @@ public class AutoActions {
                 shootingAction = shootArtifactAction(SHOOTING_SECONDS);
                 firstRun = false;
             }
-            if (pathNotCompleted) {
-                pathNotCompleted = path.run(telemetryPacket);
-            }
+            pathNotCompleted = path.run(telemetryPacket);
             if (drivebase.isWithinTolerance(new Pose2d(position.x, position.y, headingRad), SHOOTING_POSITIONAL_TOLERANCE, Math.toRadians(SHOOTING_HEADING_TOLERANCE))) {
                 shootingNotCompleted = shootingAction.run(telemetryPacket);
             }
@@ -250,7 +248,6 @@ public class AutoActions {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
                         .strafeToLinearHeading(new Vector2d(RED_LOAD_INTAKE_P1_X, RED_LOAD_INTAKE_P1_Y), Math.toRadians(RED_LOAD_INTAKE_P1_HEADING))
-                        .strafeToLinearHeading(new Vector2d(RED_LOAD_INTAKE_P2_X, RED_LOAD_INTAKE_P2_Y), Math.toRadians(RED_LOAD_INTAKE_P2_HEADING))
                         .build();
                 firstRun = false;
             }
@@ -334,7 +331,6 @@ public class AutoActions {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
                         .strafeToLinearHeading(new Vector2d(BLUE_LOAD_INTAKE_P1_X, BLUE_LOAD_INTAKE_P1_Y), Math.toRadians(BLUE_LOAD_INTAKE_P1_HEADING))
-                        .strafeToLinearHeading(new Vector2d(BLUE_LOAD_INTAKE_P2_X, BLUE_LOAD_INTAKE_P2_Y), Math.toRadians(BLUE_LOAD_INTAKE_P2_HEADING))
                         .build();
                 firstRun = false;
             }

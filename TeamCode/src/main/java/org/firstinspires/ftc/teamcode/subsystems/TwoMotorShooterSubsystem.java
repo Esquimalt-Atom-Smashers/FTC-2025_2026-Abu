@@ -32,7 +32,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
 
         public double P = Property.P;
         public double I = 0;
-        public double D = 0;
+        public double D = 0.0000001;
     }
     public static Params PARAMS = new Params();
     private OpMode opMode;
