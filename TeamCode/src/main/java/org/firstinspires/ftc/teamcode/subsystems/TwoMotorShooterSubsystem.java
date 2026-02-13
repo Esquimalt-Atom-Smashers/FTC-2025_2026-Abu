@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon;
@@ -28,7 +29,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         public double TOLERANCE = 28;
         public double kS = 0;
         public double kV = Property.kV;
-        public double kA = 0;
+        public double nominalVoltage = 13.0;
 
         public double P = Property.P;
         public double I = 0;
@@ -48,6 +49,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     public final double RPM_TOLERANCE = Property.TOLERANCE;
     private final String HOOD_SERVO_NAME = "hoodServo";
     private Servo hoodAngleServo;
+    private VoltageSensor ExpansionHub2_VoltageSensor;
 
     private final double TICKS_PER_ROTATION = 28;
     private FlywheelSetting targetSetting = new FlywheelSetting(0,0);
@@ -105,6 +107,9 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         secondFlywheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         secondFlywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        ExpansionHub2_VoltageSensor = opMode.hardwareMap.get(VoltageSensor.class, "Expansion Hub 2");
+
+
         flyWheelController = new PIDController(PARAMS.P, PARAMS.I, PARAMS.D);
         currentState = state;
         setPose2d(pose2d);
@@ -140,8 +145,11 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     }
 
     public double flywheelFeedForward(double targetVelocity) {
-        double feedForward = PARAMS.kS * Math.signum(targetVelocity) + PARAMS.kV * targetVelocity + PARAMS.kA * (getFlywheelRPM() - targetVelocity);
-        return feedForward;
+        double ff =
+                PARAMS.kS * Math.signum(targetVelocity) +
+                        PARAMS.kV * targetVelocity;
+
+        return ff * (PARAMS.nominalVoltage / ExpansionHub2_VoltageSensor.getVoltage());
     }
 
     public void setPose2d(Pose2d pose2d){

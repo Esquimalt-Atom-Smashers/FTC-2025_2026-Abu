@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.opmode.RedDegAdjTeleOp;
 import org.firstinspires.ftc.teamcode.utilities.RobotContainer;
 
 @Config
@@ -18,12 +20,12 @@ public class TurretSubsystem implements SubsystemBase {
         public double kVRobotRotation = -0.1;
         public double kVFieldAngleChange = -1.0;
 
-        public double SERVO_MIN_POS = 0.0;
-        public double SERVO_MAX_POS = 1.0;
-
         // mapping
-        public double SERVO_MIN_POS_DEG = 0;   // pos 0.0
-        public double SERVO_MAX_POS_DEG = 160;  // pos 1.0
+        public double RED_SERVO_MIN_POS_DEG = -160;   // pos 0.0
+        public double RED_SERVO_MAX_POS_DEG = 0;  // pos 1.0
+
+        public double BLUE_SERVO_MIN_POS_DEG = 20;
+        public double BLUE_SERVO_MAX_POS_DEG = 180;
     }
 
     public static Params PARAMS = new Params();
@@ -54,6 +56,8 @@ public class TurretSubsystem implements SubsystemBase {
 
     // Targets
     private double targetRobotFrameDeg = 180.0;
+    private double servoMinPosDeg;
+    private double servoMaxPosDeg;
 
     public TurretSubsystem(OpMode opMode, RobotContainer.Alliance alliance,
                            TurretState turretState, Pose2d pose2d, Pose2d goalPos) {
@@ -67,6 +71,13 @@ public class TurretSubsystem implements SubsystemBase {
         this.robotPose = pose2d;
 
         loopTimer = new ElapsedTime();
+        if (alliance == RobotContainer.Alliance.BLUE)  {
+            servoMinPosDeg = PARAMS.BLUE_SERVO_MIN_POS_DEG;
+            servoMaxPosDeg = PARAMS.BLUE_SERVO_MAX_POS_DEG;
+        } else {
+           servoMinPosDeg = PARAMS.RED_SERVO_MIN_POS_DEG;
+           servoMaxPosDeg = PARAMS.RED_SERVO_MAX_POS_DEG;
+        }
     }
 
     // ================= INPUT UPDATES =================
@@ -101,7 +112,12 @@ public class TurretSubsystem implements SubsystemBase {
         double predictedFieldAngle = currentTargetAngleFC + leadAngle;
         double robotFrame = predictedFieldAngle - robotPose.heading.toDouble();
 
-        return Math.toDegrees(robotFrame);
+        double robotFrameDeg = Math.toDegrees(robotFrame);
+        robotFrameDeg = AngleUnit.normalizeDegrees(robotFrameDeg);
+
+        robotFrameDeg = Range.clip(robotFrameDeg, Math.min(servoMinPosDeg, servoMaxPosDeg), Math.max(servoMinPosDeg, servoMaxPosDeg));
+
+        return robotFrameDeg;
     }
 
     private double getPredictedTransRotation(){
@@ -118,7 +134,7 @@ public class TurretSubsystem implements SubsystemBase {
 
         double dt = loopTimer.seconds();
         if (dt < 1e-4) dt = 1e-4;
-        aimbotLine = "fieldAngle now: " + fieldAngleNow + "\nlast field angle: " + lastTargetAngleStoredFC;
+        aimbotLine = "fieldAngle now: " + Math.toDegrees(fieldAngleNow) + "\nlast field angle: " + Math.toDegrees(lastTargetAngleStoredFC);
         double dTheta = fieldAngleNow - lastTargetAngleStoredFC; // wrap-safe
         double fieldAngularVel = dTheta / dt; // rad/s
 
@@ -170,32 +186,30 @@ public class TurretSubsystem implements SubsystemBase {
     // ================= SERVO MAPPING =================
     private double angleToServoPos(double angleDeg) {
 
-        double angle1 = PARAMS.SERVO_MIN_POS_DEG;
-        double angle2 = PARAMS.SERVO_MAX_POS_DEG;
+        double angle1 = servoMinPosDeg;
+        double angle2 = servoMaxPosDeg;
 
-        double pos1 = PARAMS.SERVO_MIN_POS;
-        double pos2 = PARAMS.SERVO_MAX_POS;
+        double pos1 = 0.0;
+        double pos2 = 1.0;
 
         double denom = (angle2 - angle1);
-        if (Math.abs(denom) < 1e-6) return pos1; // prevent divide by zero
 
         double pos = pos1 + ((angleDeg - angle1) * ((pos2 - pos1) / denom));
 
         return Range.clip(pos,
-                Math.min(pos1, pos2),
-                Math.max(pos1, pos2));
+                0.0,
+                1.0);
     }
 
     private double servoPosToAngle(double pos) {
 
-        double angle1 = PARAMS.SERVO_MIN_POS_DEG;
-        double angle2 = PARAMS.SERVO_MAX_POS_DEG;
+        double angle1 = servoMinPosDeg;
+        double angle2 = servoMaxPosDeg;
 
-        double pos1 = PARAMS.SERVO_MIN_POS;
-        double pos2 = PARAMS.SERVO_MAX_POS;
+        double pos1 = 0.0;
+        double pos2 = 1.0;
 
         double denom = (pos2 - pos1);
-        if (Math.abs(denom) < 1e-6) return angle1;
 
         double angle = angle1 + (pos - pos1) * (angle2 - angle1) / denom;
 

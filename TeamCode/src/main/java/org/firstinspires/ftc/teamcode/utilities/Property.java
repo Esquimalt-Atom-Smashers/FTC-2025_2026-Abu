@@ -140,7 +140,7 @@ public class Property {
     public static volatile double CLOSE_SHOOT_RPM = 3050;
 
     public static volatile double TOLERANCE = 100;
-    public static volatile double kV = 0.00019;
+    public static volatile double kV = 0.00016;
     public static volatile double P = 0.007;
 
     public static volatile double SHOOTING_SECONDS = 5.0;

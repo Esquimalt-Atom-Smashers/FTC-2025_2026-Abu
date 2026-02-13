@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.utilities.RobotPositionHolder;
 import org.firstinspires.ftc.teamcode.utilities.RobotPropertyParser;
 
 @Config
-@TeleOp(name = "Kenny Red deg adjust TeleOp", group = "AAA")
+@TeleOp(name = "RED TeleOp", group = "AAA")
 public class RedDegAdjTeleOp extends LinearOpMode {
     RobotContainer robotContainer;
     Pose2d startingPose;
