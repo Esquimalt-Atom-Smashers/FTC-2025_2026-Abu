@@ -20,11 +20,10 @@ public class TurretSubsystem implements SubsystemBase {
 
         public double SERVO_MIN_POS = 0.0;
         public double SERVO_MAX_POS = 1.0;
-        public double SERVO_START_POS = 0.5;
 
         // mapping
-        public double SERVO_MIN_POS_DEG = 100;   // pos 0.0
-        public double SERVO_MAX_POS_DEG = 260;  // pos 1.0
+        public double SERVO_MIN_POS_DEG = 0;   // pos 0.0
+        public double SERVO_MAX_POS_DEG = 160;  // pos 1.0
     }
 
     public static Params PARAMS = new Params();
@@ -32,7 +31,7 @@ public class TurretSubsystem implements SubsystemBase {
     private final OpMode opMode;
     private final RobotContainer.Alliance alliance;
     private final Pose2d goalPos;
-    private ElapsedTime loopTimer;
+    public ElapsedTime loopTimer;
     private String aimbotLine;
     private boolean isTelemetryEnabled = true;
 
@@ -63,7 +62,6 @@ public class TurretSubsystem implements SubsystemBase {
         this.goalPos = goalPos;
 
         turretServo = opMode.hardwareMap.get(Servo.class, "turretServo");
-        turretServo.setPosition(PARAMS.SERVO_START_POS);
 
         this.currentState = turretState;
         this.robotPose = pose2d;
@@ -170,27 +168,42 @@ public class TurretSubsystem implements SubsystemBase {
     }
 
     // ================= SERVO MAPPING =================
-    private double angleToServoPos(double angleDeg){
-        angleDeg = Range.clip(angleDeg,
-                PARAMS.SERVO_MIN_POS_DEG,
-                PARAMS.SERVO_MAX_POS_DEG);
+    private double angleToServoPos(double angleDeg) {
 
-        double t = (angleDeg - PARAMS.SERVO_MIN_POS_DEG) /
-                (PARAMS.SERVO_MAX_POS_DEG - PARAMS.SERVO_MIN_POS_DEG);
+        double angle1 = PARAMS.SERVO_MIN_POS_DEG;
+        double angle2 = PARAMS.SERVO_MAX_POS_DEG;
 
-        double pos = PARAMS.SERVO_MIN_POS + t *
-                (PARAMS.SERVO_MAX_POS - PARAMS.SERVO_MIN_POS);
+        double pos1 = PARAMS.SERVO_MIN_POS;
+        double pos2 = PARAMS.SERVO_MAX_POS;
 
-        return Range.clip(pos, PARAMS.SERVO_MIN_POS, PARAMS.SERVO_MAX_POS);
+        double denom = (angle2 - angle1);
+        if (Math.abs(denom) < 1e-6) return pos1; // prevent divide by zero
+
+        double pos = pos1 + ((angleDeg - angle1) * ((pos2 - pos1) / denom));
+
+        return Range.clip(pos,
+                Math.min(pos1, pos2),
+                Math.max(pos1, pos2));
     }
 
-    private double servoPosToAngle(double pos){
-        double t = (pos - PARAMS.SERVO_MIN_POS) /
-                (PARAMS.SERVO_MAX_POS - PARAMS.SERVO_MIN_POS);
+    private double servoPosToAngle(double pos) {
 
-        return PARAMS.SERVO_MIN_POS_DEG +
-                t * (PARAMS.SERVO_MAX_POS_DEG - PARAMS.SERVO_MIN_POS_DEG);
+        double angle1 = PARAMS.SERVO_MIN_POS_DEG;
+        double angle2 = PARAMS.SERVO_MAX_POS_DEG;
+
+        double pos1 = PARAMS.SERVO_MIN_POS;
+        double pos2 = PARAMS.SERVO_MAX_POS;
+
+        double denom = (pos2 - pos1);
+        if (Math.abs(denom) < 1e-6) return angle1;
+
+        double angle = angle1 + (pos - pos1) * (angle2 - angle1) / denom;
+
+        return Range.clip(angle,
+                Math.min(angle1, angle2),
+                Math.max(angle1, angle2));
     }
+
 
     // ================= TUNING =================
     public double getTargetRobotFrameDeg () {

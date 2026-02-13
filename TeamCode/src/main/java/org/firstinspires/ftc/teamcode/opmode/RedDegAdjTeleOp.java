@@ -68,11 +68,7 @@ public class RedDegAdjTeleOp extends LinearOpMode {
                 robotContainer.updatePoseFromVision(true);
             }
 
-            // toggle logic
-            if (gamepad1.left_bumper && !prevLeftBumper) {
-                intakeToggle = !intakeToggle;
-            }
-            prevLeftBumper = gamepad1.left_bumper;
+            intakeToggle = gamepad1.left_bumper;
 
             // shooting && intake control
             if (gamepad1.right_trigger >= 0.3) {
