@@ -61,8 +61,7 @@ public class RedCloseAuto extends LinearOpMode {
         try {
             Actions.runBlocking(
                     new ParallelAction(actionSequence,
-                            new InstantAction(robotContainer::runRobot),
-                            new InstantAction(robotContainer::updatePositionHolderAuto)
+                            robotContainer.autoRunRobot()
                     )
             );
         } finally {

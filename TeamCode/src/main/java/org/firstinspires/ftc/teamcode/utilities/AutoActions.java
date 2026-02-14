@@ -397,10 +397,8 @@ public class AutoActions {
                 shootTimer = new ElapsedTime();
                 firstLoop = false;
                 shooterSubsystem.setCurrentState(TwoMotorShooterSubsystem.ShooterState.AUTO);
-                robotContainer.shoot();
                 intakeTransferSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
             }
-            robotContainer.shoot();
             if (shootTimer.seconds() >= seconds) {
                 intakeTransferSubsystem.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
                 return false;

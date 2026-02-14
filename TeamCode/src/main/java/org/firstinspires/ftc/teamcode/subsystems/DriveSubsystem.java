@@ -317,7 +317,8 @@ public class DriveSubsystem implements SubsystemBase {
         if (isTelemetryEnabled) {
             Pose2d pose = getPose();
             opMode.telemetry.addData("Pose", "X: %.2f, Y: %.2f, H: %.2f", pose.position.x, pose.position.y, Math.toDegrees(pose.heading.toDouble()));
-            opMode.telemetry.addData("FC Heading", getFieldCentricHeading());
+//            opMode.telemetry.addData("FC Heading", getFieldCentricHeading());
+            opMode.telemetry.addData("distance", getDistanceToGoal());
         }
     }
 

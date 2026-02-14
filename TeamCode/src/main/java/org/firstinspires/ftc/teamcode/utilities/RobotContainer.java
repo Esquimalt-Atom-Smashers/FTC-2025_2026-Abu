@@ -188,6 +188,7 @@ public class RobotContainer {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             runRobot();
             updatePositionHolderAuto();
+            shoot();
             return true;
         }
     }
