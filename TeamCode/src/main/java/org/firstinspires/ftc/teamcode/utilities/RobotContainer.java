@@ -7,6 +7,10 @@ import static org.firstinspires.ftc.teamcode.utilities.Property.RED_GOAL_HEADING
 import static org.firstinspires.ftc.teamcode.utilities.Property.RED_GOAL_X;
 import static org.firstinspires.ftc.teamcode.utilities.Property.RED_GOAL_Y;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -179,11 +183,14 @@ public class RobotContainer {
 //        ledSubsystem.normalLight();
     }
 
-    public void aimbotAssistedDrive(double drive, double strafe, double turn) {
-        if (drivebase.aimbotAssistedDrive(drive, strafe, turn)) {
-//            ledSubsystem.aimedLight();
-        } else {
-//            ledSubsystem.aimingLight();
+    public class AutoRunRobot implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            runRobot();
+            updatePositionHolderAuto();
+            return true;
         }
     }
+
+    public Action autoRunRobot() {return new AutoRunRobot();}
 }
