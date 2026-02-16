@@ -38,8 +38,7 @@ public class RedDegAdjTeleOp extends LinearOpMode {
         startingPose = new Pose2d(Property.TELEOP_DEFAULT_STARTING_POS_X, Property.TELEOP_DEFAULT_STARTING_POS_Y, Math.toRadians(Property.TELEOP_DEFAULT_STARTING_POS_HEADING));
         targetRpm = Property.CLOSE_SHOOT_RPM;
         if (RobotPositionHolder.hasData()) {
-            GoBildaPinpointDriver pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-            startingPose = new Pose2d(pinpoint.getPosX(DistanceUnit.INCH), pinpoint.getPosY(DistanceUnit.INCH), pinpoint.getHeading(AngleUnit.RADIANS));
+            startingPose = new Pose2d(RobotPositionHolder.getX(), RobotPositionHolder.getY(), RobotPositionHolder.getHeading());
         }
         robotContainer = new RobotContainer(this,
                 startingPose,

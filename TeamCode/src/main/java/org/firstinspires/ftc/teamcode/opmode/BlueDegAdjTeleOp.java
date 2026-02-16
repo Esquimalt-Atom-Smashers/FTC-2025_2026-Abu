@@ -38,8 +38,7 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
         startingPose = new Pose2d(Property.TELEOP_DEFAULT_STARTING_POS_X, Property.TELEOP_DEFAULT_STARTING_POS_Y, Math.toRadians(Property.TELEOP_DEFAULT_STARTING_POS_HEADING));
         targetRpm = Property.CLOSE_SHOOT_RPM;
         if (RobotPositionHolder.hasData()) {
-            GoBildaPinpointDriver pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-            startingPose = new Pose2d(pinpoint.getPosX(DistanceUnit.INCH), pinpoint.getPosY(DistanceUnit.INCH), pinpoint.getHeading(AngleUnit.RADIANS));
+            startingPose = new Pose2d(RobotPositionHolder.getX(), RobotPositionHolder.getY(), RobotPositionHolder.getHeading());
         }
         robotContainer = new RobotContainer(this,
                 startingPose,
@@ -49,7 +48,7 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
                 TurretSubsystem.TurretState.GOAL_LOCK,
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.TRACKING_GOAL);
-        robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(90));
+        robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(270));
         waitForStart();
         while (opModeIsActive()) {
             boolean forceReset = false;
