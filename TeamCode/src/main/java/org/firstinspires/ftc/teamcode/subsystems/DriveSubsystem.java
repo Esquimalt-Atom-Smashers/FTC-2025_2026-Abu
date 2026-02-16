@@ -285,7 +285,7 @@ public class DriveSubsystem implements SubsystemBase {
         double distance = Math.hypot(dx, dy);
 
         double dTheta = targetPose.heading.toDouble() - pose.heading.toDouble();
-        dTheta = Math.atan2(Math.sin(dTheta), Math.cos(dTheta)); // normalize to [-pi, pi]
+        dTheta = AngleUnit.normalizeRadians(dTheta); // normalize to [-pi, pi]
 
         return distance <= positionalTolerance && Math.abs(dTheta) <= angularToleranceRad;
     }
