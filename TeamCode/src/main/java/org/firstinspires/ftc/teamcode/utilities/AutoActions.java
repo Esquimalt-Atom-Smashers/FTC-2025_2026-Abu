@@ -349,7 +349,7 @@ public class AutoActions {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstRun) {
                 path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
-                        .strafeToLinearHeading(new Vector2d(RED_GATE_INTAKE_P1_X, RED_GATE_INTAKE_P1_Y), Math.toRadians(RED_GATE_INTAKE_P1_HEADING))
+                        .strafeToLinearHeading(new Vector2d(BLUE_GATE_INTAKE_P1_X, BLUE_GATE_INTAKE_P1_Y), Math.toRadians(BLUE_GATE_INTAKE_P1_HEADING))
                         .stopAndAdd(new SleepAction(GATE_INTAKE_DELAY_SECOND))
                         .build();
                 firstRun = false;
