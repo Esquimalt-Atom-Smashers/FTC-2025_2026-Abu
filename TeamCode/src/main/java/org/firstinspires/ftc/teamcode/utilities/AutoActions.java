@@ -6,7 +6,9 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -52,10 +54,8 @@ public class AutoActions {
     */
     //    =================================RED SHOOTING ACTIONS==========================================
     public class ShootAction implements Action {
-        public Action path;
         public Action shootingAction;
         public boolean firstRun = true;
-        public boolean pathNotCompleted = true;
         public boolean shootingNotCompleted = true;
         public Vector2d position;
         public double headingRad;
@@ -67,16 +67,13 @@ public class AutoActions {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstRun) {
-                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose()).
-                        strafeToLinearHeading(position, headingRad).build();
                 shootingAction = shootArtifactAction(SHOOTING_SECONDS);
                 firstRun = false;
             }
-            pathNotCompleted = path.run(telemetryPacket);
             if (drivebase.isWithinTolerance(new Pose2d(position.x, position.y, headingRad), SHOOTING_POSITIONAL_TOLERANCE, Math.toRadians(SHOOTING_HEADING_TOLERANCE))) {
                 shootingNotCompleted = shootingAction.run(telemetryPacket);
             }
-            return pathNotCompleted || shootingNotCompleted;
+            return shootingNotCompleted;
         }
     }
     public class RedFarShootAction implements Action{
@@ -91,7 +88,7 @@ public class AutoActions {
         }
     }
     public Action redFarShootAction() {
-        return new RedFarShootAction();
+        return new ParallelAction(new RedFarShootAction(), goToPoseAction(RED_FAR_X, RED_FAR_Y, RED_FAR_HEADING));
     }
 
     public class RedCloseShootAction implements Action{
@@ -106,7 +103,7 @@ public class AutoActions {
         }
     }
     public Action redCloseShootAction() {
-        return new RedCloseShootAction();
+        return new ParallelAction(new RedCloseShootAction(), goToPoseAction(RED_CLOSE_X, RED_CLOSE_Y, RED_CLOSE_HEADING));
     }
     //    =================================BLUE SHOOTING ACTIONS==========================================
     public class BlueFarShootAction implements Action{
@@ -121,7 +118,7 @@ public class AutoActions {
         }
     }
     public Action blueFarShootAction() {
-        return new BlueFarShootAction();
+        return new ParallelAction(new BlueFarShootAction(), goToPoseAction(BLUE_FAR_X, BLUE_FAR_Y, BLUE_FAR_HEADING));
     }
 
     public class BlueCloseShootAction implements Action{
@@ -136,7 +133,7 @@ public class AutoActions {
         }
     }
     public Action blueCloseShootAction() {
-        return new BlueCloseShootAction();
+        return new ParallelAction(new BlueCloseShootAction(), goToPoseAction(BLUE_CLOSE_X, BLUE_CLOSE_Y, BLUE_CLOSE_HEADING));
     }
 
     //    =================================RED INTAKE ACTIONS==========================================
