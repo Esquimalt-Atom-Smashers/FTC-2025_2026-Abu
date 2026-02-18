@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -22,6 +23,7 @@ public class AutoActions {
     TwoMotorShooterSubsystem shooterSubsystem;
     IntakeTransferSubsystem intakeTransferSubsystem;
     VisionSubsystem visionSubsystem;
+    public static TrajectoryActionBuilder builder;
     public AutoActions(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
         drivebase = robotContainer.drivebase;
@@ -410,31 +412,14 @@ public class AutoActions {
     }
     public ShootArtifactAction shootArtifactAction(double seconds) {return new ShootArtifactAction(seconds);}
 
-    public class GoToPoseAction implements Action{
-        public Action path;
-        public boolean firstRun = true;
-        public double x;
-        public double y;
-        public double headingDegree;
-
-        public GoToPoseAction(double x, double y, double headingDegree) {
-            this.x = x;
-            this.y = y;
-            this.headingDegree = headingDegree;
-        }
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (firstRun) {
-                path = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose())
-                        .strafeToLinearHeading(new Vector2d(x, y), Math.toRadians(headingDegree))
-                        .build();
-                firstRun = false;
-            }
-            return path.run(telemetryPacket);
-        }
-    }
     public Action goToPoseAction(double x, double y, double headingDegree) {
-        return new GoToPoseAction(x, y, headingDegree);
+        if (builder == null) {
+            builder = drivebase.getMecanumDrive().actionBuilder(drivebase.getPose());
+        }
+        builder = builder.strafeToLinearHeading(new Vector2d(x, y), Math.toRadians(headingDegree));
+        TrajectoryActionBuilder oldBuilder = builder;
+        builder = builder.fresh(); // continue from last end
+        return oldBuilder.build();
     }
     public class UpdatePoseFromVisionAction implements Action {
         public boolean forceReset;
