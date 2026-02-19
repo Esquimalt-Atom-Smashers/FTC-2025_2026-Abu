@@ -96,7 +96,7 @@ public class RobotContainer {
         }
         robotPose = drivebase.getPose();
         drivebase.periodic();
-        shooter.periodic();
+        shooter.periodic(intake.getState() == IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
         turretSubsystem.updateRobotPose(robotPose, drivebase.getMecanumDrive().localizer.update());
         turretSubsystem.periodic();
         intake.periodic();
@@ -164,9 +164,9 @@ public class RobotContainer {
 
 
     /**High-level shooting command.*/
-    public void shoot() {
+    public void shootByDistance() {
         TwoMotorShooterSubsystem.FlywheelSetting flywheelSetting = shooter.distanceToFlywheelSetting(drivebase.getDistanceToGoal());
-        shooter.shoot(flywheelSetting);
+        shooter.shoot(flywheelSetting, intake.getState() == IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
     }
 
     public void drive(double drive, double strafe, double turn) {
@@ -179,7 +179,7 @@ public class RobotContainer {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             runRobot();
             updatePositionHolderAuto();
-            shoot();
+            shootByDistance();
             return true;
         }
     }

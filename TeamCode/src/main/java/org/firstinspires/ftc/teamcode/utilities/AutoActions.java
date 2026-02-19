@@ -336,7 +336,7 @@ public class AutoActions {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            boolean updateSuccessful = robotContainer.updatePoseFromVision(forceReset);
+            boolean updateSuccessful = robotContainer.updatePoseFromVision();
             if (!updateSuccessful) {
                 failedTimes ++;
                 return failedTimes < 5;

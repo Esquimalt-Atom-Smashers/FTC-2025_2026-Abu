@@ -136,8 +136,12 @@ public class PropertyDefaults {
     public static volatile double BLUE_GATE_INTAKE_P2_HEADING = 290;
 
     //FLYWHEEL CONTROL
-    public static volatile double FAR_SHOOT_RPM = 3450;
-    public static volatile double CLOSE_SHOOT_RPM = 3050;
+    public static volatile double FAR_SHOOT_RPM = 3400;
+    public static volatile double MID_SHOOT_RPM = 3100;
+    public static volatile double CLOSE_SHOOT_RPM = 2900;
+    public static volatile double FAR_SHOOT_HOOD_ANGLE = 0.5;
+    public static volatile double MID_SHOOT_HOOD_ANGLE = 0.5;
+    public static volatile double CLOSE_SHOOT_HOOD_ANGLE = 0.5;
 
     public static volatile double TOLERANCE = 100;
     public static volatile double kV = 0.00019;

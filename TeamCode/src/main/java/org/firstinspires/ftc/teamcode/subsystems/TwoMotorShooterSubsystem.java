@@ -26,7 +26,7 @@ import java.util.TreeMap;
 @Config
 public class TwoMotorShooterSubsystem implements SubsystemBase {
     public static class Params {
-        public double TOLERANCE = 28;
+        public double additionalFirePower = 0.0;
         public double kS = 0.07;
         public double kV = 0.000165;
         public double nominalVoltage = 13.0;
@@ -56,7 +56,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     //custom PID + feedforward
     private double maxFlywheelPower = 1.0;
     private Pose2d pose2d;
-
+    private double flywheelPower = 0.0;
 
     //distance to rpm matching table, we are not using hood angle rn
     public static class FlywheelSetting {
@@ -129,6 +129,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     }
 
     public void setFlywheelMotorPower(double power) {
+        flywheelPower = power;
         flywheelMotor.setPower(-power);
         secondFlywheelMotor.setPower(-power);
     }
@@ -141,10 +142,11 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         return pid;
     }
 
-    public double flywheelFeedForward(double targetVelocity) {
+    public double flywheelFeedForward(double targetVelocity, boolean isFeeding) {
         double ff =
                 PARAMS.kS * Math.signum(targetVelocity) +
-                        PARAMS.kV * targetVelocity;
+                        PARAMS.kV * targetVelocity +
+                        (isFeeding? PARAMS.additionalFirePower: 0);
 
         return ff * (PARAMS.nominalVoltage / ExpansionHub2_VoltageSensor.getVoltage());
     }
@@ -157,11 +159,11 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
      * Shoots using a specific hood angle and flywheel RPM.
      * It is just a placeholder for setRPM, it will have its intended function later
      */
-    public void shoot(FlywheelSetting targetSetting) {
+    public void shoot(FlywheelSetting targetSetting, boolean isFeeding) {
         this.targetSetting = targetSetting;
 
         double targetVelocity = targetSetting.rpm;
-        double feedforward = flywheelFeedForward(targetVelocity);
+        double feedforward = flywheelFeedForward(targetVelocity, isFeeding);
         double pid = flywheelCustomPID(targetVelocity);
 
         hoodAngleServo.setPosition(targetSetting.hoodAngle);
@@ -200,11 +202,11 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     /**
      * Runs every loop
      */
-    public void periodic() {
+    public void periodic(boolean isFeeding) {
         if (currentState == ShooterState.DISABLED) {
             shutDownSubsystem();
         } else {
-            shoot(targetSetting);
+            shoot(targetSetting, isFeeding);
         }
     }
 
@@ -222,6 +224,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         if (isTelemetryEnabled) {
             opMode.telemetry.addData("RPM", "Target: %.2f, Current : %.2f", targetSetting.rpm, getFlywheelRPM());
             opMode.telemetry.addData("HoodAngle", hoodAngleServo.getPosition());
+            opMode.telemetry.addData("FW Power", flywheelPower);
         }
     }
 

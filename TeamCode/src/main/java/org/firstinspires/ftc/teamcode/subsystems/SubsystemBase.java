@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 public interface SubsystemBase {
         boolean isTelemetryEnabled = true;
         /** gets called from robot container every loop*/
-        void periodic();
 
         /**
          * Enables or disables telemetry output for this subsystem. defaults to true

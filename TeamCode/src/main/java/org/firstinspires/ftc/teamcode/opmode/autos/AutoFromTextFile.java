@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.autos;
 
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -57,7 +56,7 @@ public class AutoFromTextFile extends LinearOpMode {
         waitForStart();
         //once robot starts do the prescribed actions from the action list.
         actionSequence = new SequentialAction(actionList);
-        robotContainer.shoot();
+        robotContainer.shootByDistance();
         try {
             Actions.runBlocking(
                     new ParallelAction(actionSequence,

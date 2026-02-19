@@ -2,12 +2,9 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
@@ -93,8 +90,16 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
             } else if (gamepad1.dpad_right && !isRightDpadPressed) {
                 isRightDpadPressed = true;
             }
-            robotContainer.shoot();
-            robotContainer.drive(drive, strafe, turn);
+
+            if (gamepad1.y || gamepad1.triangle) {
+                robotContainer.shooter.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(Property.CLOSE_SHOOT_RPM, Property.CLOSE_SHOOT_HOOD_ANGLE), intakeToggle);
+            } else if (gamepad1.x || gamepad1.square) {
+                robotContainer.shooter.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(Property.MID_SHOOT_RPM, Property.MID_SHOOT_HOOD_ANGLE), intakeToggle);
+            } else if (gamepad1.a || gamepad1.cross) {
+                robotContainer.shooter.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(Property.FAR_SHOOT_RPM, Property.FAR_SHOOT_HOOD_ANGLE), intakeToggle);
+            } else {
+                robotContainer.shootByDistance();
+            }            robotContainer.drive(drive, strafe, turn);
             robotContainer.addOpModeTelemetry("is Reseting Manual: " + isLLReseting);
             robotContainer.runRobot();
         }

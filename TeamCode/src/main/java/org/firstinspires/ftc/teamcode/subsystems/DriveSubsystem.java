@@ -295,7 +295,6 @@ public class DriveSubsystem implements SubsystemBase {
     }
 //--------------------Common functions across subsystems--------------------
     /** shall be ran every loop*/
-    @Override
     public void periodic() {
         currentPose = getPose();
         if (currentState == DriveSubsystemState.DISABLED) {

@@ -132,7 +132,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
         // Shooter control
         double targetRPM = motionProfiling();
         flywheelSubsystem.shoot(
-                new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, hoodPosition)
+                new TwoMotorShooterSubsystem.FlywheelSetting(targetRPM, hoodPosition), gamepad1.a
         );
         turretSubsystem.updateRobotPose(new Pose2d(0,0,0), new PoseVelocity2d(new Vector2d(0,0),0));
         turretSubsystem.periodic();
@@ -140,6 +140,7 @@ public class TwoMotorFlywheelTuner extends OpMode {
         // Telemetry
         telemetry.addData("targetRPM", targetRPM);
         telemetry.addData("currentRPM", flywheelSubsystem.getFlywheelRPM());
+        telemetry.addData("power", flywheelSubsystem.getFlywheelPower());
         telemetry.addData("hood position", hoodPosition);
         turretSubsystem.addSubsystemTelemetry();
         telemetry.addData("latency (ms)", loopTimer.milliseconds());

@@ -32,7 +32,6 @@ public class LEDSubsystem implements SubsystemBase {
         this.alliance = alliance;
     }
 
-    @Override
     public void periodic() {
         // LEDs are state-based. If you're updating them every loop,
         // you're wasting cycles.

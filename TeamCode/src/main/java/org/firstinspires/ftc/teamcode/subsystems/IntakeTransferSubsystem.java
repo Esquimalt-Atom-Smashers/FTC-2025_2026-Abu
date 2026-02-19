@@ -88,7 +88,6 @@ public class IntakeTransferSubsystem implements SubsystemBase{
     /**
      * gets called from robot container every loop
      */
-    @Override
     public void periodic() {
         switch (currentState) {
             case DISABLED:

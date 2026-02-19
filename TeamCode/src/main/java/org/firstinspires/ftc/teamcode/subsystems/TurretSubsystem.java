@@ -229,7 +229,6 @@ public class TurretSubsystem implements SubsystemBase {
     }
 
     // ================= LOOP =================
-    @Override
     public void periodic() {
         if(currentState == TurretState.IDLE){
             return;
