@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.opensource.FTC.RTPAxon.RTPAxon;
@@ -57,6 +58,8 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     private double maxFlywheelPower = 1.0;
     private Pose2d pose2d;
     private double flywheelPower = 0.0;
+    private double cachedVoltage;
+    private ElapsedTime voltageTimer;
 
     //distance to rpm matching table, we are not using hood angle rn
     public static class FlywheelSetting {
@@ -114,6 +117,8 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
 
         hoodAngleServo = opMode.hardwareMap.get(Servo.class, HOOD_SERVO_NAME);
         hoodAngleServo.setDirection(Servo.Direction.FORWARD); // or REVERSE if needed
+        voltageTimer = new ElapsedTime();
+        voltageTimer.reset();
     }
 
     public double getFlywheelPower() {
@@ -148,7 +153,13 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
                         PARAMS.kV * targetVelocity +
                         (isFeeding? PARAMS.additionalFirePower: 0);
 
-        return ff * (PARAMS.nominalVoltage / ExpansionHub2_VoltageSensor.getVoltage());
+        if(voltageTimer.milliseconds() > 100){
+            cachedVoltage = ExpansionHub2_VoltageSensor.getVoltage();
+            voltageTimer.reset();
+        }
+
+
+        return ff * (PARAMS.nominalVoltage / cachedVoltage);
     }
 
     public void setPose2d(Pose2d pose2d){
@@ -167,7 +178,8 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         double pid = flywheelCustomPID(targetVelocity);
 
         hoodAngleServo.setPosition(targetSetting.hoodAngle);
-        setFlywheelMotorPower(feedforward + pid);
+        flywheelPower = feedforward + pid;
+        setFlywheelMotorPower(flywheelPower);
     }
 
     public void setTargetSetting (FlywheelSetting targetSetting) {
