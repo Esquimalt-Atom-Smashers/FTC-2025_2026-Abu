@@ -261,13 +261,14 @@ public class TurretSubsystem implements SubsystemBase {
     @Override
     public void addSubsystemTelemetry() {
         if (isTelemetryEnabled) {
-            opMode.telemetry.addData("Current TA On Bot", getTurretAngleOnBot());
-            opMode.telemetry.addData("Target TA On Bot", targetRobotFrameDeg);
-            opMode.telemetry.addLine(aimbotLine);
-            if(robotVelocity != null){
-                opMode.telemetry.addData("Turret velocity", Math.toDegrees(robotVelocity.angVel));
-            }
-            opMode.telemetry.addData("Servo Pos", turretServo.getPosition());
+//            opMode.telemetry.addData("Current TA On Bot", getTurretAngleOnBot());
+//            opMode.telemetry.addData("Target TA On Bot", targetRobotFrameDeg);
+//            opMode.telemetry.addLine(aimbotLine);
+//            if(robotVelocity != null){
+//                opMode.telemetry.addData("Turret velocity", Math.toDegrees(robotVelocity.angVel));
+//            }
+//            opMode.telemetry.addData("Servo Pos", turretServo.getPosition());
+            opMode.telemetry.addData("lt", loopTimer.milliseconds());
         }
     }
 

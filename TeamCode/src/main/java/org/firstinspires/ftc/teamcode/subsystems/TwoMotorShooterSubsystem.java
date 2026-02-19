@@ -27,11 +27,11 @@ import java.util.TreeMap;
 public class TwoMotorShooterSubsystem implements SubsystemBase {
     public static class Params {
         public double TOLERANCE = 28;
-        public double kS = 0;
-        public double kV = Property.kV;
+        public double kS = 0.07;
+        public double kV = 0.000165;
         public double nominalVoltage = 13.0;
 
-        public double P = Property.P;
+        public double P = 0.007;
         public double I = 0;
         public double D = 0.0000001;
     }
@@ -54,7 +54,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
     private final double TICKS_PER_ROTATION = 28;
     private FlywheelSetting targetSetting = new FlywheelSetting(0,0);
     //custom PID + feedforward
-    private PIDController flyWheelController;
     private double maxFlywheelPower = 1.0;
     private Pose2d pose2d;
 
@@ -109,8 +108,6 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
 
         ExpansionHub2_VoltageSensor = opMode.hardwareMap.get(VoltageSensor.class, "Expansion Hub 2");
 
-
-        flyWheelController = new PIDController(PARAMS.P, PARAMS.I, PARAMS.D);
         currentState = state;
         setPose2d(pose2d);
         setFlywheelMotorPower(0);
@@ -140,7 +137,7 @@ public class TwoMotorShooterSubsystem implements SubsystemBase {
         if (flywheelMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             flywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        double pid = Range.clip(flyWheelController.calculate(getFlywheelRPM(), targetVelocity), -maxFlywheelPower, maxFlywheelPower);
+        double pid = Range.clip((targetVelocity - getFlywheelRPM()) * PARAMS.P, -maxFlywheelPower, maxFlywheelPower);
         return pid;
     }
 
