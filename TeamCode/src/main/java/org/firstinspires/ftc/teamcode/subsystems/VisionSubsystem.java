@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.utilities.RobotContainer.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * VisionSubsystem
@@ -48,9 +50,6 @@ public class VisionSubsystem implements SubsystemBase{
     private final int RED_GOAL_APRILTAG_PIPELINE = 0;
     private final int BLUE_GOAL_APRILTAG_PIPELINE = 1;
     private final int PULL_RATE_HZ = 10;
-
-    public final Pose2d RED_GOAL_POSE = new Pose2d(-60, 65 ,0);
-    public final Pose2d BLUE_GOAL_POSE = new Pose2d(-60, -65, 0);
     private double METER_TO_INCH = 39.37008;
     private final double POSITIONAL_TOLARANCE = 1.0;
 
@@ -68,6 +67,9 @@ public class VisionSubsystem implements SubsystemBase{
     private Pose2d pose2d;
     private boolean LLGotData = false;
     boolean isTelemetryEnabled = true;
+    private final List<Pose2d> mt2Samples = new ArrayList<>();
+    private boolean samplingActive = false;
+    public static int MIN_SAMPLES = 8;
 
 
     /**
@@ -132,6 +134,46 @@ public class VisionSubsystem implements SubsystemBase{
         return returningPose;
     }
 
+    public void startMT2Sampling() {
+        mt2Samples.clear();
+        samplingActive = true;
+    }
+
+    public void stopMT2Sampling() {
+        samplingActive = false;
+    }
+
+    private double median(List<Double> values) {
+        if (values.isEmpty()) return Double.NaN;
+        values.sort(Double::compare);
+        int mid = values.size() / 2;
+        return values.size() % 2 == 0
+                ? (values.get(mid - 1) + values.get(mid)) / 2.0
+                : values.get(mid);
+    }
+
+    public Vector2d consumeMedianMT2Pose(Pose2d currentPose) {
+
+        if (samplingActive || mt2Samples.size() < MIN_SAMPLES)
+            return null;
+
+        List<Double> xs = new ArrayList<>();
+        List<Double> ys = new ArrayList<>();
+
+        for (Pose2d p : mt2Samples) {
+            xs.add(p.position.x);
+            ys.add(p.position.y);
+        }
+
+        double medX = median(xs);
+        double medY = median(ys);
+
+        mt2Samples.clear();
+
+        // keep odometry heading
+        return new Vector2d(medX, medY);
+    }
+
     /**
      * Returns the heading the robot should turn to
      * in order to face the target for the given alliance.
@@ -174,6 +216,13 @@ public class VisionSubsystem implements SubsystemBase{
                     }
                 }
                 LLGotData = true;
+                if (samplingActive && LLGotData) {
+                    Pose2d mt2 = getLimelightPosMT2();
+                    if (mt2 != null) {
+                        mt2Samples.add(mt2);
+                    }
+                }
+
             } else {
                 ty = 9999.9999;
                 tx = 9999.9999;

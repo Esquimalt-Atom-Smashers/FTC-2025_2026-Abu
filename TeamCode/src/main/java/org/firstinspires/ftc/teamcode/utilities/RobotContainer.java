@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -32,7 +33,7 @@ public class RobotContainer {
     public final TwoMotorShooterSubsystem shooter;
     public final IntakeTransferSubsystem intake;
     public final TurretSubsystem turretSubsystem;
-//    public final VisionSubsystem vision;
+    public final VisionSubsystem vision;
     public final ReturnToBaseSubsystem returnToBase;
 //    public final LEDSubsystem ledSubsystem;
 
@@ -53,7 +54,6 @@ public class RobotContainer {
         BLUE
     }
     public Alliance alliance;
-    private final double POSITIONAL_TOLARANCE = 1.0;
 
     /**
      * Constructor for RobotContainer.
@@ -68,7 +68,7 @@ public class RobotContainer {
         shooter = new TwoMotorShooterSubsystem(opMode, alliance, shooterState, robotPose);
         turretSubsystem = new TurretSubsystem(opMode, alliance, turretState, robotPose, goalPos);
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
-//        vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
+        vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
         returnToBase = new ReturnToBaseSubsystem();
 //        ledSubsystem = new LEDSubsystem(opMode, alliance);
         shooter.shutDownSubsystem();
@@ -100,8 +100,7 @@ public class RobotContainer {
         turretSubsystem.updateRobotPose(robotPose, drivebase.getMecanumDrive().localizer.update());
         turretSubsystem.periodic();
         intake.periodic();
-//        vision.updateCurrentPose(drivebase.getPose());
-//        vision.periodic();
+        vision.periodic();
         // TODO: Update subsystems if needed
         if (telemetryTimer.seconds() >= Property.TELEMETRY_UPDATE_TIME) {
             opMode.telemetry.clearAll();
@@ -109,7 +108,7 @@ public class RobotContainer {
             shooter.addSubsystemTelemetry();
             turretSubsystem.addSubsystemTelemetry();
             intake.addSubsystemTelemetry();
-//            vision.addSubsystemTelemetry();
+            vision.addSubsystemTelemetry();
             opMode.telemetry.addLine(opModeTelemetry);
             opMode.telemetry.update();
             telemetryTimer.reset();
@@ -148,29 +147,21 @@ public class RobotContainer {
      *
      * Vision data is fused with drive localization.
      */
-    public boolean updatePoseFromVision(boolean forceReset) {
+    public boolean updatePoseFromVision() {
         Pose2d drivePose = getPose();
-//        vision.updateCurrentPose(drivePose);
-//        vision.periodic();
-//        Pose2d visionPose = vision.getLimelightPosMT2();
-//        if (visionPose != null) {
-//            if ((Math.abs(visionPose.position.x - drivePose.position.x) <= POSITIONAL_TOLARANCE && Math.abs(visionPose.position.y - drivePose.position.y) <= POSITIONAL_TOLARANCE) || !forceReset) {
-//                drivebase.setPose(visionPose);//TODO create a filter to manage a "robot Pose" that takes values from vision and controls how it weights it before updating drive
-//                return true;
-//            }
-//        }
-        //did not update pose
-        return false;
+        // ensure vision has correct robot heading reference
+        vision.updateCurrentPose(drivePose);
+
+        Vector2d visionPose = vision.consumeMedianMT2Pose(drivePose);
+
+        if (visionPose == null) {
+            return false;
+        }
+
+        drivebase.setPose(new Pose2d(visionPose.x, visionPose.y, drivePose.heading.toDouble()));
+        return true;
     }
 
-    /**
-     * Commands the robot to drive to a target pose.
-     *
-     * @param pose Target pose
-     */
-    public void goToPose(Pose2d pose) {
-        drivebase.goToPose(pose);
-    }
 
     /**High-level shooting command.*/
     public void shoot() {

@@ -30,7 +30,8 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
     boolean isLeftDpadPressed = false;
     boolean isRightDpadPressed = false;
     boolean intakeToggle = false;
-    boolean prevLeftBumper = false;
+    boolean prevB = false;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -51,21 +52,22 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
         robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(270));
         waitForStart();
         while (opModeIsActive()) {
-            boolean forceReset = false;
             boolean isLLReseting = false;
             //drive control
             double drive = InputUtility.deadZoneJoyStick(-gamepad1.left_stick_y);
             double strafe = InputUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
             double turn = InputUtility.deadZoneJoyStick(-gamepad1.right_stick_x);
 
-            //reset field centric
-            if (gamepad1.start || gamepad1.share) {
-                robotContainer.drivebase.setHeading(alliance == RobotContainer.Alliance.RED? 90: 270);
+            //vision pose update
+            boolean b = gamepad1.b;
+            if (b && !prevB) {
+                robotContainer.vision.startMT2Sampling();
             }
-            //reset aimbot
-            if (gamepad1.back || gamepad1.share) {
-                robotContainer.updatePoseFromVision(true);
+            if (!b && prevB) {
+                robotContainer.vision.stopMT2Sampling();
+                robotContainer.updatePoseFromVision();
             }
+            prevB = b;
 
             intakeToggle = gamepad1.left_bumper;
 
@@ -78,13 +80,6 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
             } else {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.DISABLED);
-            }
-
-            //flywheel control
-            if (gamepad1.triangle) {
-                forceReset = true;
-            } else if (gamepad1.square) {
-                forceReset = false;
             }
 
             if (!gamepad1.dpad_left && isLeftDpadPressed) {
@@ -100,11 +95,6 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
             }
             robotContainer.shoot();
             robotContainer.drive(drive, strafe, turn);
-
-            if (gamepad1.x) {
-                robotContainer.updatePoseFromVision(forceReset);
-                isLLReseting = true;
-            }
             robotContainer.addOpModeTelemetry("is Reseting Manual: " + isLLReseting);
             robotContainer.runRobot();
         }
