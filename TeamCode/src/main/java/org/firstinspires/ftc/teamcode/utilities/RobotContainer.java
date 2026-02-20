@@ -33,7 +33,7 @@ public class RobotContainer {
     public final TwoMotorShooterSubsystem shooter;
     public final IntakeTransferSubsystem intake;
     public final TurretSubsystem turretSubsystem;
-    public final VisionSubsystem vision;
+//    public final VisionSubsystem vision;
     public final ReturnToBaseSubsystem returnToBase;
 //    public final LEDSubsystem ledSubsystem;
 
@@ -68,7 +68,7 @@ public class RobotContainer {
         shooter = new TwoMotorShooterSubsystem(opMode, alliance, shooterState, robotPose);
         turretSubsystem = new TurretSubsystem(opMode, alliance, turretState, robotPose, goalPos);
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
-        vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
+//        vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
         returnToBase = new ReturnToBaseSubsystem();
 //        ledSubsystem = new LEDSubsystem(opMode, alliance);
         shooter.shutDownSubsystem();
@@ -100,19 +100,19 @@ public class RobotContainer {
         turretSubsystem.updateRobotPose(robotPose, drivebase.getMecanumDrive().localizer.update());
         turretSubsystem.periodic();
         intake.periodic();
-        vision.periodic();
+//        vision.periodic();
         // TODO: Update subsystems if needed
-        if (telemetryTimer.seconds() >= Property.TELEMETRY_UPDATE_TIME) {
-            opMode.telemetry.clearAll();
-            drivebase.addSubsystemTelemetry();
-            shooter.addSubsystemTelemetry();
-            turretSubsystem.addSubsystemTelemetry();
-            intake.addSubsystemTelemetry();
-            vision.addSubsystemTelemetry();
-            opMode.telemetry.addLine(opModeTelemetry);
-            opMode.telemetry.update();
-            telemetryTimer.reset();
-        }
+//        if (telemetryTimer.seconds() >= Property.TELEMETRY_UPDATE_TIME) {
+//            opMode.telemetry.clearAll();
+//            drivebase.addSubsystemTelemetry();
+//            shooter.addSubsystemTelemetry();
+//            turretSubsystem.addSubsystemTelemetry();
+//            intake.addSubsystemTelemetry();
+//            vision.addSubsystemTelemetry();
+//            opMode.telemetry.addLine(opModeTelemetry);
+//            opMode.telemetry.update();
+//            telemetryTimer.reset();
+//        }
     }
 
     public void addOpModeTelemetry(String line) {
@@ -148,17 +148,17 @@ public class RobotContainer {
      * Vision data is fused with drive localization.
      */
     public boolean updatePoseFromVision() {
-        Pose2d drivePose = getPose();
-        // ensure vision has correct robot heading reference
-        vision.updateCurrentPose(drivePose);
+//        Pose2d drivePose = getPose();
+//        // ensure vision has correct robot heading reference
+////        vision.updateCurrentPose(drivePose);
+//
+////        Vector2d visionPose = vision.consumeMedianMT2Pose(drivePose);
+//
+//        if (visionPose == null) {
+//            return false;
+//        }
 
-        Vector2d visionPose = vision.consumeMedianMT2Pose(drivePose);
-
-        if (visionPose == null) {
-            return false;
-        }
-
-        drivebase.setPose(new Pose2d(visionPose.x, visionPose.y, drivePose.heading.toDouble()));
+//        drivebase.setPose(new Pose2d(visionPose.x, visionPose.y, drivePose.heading.toDouble()));
         return true;
     }
 

@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.utilities.Property;
+
 /**
  * IntakeTransferSubsystem
  *
@@ -77,7 +79,7 @@ public class IntakeTransferSubsystem implements SubsystemBase{
      */
     public void feedShooter() {
         intakeMotor.setPower(ServoStates.SPINNING.servoPower);
-        feedMotor.setPower(ServoStates.SPINNING.servoPower);
+        feedMotor.setPower(Property.FEEDING_POWER);
     }
 
 

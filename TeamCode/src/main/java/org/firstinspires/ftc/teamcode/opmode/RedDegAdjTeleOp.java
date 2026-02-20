@@ -48,7 +48,11 @@ public class RedDegAdjTeleOp extends LinearOpMode {
                 IntakeTransferSubsystem.IntakeTransferState.DISABLED,
                 VisionSubsystem.VisionState.TRACKING_GOAL);
         robotContainer.drivebase.setDriveHeadingErrorTo(Math.toRadians(90));
-        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+//        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+        TwoMotorShooterSubsystem.FlywheelSetting closeShootSetting = new TwoMotorShooterSubsystem.FlywheelSetting(Property.CLOSE_SHOOT_RPM, Property.CLOSE_SHOOT_HOOD_ANGLE);
+        TwoMotorShooterSubsystem.FlywheelSetting midShootSetting = new TwoMotorShooterSubsystem.FlywheelSetting(Property.MID_SHOOT_RPM, Property.MID_SHOOT_HOOD_ANGLE);
+        TwoMotorShooterSubsystem.FlywheelSetting farShootSetting = new TwoMotorShooterSubsystem.FlywheelSetting(Property.FAR_SHOOT_RPM, Property.FAR_SHOOT_HOOD_ANGLE);
+
         waitForStart();
         while (opModeIsActive()) {
             boolean isLLReseting = false;
@@ -61,17 +65,17 @@ public class RedDegAdjTeleOp extends LinearOpMode {
             if (gamepad1.back || gamepad1.share) {
                 robotContainer.drivebase.setHeading(alliance == RobotContainer.Alliance.RED? 90: 270);
             }
-            //vision pose update
-            boolean b = gamepad1.b;
-            isLLReseting = b;
-            if (b && !prevB) {
-                robotContainer.vision.startMT2Sampling();
-            }
-            if (!b && prevB) {
-                robotContainer.vision.stopMT2Sampling();
-                robotContainer.updatePoseFromVision();
-            }
-            prevB = b;
+//            //vision pose update
+//            boolean b = gamepad1.b;
+//            isLLReseting = b;
+//            if (b && !prevB) {
+//                robotContainer.vision.startMT2Sampling();
+//            }
+//            if (!b && prevB) {
+//                robotContainer.vision.stopMT2Sampling();
+//                robotContainer.updatePoseFromVision();
+//            }
+//            prevB = b;
 
             intakeToggle = gamepad1.left_bumper;
 
@@ -99,16 +103,16 @@ public class RedDegAdjTeleOp extends LinearOpMode {
             }
 
             if (gamepad1.y || gamepad1.triangle) {
-                robotContainer.shooter.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(Property.CLOSE_SHOOT_RPM, Property.CLOSE_SHOOT_HOOD_ANGLE), intakeToggle);
+                robotContainer.shooter.shoot(closeShootSetting, intakeToggle);
             } else if (gamepad1.x || gamepad1.square) {
-                robotContainer.shooter.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(Property.MID_SHOOT_RPM, Property.MID_SHOOT_HOOD_ANGLE), intakeToggle);
+                robotContainer.shooter.shoot(midShootSetting, intakeToggle);
             } else if (gamepad1.a || gamepad1.cross) {
-                robotContainer.shooter.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(Property.FAR_SHOOT_RPM, Property.FAR_SHOOT_HOOD_ANGLE), intakeToggle);
+                robotContainer.shooter.shoot(farShootSetting, intakeToggle);
             } else {
                 robotContainer.shootByDistance();
             }
             robotContainer.drive(drive, strafe, turn);
-            robotContainer.addOpModeTelemetry("is Reseting Manual: " + isLLReseting);
+//            robotContainer.addOpModeTelemetry("is Reseting Manual: " + isLLReseting);
             robotContainer.runRobot();
         }
         robotContainer.shutDownRobot();

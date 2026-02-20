@@ -56,15 +56,15 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
             double turn = InputUtility.deadZoneJoyStick(-gamepad1.right_stick_x);
 
             //vision pose update
-            boolean b = gamepad1.b;
-            if (b && !prevB) {
-                robotContainer.vision.startMT2Sampling();
-            }
-            if (!b && prevB) {
-                robotContainer.vision.stopMT2Sampling();
-                robotContainer.updatePoseFromVision();
-            }
-            prevB = b;
+//            boolean b = gamepad1.b;
+//            if (b && !prevB) {
+//                robotContainer.vision.startMT2Sampling();
+//            }
+//            if (!b && prevB) {
+//                robotContainer.vision.stopMT2Sampling();
+//                robotContainer.updatePoseFromVision();
+//            }
+//            prevB = b;
 
             intakeToggle = gamepad1.left_bumper;
 
