@@ -122,8 +122,6 @@ public class RobotContainer {
     public void updatePositionHolderAuto() {
         Pose2d lastPose = getPose();
         RobotPositionHolder.storePos(lastPose.position.x, lastPose.position.y, lastPose.heading.toDouble());
-        if (isAuto && autoTimer.seconds() >= 29.5) {
-        }
     }
     public void shutDownRobot() {
         drivebase.shutDownSubsystem();

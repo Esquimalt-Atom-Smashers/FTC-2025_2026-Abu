@@ -55,16 +55,11 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
             double strafe = InputUtility.deadZoneJoyStick(-gamepad1.left_stick_x);
             double turn = InputUtility.deadZoneJoyStick(-gamepad1.right_stick_x);
 
-            //vision pose update
-//            boolean b = gamepad1.b;
-//            if (b && !prevB) {
-//                robotContainer.vision.startMT2Sampling();
-//            }
-//            if (!b && prevB) {
-//                robotContainer.vision.stopMT2Sampling();
-//                robotContainer.updatePoseFromVision();
-//            }
-//            prevB = b;
+            //backup code for LZ reset
+            if (gamepad1.b) {
+                robotContainer.drivebase.setPose(new Pose2d(63, 63, Math.toRadians(90)));
+            }
+
 
             intakeToggle = gamepad1.left_bumper;
 
@@ -103,8 +98,8 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
             robotContainer.addOpModeTelemetry("is Reseting Manual: " + isLLReseting);
             robotContainer.runRobot();
         }
+        robotContainer.updatePositionHolderAuto();
         robotContainer.shutDownRobot();
-        RobotPositionHolder.clear();
         Property.reset();
     }
 }
