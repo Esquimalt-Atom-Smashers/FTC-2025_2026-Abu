@@ -23,16 +23,21 @@ public class RobotPropertyParser {
     public static final String FILE_LOCATION = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode";
     public static final String PROPERTIES_FILE_NAME = "robot_properties.txt";
     public static final String CUSTOMIZABLE_AUTO_FILE_NAME = "ActiveAuto.txt";
-    public static final String RED_FAR_AUTO_FILE_NAME = "RedFarAuto.txt";
+    public static final String RED_FAR_AUTO_FILE_NAME = "RedFarAuto.++txt";
+    public static final String RED_FAR_THIRD_AUTO_FILE_NAME = "RedFarThirdAuto.txt";
     public static final String RED_CLOSE_AUTO_FILE_NAME = "RedCloseAuto.txt";
     public static final String BLUE_FAR_AUTO_FILE_NAME = "BlueFarAuto.txt";
+    public static final String BLUE_FAR_THIRD_AUTO_FILE_NAME = "BlueFarThirdAuto.txt";
     public static final String BLUE_CLOSE_AUTO_FILE_NAME = "BlueCloseAuto.txt";
-
+//skibidi
     public enum AUTO {
         CUSTOMIZABLE_AUTO(CUSTOMIZABLE_AUTO_FILE_NAME),
         RED_FAR_AUTO(RED_FAR_AUTO_FILE_NAME),
+
+        RED_FAR_THIRD_AUTO(RED_FAR_THIRD_AUTO_FILE_NAME),
         RED_CLOSE_AUTO(RED_CLOSE_AUTO_FILE_NAME),
         BLUE_FAR_AUTO(BLUE_FAR_AUTO_FILE_NAME),
+        BLUE_FAR_THIRD_AUTO(BLUE_FAR_THIRD_AUTO_FILE_NAME),
         BLUE_CLOSE_AUTO(BLUE_CLOSE_AUTO_FILE_NAME);
 
         private final String fileName;
