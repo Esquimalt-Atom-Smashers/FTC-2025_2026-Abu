@@ -28,7 +28,7 @@ public class LEDSubsystem implements SubsystemBase {
 
     public LEDSubsystem(OpMode opMode, RobotContainer.Alliance alliance) {
         this.opMode = opMode;
-        this.blinkin = opMode.hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+        this.blinkin = opMode.hardwareMap.get(RevBlinkinLedDriver.class, "blinkin1");
         this.alliance = alliance;
     }
 

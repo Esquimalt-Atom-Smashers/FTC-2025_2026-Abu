@@ -56,22 +56,30 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
             double turn = InputUtility.deadZoneJoyStick(-gamepad1.right_stick_x);
 
             //backup code for LZ reset
-            if (gamepad1.b) {
-                robotContainer.drivebase.setPose(new Pose2d(63, 63, Math.toRadians(90)));
-            }
+//            if (gamepad1.b) {
+//                robotContainer.drivebase.setPose(new Pose2d(63, 63, Math.toRadians(90)));
+//            }
 
+            //reset field centric
+            if (gamepad1.back || gamepad1.share) {
+                robotContainer.drivebase.setHeading(alliance == RobotContainer.Alliance.RED? 90: 270);
+            }
 
             intakeToggle = gamepad1.left_bumper;
 
             // shooting && intake control
             if (gamepad1.right_trigger >= 0.3) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
+                robotContainer.ledSubsystem.aimedLight();
             } else if (gamepad1.right_bumper) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.EJECTING);
+                robotContainer.ledSubsystem.parkingLight();
             } else if (intakeToggle) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
+                robotContainer.ledSubsystem.aimingLight();
             } else {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.DISABLED);
+                robotContainer.ledSubsystem.normalLight();
             }
 
             if (!gamepad1.dpad_left && isLeftDpadPressed) {
@@ -94,7 +102,8 @@ public class BlueDegAdjTeleOp extends LinearOpMode {
                 robotContainer.shooter.shoot(new TwoMotorShooterSubsystem.FlywheelSetting(Property.FAR_SHOOT_RPM, Property.FAR_SHOOT_HOOD_ANGLE), intakeToggle);
             } else {
                 robotContainer.shootByDistance();
-            }            robotContainer.drive(drive, strafe, turn);
+            }
+            robotContainer.drive(drive, strafe, turn);
             robotContainer.addOpModeTelemetry("is Reseting Manual: " + isLLReseting);
             robotContainer.runRobot();
         }

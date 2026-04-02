@@ -66,21 +66,25 @@ public class RedDegAdjTeleOp extends LinearOpMode {
                 robotContainer.drivebase.setHeading(alliance == RobotContainer.Alliance.RED? 90: 270);
             }
             //backup code for LZ reset
-            if (gamepad1.b) {
-                robotContainer.drivebase.setPose(new Pose2d(63, -63, Math.toRadians(270)));
-            }
+//            if (gamepad1.b) {
+//                robotContainer.drivebase.setPose(new Pose2d(63, -63, Math.toRadians(270)));
+//            }
 
             intakeToggle = gamepad1.left_bumper;
 
             // shooting && intake control
             if (gamepad1.right_trigger >= 0.3) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.FEEDING_SHOOTER);
+                robotContainer.ledSubsystem.aimedLight();
             } else if (gamepad1.right_bumper) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.EJECTING);
+                robotContainer.ledSubsystem.parkingLight();
             } else if (intakeToggle) {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.INTAKING);
+                robotContainer.ledSubsystem.aimingLight();
             } else {
                 robotContainer.intake.setState(IntakeTransferSubsystem.IntakeTransferState.DISABLED);
+                robotContainer.ledSubsystem.normalLight();
             }
 
             if (!gamepad1.dpad_left && isLeftDpadPressed) {

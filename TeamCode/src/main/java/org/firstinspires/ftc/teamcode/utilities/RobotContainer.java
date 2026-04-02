@@ -35,7 +35,7 @@ public class RobotContainer {
     public final TurretSubsystem turretSubsystem;
 //    public final VisionSubsystem vision;
     public final ReturnToBaseSubsystem returnToBase;
-//    public final LEDSubsystem ledSubsystem;
+    public final LEDSubsystem ledSubsystem;
 
     private OpMode opMode;
     private Pose2d robotPose;
@@ -70,7 +70,7 @@ public class RobotContainer {
         intake = new IntakeTransferSubsystem(opMode, intakeTransferState);
 //        vision = new VisionSubsystem(opMode, alliance, visionState, robotPose);
         returnToBase = new ReturnToBaseSubsystem();
-//        ledSubsystem = new LEDSubsystem(opMode, alliance);
+        ledSubsystem = new LEDSubsystem(opMode, alliance);
         shooter.shutDownSubsystem();
 
         telemetryTimer = new ElapsedTime();
@@ -92,7 +92,7 @@ public class RobotContainer {
     public void runRobot() {
         if (firstRun) {
             firstRun = false;
-//            ledSubsystem.normalLight();
+            ledSubsystem.normalLight();
         }
         robotPose = drivebase.getPose();
         drivebase.periodic();
@@ -128,7 +128,7 @@ public class RobotContainer {
         shooter.shutDownSubsystem();
         intake.shutDownSubsystem();
 //        vision.shutDownSubsystem();
-//        ledSubsystem.shutDownSubsystem();
+          ledSubsystem.shutDownSubsystem();
     }
 
     /**
@@ -169,7 +169,6 @@ public class RobotContainer {
 
     public void drive(double drive, double strafe, double turn) {
         drivebase.driveFieldCentric(drive, strafe, turn);
-//        ledSubsystem.normalLight();
     }
 
     public class AutoRunRobot implements Action {
